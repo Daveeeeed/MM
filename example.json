@@ -1,23 +1,23 @@
 {
-  "stages": [
+  "items": [
     {
-      "title": "L'inizio",
+      "name": "L'inizio",
       "content": "C'era una volta..."
     },
     {
-      "title": "Parte uno",
+      "name": "Parte uno",
       "content": "...una storia da completare."
     },
     {
-      "title": "Parte due",
+      "name": "Parte due",
       "content": "Con tre missioni..."
     },
     {
-      "title": "Parte tre",
+      "name": "Parte tre",
       "content": "...e un finale."
     },
     {
-      "title": "Fine",
+      "name": "Fine",
       "content": "Fine."
     }
   ],
