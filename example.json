@@ -7,18 +7,6 @@
     {
       "name": "Parte uno",
       "content": "...una storia da completare."
-    },
-    {
-      "name": "Parte due",
-      "content": "Con tre missioni..."
-    },
-    {
-      "name": "Parte tre",
-      "content": "...e un finale."
-    },
-    {
-      "name": "Fine",
-      "content": "Fine."
     }
   ],
   "gui": [

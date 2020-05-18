@@ -3,36 +3,18 @@
 <head>
   <meta charset="utf-8">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <title>Request JSON Test</title>
-  <style type="text/css">
-    .arrow {
-      border: solid black;
-      border-width: 0 3px 3px 0;
-      display: inline-block;
-      padding: 3px;
-    }
-
-    .right {
-      transform: rotate(-45deg);
-      -webkit-transform: rotate(-45deg);
-    }
-
-    .left {
-      transform: rotate(135deg);
-      -webkit-transform: rotate(135deg);
-    }
-
-  </style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="example.js"></script>
+  <title>Player</title>
 </head>
 <body>
 <div id="main">
-  <div id="textbox">
-    First
+  <div class="jumbotron">
+    <h1>Title</h1>
+    <p>Content</p>
   </div>
-  <button id="left_arrow">Indietro</button>
-  <button id="right_arrow">Avanti</button>
+  <button type="button" class="btn btn-primary">Indietro</button>
+  <button type="button" class="btn btn-secondary">Indietro</button>
 </div>
-
 </body>
-<script src="example.js"></script>
 </html>
