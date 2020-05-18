@@ -1,0 +1,27 @@
+{
+  "stages": [
+    {
+      "title": "L'inizio",
+      "content": "C'era una volta..."
+    },
+    {
+      "title": "Parte uno",
+      "content": "...una storia da completare."
+    },
+    {
+      "title": "Parte due",
+      "content": "Con tre missioni..."
+    },
+    {
+      "title": "Parte tre",
+      "content": "...e un finale."
+    },
+    {
+      "title": "Fine",
+      "content": "Fine."
+    }
+  ],
+  "gui": [
+
+  ]
+}
