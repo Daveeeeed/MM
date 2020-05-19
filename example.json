@@ -10,6 +10,46 @@
     }
   ],
   "gui": [
-
+    {
+      "tag": "div",
+      "parameters": [
+        {"key": "class","value": "jumbotron"}
+      ],
+      "content": "",
+      "children": [
+        {
+          "tag": "h1",
+          "parameters": [],
+          "content": "Title",
+          "children": []
+        },
+        {
+          "tag": "p",
+          "parameters": [],
+          "content": "Content",
+          "children": []
+        }
+      ]
+    },
+    {
+      "tag": "button",
+      "parameters": [
+        {"key": "id","value": "indietro"},
+        {"key": "type","value": "button"},
+        {"key": "class","value": "btn btn-secondary"}
+      ],
+      "content": "Indietro",
+      "children": []
+    },
+    {
+      "tag": "button",
+      "parameters": [
+        {"key": "id","value": "avanti"},
+        {"key": "type","value": "button"},
+        {"key": "class","value": "btn btn-primary"}
+      ],
+      "content": "Avanti",
+      "children": []
+    }
   ]
 }
