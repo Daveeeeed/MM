@@ -1,11 +1,24 @@
-var page = 0;
+var page_index = -1;
 
 $(document).ready(function () {
     $.getJSON('example.json', function (data) {
-        var main = $("body");
         let string = "";
         string = string.concat(mergeChild(data.gui));
-        main.html(string);
+        $("body").html(string);
+        $('#avanti').click(function () {
+            let title = $('#title');
+            let content = $('#content');
+            page_index++;
+            title.text(data.items[page_index].name);
+            content.text(data.items[page_index].content);
+        })
+        $('#indietro').click(function () {
+            let title = $('#title');
+            let content = $('#content');
+            page_index--;
+            title.text(data.items[page_index].name);
+            content.text(data.items[page_index].content);
+        })
     });
 });
 
