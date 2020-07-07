@@ -1,0 +1,10 @@
+{
+  "name": "root_db",
+  "path": "/json/root_db.json",
+  "collections": [
+    {
+      "name": "stories",
+      "path": "/json/stories.json"
+    }
+  ]
+}
