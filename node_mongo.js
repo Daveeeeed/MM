@@ -5,14 +5,17 @@ const app = express();
 const db_url = "mongodb://127.0.0.1:27017";
 const dbName = "test";
 
-async function sendFile(req, res) {
-    console.log("Requested " + req.path);
-    try {
-        await fs.promises.access(__dirname + req.url);
-        res.sendFile(__dirname + req.url);
-    } catch (error) {
-        res.sendFile(__dirname + '/html/404.html');
-    }
+function sendFile(req, res) {
+    return new Promise(resolve => {
+        fs.access(__dirname + req.url, fs.constants.F_OK, (err) =>{
+            if (err) {
+                res.sendFile(__dirname + '/html/404.html');
+                console.log("ERROR: requested " + req.path);
+            }
+            res.sendFile(__dirname + req.url);
+        })
+        resolve();
+    })
 }
 
 function fetchElements(collectionName){
@@ -77,7 +80,7 @@ app.get('/api/:collectionName/:action', (req, res) => {
         case "remove":
         case "add": {
             editElement(req.params.action, req.params.collectionName, req.query.name)
-                .then((response) => res.send(response));
+                .then(() => res.send());
         }
     }
 })

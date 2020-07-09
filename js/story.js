@@ -25,16 +25,12 @@ function updateList() {
 
 function add() {
     fetch('/api/stories/add?name=' + $('#storyname')[0].value)
-        .then(() => {
-            $('#storyname')[0].value = "";
-            updateList();
-        });
+        .then(() => updateList());
+    $('#storyname')[0].value = "";
 }
 
 function remove() {
     fetch('api/stories/remove?name=' + $('#storyname')[0].value)
-        .then(() => {
-            $('#storyname')[0].value = "";
-            updateList();
-        });
+        .then(() => updateList());
+    $('#storyname')[0].value = "";
 }

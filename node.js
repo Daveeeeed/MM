@@ -3,80 +3,102 @@ const fs = require('fs');
 const app = express();
 const database = "/json/root_db.json";
 
-async function sendFile(req, res) {
-    console.log("Requested " + req.path);
-    try {
-        await fs.promises.access(__dirname + req.url);
-        res.sendFile(__dirname + req.url);
-    } catch (error) {
-        res.sendFile(__dirname + '/html/404.html');
-    }
-}
-
-function fetchElements(collectionName){
-    return fs.promises.readFile(__dirname + database, (err, data) => {
-        console.log("ciao")
-        let collections = JSON.parse(data).collections;
-        for (let i = 0; i < collections.length; i += 1) {
-            if (collections[i].name == collectionName) {
-                return fs.promises.readFile(__dirname + collections[i].path, (err, data) => {
-                    console.log(JSON.parse(data).elements);
-                    return JSON.parse(data).elements;
-                })
+function sendFile(req, res) {
+    return new Promise(resolve => {
+        fs.access(__dirname + req.url, fs.constants.F_OK, (err) =>{
+            if (err) {
+                res.sendFile(__dirname + '/html/404.html');
+                console.log("ERROR: requested " + req.path);
             }
-        }
+            res.sendFile(__dirname + req.url);
+        })
+        resolve();
     })
+}
+
+function fetchDatabase(){
+    return new Promise(resolve => {
+        fs.readFile(__dirname + database, 'utf8', (err, data) => {
+            if (err) throw err;
+            resolve(JSON.parse(data));
+        })
+    })
+}
+
+function getDatabaseCollections() {
+    return fetchDatabase()
+        .then(response => new Promise(resolve => {
+            resolve(response.collections);
+        }))
+}
+
+function fetchCollection(collectionName){
+    return getDatabaseCollections()
+        .then(response => new Promise(resolve => {
+            for (let i = 0; i < response.length; i += 1){
+                if (response[i].name == collectionName){
+                    resolve(response[i]);
+                }
+            }
+        }))
+        .then(response => new Promise(resolve => {
+            fs.readFile(__dirname + response.path, 'utf8', (err, data) => {
+                if (err) throw err;
+                resolve(JSON.parse(data));
+            })
+        }))
+}
+
+function getCollectionElements(collectionName) {
+    return fetchCollection(collectionName)
+        .then(response => new Promise(resolve => {
+            resolve(response.elements);
+        }))
+}
+
+function fetchElements(collectionName, elementName){
+    return fetchCollection(collectionName)
+        .then(response => new Promise(resolve => {
+            for (let i = 0; i < response.length; i += 1){
+                if (response[i].name == elementName){
+                    resolve(response[i]);
+                }
+            }
+        }))
+        .then(response => new Promise(resolve => {
+            fs.readFile(__dirname + response.path, 'utf8', (err, data) => {
+                if (err) throw err;
+                resolve(JSON.parse(data));
+            })
+        }))
 }
 
 function editElement(action, collectionName, storyName){
-
-}
-/*
-function fetchElements(collectionName){
-    return mongo.connect(db_url, {useUnifiedTopology: true})
-    .then((db) => {
-        let dbo = db.db(dbName);
-        return dbo.collection(collectionName).find({}).toArray()
-    })
-    .then((success, error) => {
-        if (error) {
-            console.log(error);
-            return undefined;
-        } else {
-            return success;
-        }
-    })
-    .catch(err => {
-        console.log(err);
-        return undefined
-    })
-}
-
-function editElement(action, collectionName, storyName){
-    return mongo.connect(db_url, {useUnifiedTopology: true})
-        .then((db) => {
-            let dbo = db.db(dbName);
-            let obj = { name: storyName };
+    return fetchCollection(collectionName)
+        .then(response => new Promise(resolve => {
             switch (action) {
-                case "add": return dbo.collection(collectionName).insertOne(obj);
-                case "remove": return dbo.collection(collectionName).deleteOne(obj);
+                case "add": {
+                    let obj = {
+                        id: '__00000000__',
+                        name: storyName,
+                        path: ('/json/' + storyName + '.json')
+                    };
+                    response.elements.push(obj);
+                    break;
+                }
+                case "remove": {
+                    response.elements.forEach((item) =>{
+                        if (item.name == storyName) response.elements.splice(response.elements.indexOf(item.name),1);
+                    })
+                }
             }
-        })
-        .then((success, error) => {
-            if (error) {
-                console.log(error);
-                return undefined;
-            } else {
-                return success;
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            return undefined
-        })
+            let json = JSON.stringify(response, null, 2);
+            fs.writeFile(__dirname + response.path, json,'utf8', (err, data) => {
+                if (err) throw  err;
+                resolve();
+            })
+        }))
 }
-*/
-
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/html/story.html',null,function (err) {});
@@ -89,16 +111,14 @@ app.get(['/homepage', '/home'], (req, res) => {
 app.get('/api/:collectionName/:action', (req, res) => {
     switch(req.params.action){
         case "fetch": {
-            fetchElements(req.params.collectionName)
-                .then((response) => {
-                    res.send(response)
-                });
+            getCollectionElements(req.params.collectionName)
+                .then(response => res.send(response))
             break;
         }
         case "remove":
         case "add": {
             editElement(req.params.action, req.params.collectionName, req.query.name)
-                .then((response) => res.send(response));
+                .then(() => res.send());
         }
     }
 })
