@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Story Editor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-light navbar-collapse bg-light">
+    <a class="navbar-brand" href="#">Editor di Storie</a>
+    <div class="justify-content-end">
+        <div>Esegui il <a href="/">login</a> per procedere</div>
+    </div>
+</nav>
+
+<div class="text-center mt-4">
+    <div class="row">
+        <div class="col my-auto">
+            <form class="form-signin" method="post" action="/register">
+                <h1 class="h4 font-weight-normal">Register</h1>
+                <label for="inputName" class="sr-only">Name</label>
+                <input type="text" id="inputName" class="form-control my-1" placeholder="Name" name="name">
+                <label for="inputSurname" class="sr-only">Surname</label>
+                <input type="text" id="inputSurname" class="form-control my-1" placeholder="Surname" name="surname">
+                <label for="inputCompany" class="sr-only">Company</label>
+                <input type="text" id="inputCompany" class="form-control my-1" placeholder="Company" name="company">
+                <label for="inputEmail" class="sr-only">Email address</label>
+                <input type="email" id="inputEmail" class="form-control my-1" placeholder="Email address" name="email">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" id="inputPassword" class="form-control my-1" placeholder="Password" name="password">
+                <label for="inputAvatar" class="sr-only">Avatar</label>
+                <input type="file" id="inputAvatar" class="form-control-file my-3" name="avatar">
+                <button class="btn btn-lg btn-primary btn-block mt-3" type="submit">Sign in</button>
+            </form>
+        </div>
+        <div class="vl"></div>
+        <div class="col my-auto">
+            <form class="form-signin" method="post" action="/login">
+                <h1 class="h4 font-weight-normal">Login</h1>
+                <label for="loginEmail" class="sr-only">Email address</label>
+                <input type="email" id="loginEmail" class="form-control my-1" placeholder="Email address" name="email">
+                <label for="loginPassword" class="sr-only">Password</label>
+                <input type="password" id="loginPassword" class="form-control my-1" placeholder="Password" name="password">
+                <button class="btn btn-lg btn-primary btn-block mt-3" type="submit">Sign in</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

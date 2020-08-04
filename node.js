@@ -1,7 +1,26 @@
+/* EXPRESS - routing */
 const express = require('express');
-const fs = require('fs');
 const app = express();
-const database = "/json/root_db.json";
+
+/* MONGODB - main database */
+const mongo = require('mongodb').MongoClient;
+const db_url = "mongodb://127.0.0.1:27017";
+const dbName = "techweb";
+
+/* MULTER - parse form-data from post request */
+const bodyParser = require('body-parser');
+
+/* FS - filesystem */
+const fs = require("fs");
+
+/* CRYPTO - hashing functions */
+const crypto = require('crypto-js')
+
+const middlewares = [
+    bodyParser.urlencoded({extended: true})
+]
+
+app.use(middlewares);
 
 function sendFile(req, res) {
     return new Promise(resolve => {
@@ -16,92 +35,51 @@ function sendFile(req, res) {
     })
 }
 
-function fetchDatabase(){
-    return new Promise(resolve => {
-        fs.readFile(__dirname + database, 'utf8', (err, data) => {
-            if (err) throw err;
-            resolve(JSON.parse(data));
+function fetchElements(collectionName, filters){
+    return mongo.connect(db_url, {useUnifiedTopology: true})
+        .then((db) => {
+            let dbo = db.db(dbName);
+            return dbo.collection(collectionName).find(filters).toArray()
         })
-    })
-}
-
-function getDatabaseCollections() {
-    return fetchDatabase()
-        .then(response => new Promise(resolve => {
-            resolve(response.collections);
-        }))
-}
-
-function fetchCollection(collectionName){
-    return getDatabaseCollections()
-        .then(response => new Promise(resolve => {
-            for (let i = 0; i < response.length; i += 1){
-                if (response[i].name == collectionName){
-                    resolve(response[i]);
-                }
+        .then((success, error) => {
+            if (error) {
+                console.log(error);
+                return undefined;
+            } else {
+                return success;
             }
-        }))
-        .then(response => new Promise(resolve => {
-            fs.readFile(__dirname + response.path, 'utf8', (err, data) => {
-                if (err) throw err;
-                resolve(JSON.parse(data));
-            })
-        }))
+        })
+        .catch(err => {
+            console.log(err);
+            return undefined
+        })
 }
 
-function getCollectionElements(collectionName) {
-    return fetchCollection(collectionName)
-        .then(response => new Promise(resolve => {
-            resolve(response.elements);
-        }))
-}
-
-function fetchElements(collectionName, elementName){
-    return fetchCollection(collectionName)
-        .then(response => new Promise(resolve => {
-            for (let i = 0; i < response.length; i += 1){
-                if (response[i].name == elementName){
-                    resolve(response[i]);
-                }
-            }
-        }))
-        .then(response => new Promise(resolve => {
-            fs.readFile(__dirname + response.path, 'utf8', (err, data) => {
-                if (err) throw err;
-                resolve(JSON.parse(data));
-            })
-        }))
-}
-
-function editElement(action, collectionName, storyName){
-    return fetchCollection(collectionName)
-        .then(response => new Promise(resolve => {
+function editElement(action, collectionName, object){
+    return mongo.connect(db_url, {useUnifiedTopology: true})
+        .then((db) => {
+            let dbo = db.db(dbName);
             switch (action) {
-                case "add": {
-                    let obj = {
-                        id: '__00000000__',
-                        name: storyName,
-                        path: ('/json/' + storyName + '.json')
-                    };
-                    response.elements.push(obj);
-                    break;
-                }
-                case "remove": {
-                    response.elements.forEach((item) =>{
-                        if (item.name == storyName) response.elements.splice(response.elements.indexOf(item.name),1);
-                    })
-                }
+                case "add": return dbo.collection(collectionName).insertOne(object);
+                case "remove": return dbo.collection(collectionName).deleteOne(object);
             }
-            let json = JSON.stringify(response, null, 2);
-            fs.writeFile(__dirname + response.path, json,'utf8', (err, data) => {
-                if (err) throw  err;
-                resolve();
-            })
-        }))
+        })
+        .then((success, error) => {
+            if (error) {
+                console.log(error);
+                return undefined;
+            } else {
+                return success;
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            return undefined
+        })
 }
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/html/story.html',null,function (err) {});
+    res.sendFile(__dirname + '/html/auth.html',null,function (err) {});
 })
 
 app.get(['/homepage', '/home'], (req, res) => {
@@ -111,17 +89,56 @@ app.get(['/homepage', '/home'], (req, res) => {
 app.get('/api/:collectionName/:action', (req, res) => {
     switch(req.params.action){
         case "fetch": {
-            getCollectionElements(req.params.collectionName)
-                .then(response => res.send(response))
+            fetchElements(req.params.collectionName)
+                .then((response) => res.send(response));
             break;
         }
         case "remove":
         case "add": {
-            editElement(req.params.action, req.params.collectionName, req.query.name)
+            let obj = { name: req.query.name };
+            editElement(req.params.action, req.params.collectionName, obj)
                 .then(() => res.send());
         }
     }
 })
+
+app.get('/editor', (req, res) => {
+    res.sendFile(__dirname + '/html/editor.html',null,function (err) {});
+})
+
+app.post('/register', (req, res) => {
+    let user = {
+        name: req.body.name,
+        surname: req.body.surname,
+        company: req.body.company,
+        email: req.body.email,
+        password: req.body.password,
+        user_id: "RANDOM",
+        avatar: req.body.avatar,
+        preferred_settings: null
+    }
+    editElement('add', 'utenti', user)
+        .then(() => res.redirect('/'))
+});
+
+app.post('/login', (req, res) => {
+    let user = {
+        email: req.body.email,
+        password: req.body.password
+    }
+    fetchElements('utenti', user).
+        then(response =>{
+            if (response.length == 1){
+                console.log(response)
+                response.json()
+                    .then(json => {
+                        res.send(json.avatar);
+                    })
+            } else {
+                res.send('Dati errati');
+            }
+    })
+});
 
 app.get('*', (req, res) => sendFile(req, res))
 
