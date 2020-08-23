@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Mistero al Museo</title>
+    </head>
+    <body>
+        <div>
+            <div>
+                <h3>Login</h3>
+                <form action="/api/login" method="POST">
+                    <label for="loginUser">Username</label>
+                    <input type="text" name="loginUser" id="user" />
+                    <label for="loginPassword">Password</label>
+                    <input type="password" name="loginPassword" id="password" />
+                    <input type="submit" />
+                </form>
+            </div>
+            <div>
+                <h3>Register</h3>
+                <form action="/api/register" method="POST">
+                    <label for="registerUser">Username</label>
+                    <input type="text" name="registerUser" id="user" />
+                    <label for="registerPassword">Password</label>
+                    <input
+                        type="password"
+                        name="registerPassword"
+                        id="password"
+                    />
+                    <input type="submit" />
+                </form>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="/public/javascripts/sign.js"></script>
+    </body>
+</html>
