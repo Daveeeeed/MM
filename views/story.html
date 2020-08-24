@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Nome della storia</title>
+        <link rel="stylesheet" href="../public/stylesheets/story.css" />
+    </head>
+    <body>
+        <div id="app">
+            <loading v-if="!story" text="Loading..."></loading>
+            <div v-else>
+                <component
+                    :is="mission_template"
+                    v-bind="mission_props"
+                    v-on:success="proceed"
+                ></component>
+            </div>
+        </div>
+
+        <template id="intro">
+            <div>
+                <div>{{ text }}</div>
+                <button v-on:click="next">Avanti</button>
+            </div>
+        </template>
+
+        <template id="connect">
+            <div>
+                <div>{{ text }}</div>
+                <div class="wrapper">
+                    <div class="left-phrase">
+                        <div v-for="left in leftElements">{{left.text}}</div>
+                    </div>
+                    <div class="right-phrase">
+                        <div v-for="right in rightElements">{{right.text}}</div>
+                    </div>
+                </div>
+                <button v-on:click="next">Avanti</button>
+            </div>
+        </template>
+
+        <template id="choice">
+            <div>
+                <div>{{ text }}</div>
+                <div class="wrapper">
+                    <div>{{ answers.first }}</div>
+                    <div>{{ answers.second }}</div>
+                    <div>{{ answers.third }}</div>
+                    <div>{{ answers.fourth }}</div>
+                </div>
+                <button v-on:click="next">Avanti</button>
+            </div>
+        </template>
+
+        <template id="question">
+            <div>
+                <div>{{ text }}</div>
+                <div class="wrapper">
+                    <label for="answer">Scrivi qui la tua risposta:</label>
+                    <input
+                        type="text"
+                        id="answer"
+                        name="answer"
+                        placeholder="Riposta..."
+                        autofocus
+                    />
+                </div>
+                <button v-on:click="next">Avanti</button>
+            </div>
+        </template>
+
+        <template id="ending">
+            <div>
+                <div>{{ text }}</div>
+                <div class="wrapper">
+                    <div v-if="game_time">
+                        Ecco il tuo tempo di gioco
+                    </div>
+                    <div v-if="game_points">
+                        Ecco i tuoi punti di merda
+                    </div>
+                </div>
+                <button v-on:click="next">Avanti</button>
+            </div>
+        </template>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="/public/javascripts/story.js"></script>
+    </body>
+</html>
