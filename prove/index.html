@@ -11,6 +11,15 @@
 		<div class="container">
 			<h1 id="saluto"> {{titolo}} </h1>
 		</div>
+
+		<select name="test" id="test">
+			<option value="0">scegli il saluto</option>
+			<option :value="titolo">{{ titolo }}</option>
+		</select>
+	</div>
+
+	<div id="esterno">
+		{{ titolo }}
 	</div>
 
 
