@@ -1,3 +1,112 @@
+body {
+    background-color: #121421;
+}
+
+#topbar {
+    background-color: #1C1E2B;
+}
+
+.nav-item {
+    box-sizing: border-box;
+    transition: 0.5s;
+    color: #848689;
+}
+
+.nav-item.active {
+    box-shadow: 0 2px 0 #00BD58;
+    color: #FFFFFF;
+}
+
+.nav-item:hover {
+    background-color: #28293D;
+}
+
+.list-group-item {
+    background-color: transparent;
+    border: 0px;
+    color: #848689;
+    white-space:nowrap;
+}
+
+.list-group-item:hover {
+    background-color: transparent;
+    border: 0px;
+    color: #848689;
+}
+
+.list-group-item:focus {
+    background-color: transparent;
+    border: 0px;
+    color: #848689;
+    border: none;
+    box-shadow: none;
+    outline: 0;
+}
+
+.list-group-item.active {
+    background-color: transparent;
+    border: 0px;
+    color: white;
+}
+
+.btn {
+    background-color: #1A1C2C;
+    border: none;
+    border-radius: 10px;
+}
+
+.input-group-text {
+    background-color: #1A1C2C;
+    color: #848689;
+    border: none;
+    border-radius: 10px;
+}
+
+.form-control {
+    background-color: #1A1C2C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+}
+
+.form-control:focus {
+    background-color: #1A1C2C;
+    color: #FFFFFF;
+    border: none;
+    box-shadow: none;
+}
+
+.b-table {
+    border-collapse: separate;
+    border-spacing: 0px 15px;
+    
+}
+
+.cell-true {
+    color: #00CA5B;
+    font-size: 14px;
+    text-align: center;
+}
+
+.cell-false {
+    color: #FF3D4A;
+    font-size: 14px;
+    text-align: center;
+}
+
+.cell-title {
+    color: #FFFFFF;
+}
+
+.table-row {
+    background-color: #171926;
+    color: #FFFFFF;
+}
+
+.title-table {
+    width: 32%;
+}
+
 .sidebar {
     position: fixed;
     top: 0;

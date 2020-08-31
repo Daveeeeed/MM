@@ -26,15 +26,31 @@ router.get("/", function (req, res, next) {
     res.send("api page");
 });
 
-router.get("/stories/delete", (req, res) => {
+/* DELETE a story */
+router.post("/stories/delete", (req, res) => {
     db.get("stories")
-        .remove({ key: parseInt(req.query.key) })
+        .findOneAndDelete({ key: req.body.key })
         .then((response) => res.send(response));
 });
 
+/* CREATE a new story */
 router.post("/stories/new", (req, res) => {
     db.get("stories")
         .insert(req.body)
+        .then((response) => res.send(response));
+});
+
+/* REPLACE/EDIT a story */
+router.post("/stories/edit", (req, res) => {
+    db.get("stories")
+        .update({ key: req.body.key },{
+                $set: {
+                    title: req.body.title,
+                    stages: req.body.stages,
+                    settings: req.body.settings,
+                },
+            }
+        )
         .then((response) => res.send(response));
 });
 

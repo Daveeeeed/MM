@@ -35,275 +35,196 @@
     </head>
     <body>
         <div id="app">
-            <b-navbar sticky type="dark" variant="dark">
-                <b-navbar-brand href="/">Logo</b-navbar-brand>
+            <b-navbar sticky id="topbar" type="dark" class="py-0 px-0">
+                <b-navbar-brand href="/editor" class="py-0 mx-5">
+                    <img
+                        src="../public/images/logo2.png"
+                        alt="Cyber Logo"
+                        height="46"
+                    />
+                </b-navbar-brand>
                 <b-navbar-nav>
-                    <b-nav-item href="/">
-                        Homepage
-                    </b-nav-item>
-                    <b-nav-item active href="/editor">
-                        Editor <span class="sr-only">(current)</span>
-                    </b-nav-item>
-                    <b-nav-item>
-                        Link
-                    </b-nav-item>
-                </b-navbar-nav>
-                <b-navbar-nav class="ml-auto">
-                    <b-button
-                        size="sm"
-                        class="my-2 ml-2"
-                        variant="primary"
-                        type="button"
-                        @click="$bvModal.show('modal-add-simple-story')"
-                        >Crea nuova</b-button
-                    >
-                    <add-simple-story-modal></add-simple-story-modal>
+                    <custom-navbar-item :item="item" v-for="item in navbar_items">
+                    </custom-navbar-item>
                 </b-navbar-nav>
             </b-navbar>
-            <b-container fluid>
-                <loading v-if="!stories"></loading>
-                <story-table v-else-if="!edit_mode"></story-table>
-                <story-edit v-else></story-edit>
+            <b-container fluid v-if="navbar_items[0].isActive">
+                <b-row>
+                    <b-col cols="auto" class="mr-auto ml-4">
+                        <b-list-group horizontal>
+                            <custom-list-item
+                                :item="item"
+                                v-for="item in list_items_stories"
+                            ></custom-list-item>
+                        </b-list-group>
+                    </b-col>
+                    <b-col cols="4" class="my-2 px-0">
+                        <b-input-group id="searchbar" class="px-1">
+                            <b-input-group-prepend is-text>
+                                <b-icon-search></b-icon-search>
+                            </b-input-group-prepend>
+                            <b-form-input
+                                spellcheck="false"
+                                type="search"
+                                placeholder="Cerca"
+                                v-model="story_filter"
+                            ></b-form-input>
+                        </b-input-group>
+                    </b-col>
+                    <b-col cols="auto" class="my-2 mr-3 px-0">
+                        <b-button class="px-4" @click="$bvModal.show('modal-add-simple-story')">Crea Nuova Storia</b-button>
+                        <b-button class="px-4" @click="$bvModal.show('modal-add-simple-story')">Importa</b-button>
+                        <b-button class="px-4" @click="$bvModal.show('modal-add-simple-story')">Esporta</b-button>
+                        <add-simple-story-modal></add-simple-story-modal>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-table
+                            v-if="list_items_stories[0].isActive"
+                            borderless
+                            hover
+                            :busy="isBusy"
+                            :filter="story_filter"
+                            :filter-included-fields="story_filter_field"
+                            :items="availableStories"
+                            :fields="stories_fields"
+                            tbody-tr-class="table-row"
+                            thead-class="cell-title"
+                        >
+                            <template v-slot:cell(actions)="data">
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #8f65fc;"
+                                    @click="onPublish(data)"
+                                >
+                                    <b-icon-play-fill></b-icon-play-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #003086;"
+                                    @click="onArchive(data)"
+                                >
+                                    <b-icon-archive-fill></b-icon-archive-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #ff3d4a;"
+                                    @click="onDelete(data)"
+                                >
+                                    <b-icon-trash-fill></b-icon-trash-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #00bec8;"
+                                    @click="onEdit(data)"
+                                >
+                                    <b-icon-pencil-square></b-icon-pencil-square>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #ffa300;"
+                                    @click="onClone(data)"
+                                >
+                                    <b-icon-back></b-icon-back>
+                                </b-button>
+                            </template>
+                            <template v-slot:table-busy>
+                                <div class="text-center text-danger my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Loading...</strong>
+                                </div>
+                            </template>
+                        </b-table>
+                        <b-table
+                        v-if="list_items_stories[1].isActive"
+                        borderless
+                        hover
+                        :busy="isBusy"
+                        :filter="story_filter"
+                        :items="archivedStories"
+                        :fields="stories_fields"
+                        tbody-tr-class="table-row"
+                        thead-class="cell-title"
+                        >
+                            <template v-slot:cell(actions)="data">
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #8f65fc;"
+                                    @click="onPublish(data)"
+                                >
+                                    <b-icon-play-fill></b-icon-play-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #003086;"
+                                    @click="onArchive(data)"
+                                >
+                                    <b-icon-archive-fill></b-icon-archive-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #ff3d4a;"
+                                    @click="onDelete(data)"
+                                >
+                                    <b-icon-trash-fill></b-icon-trash-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #00bec8;"
+                                    @click="onEdit(data)"
+                                >
+                                    <b-icon-pencil-square></b-icon-pencil-square>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #ffa300;"
+                                    @click="onClone(data)"
+                                >
+                                    <b-icon-back></b-icon-back>
+                                </b-button>
+                            </template>
+                            <template v-slot:table-busy>
+                                <div class="text-center text-danger my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Loading...</strong>
+                                </div>
+                            </template>
+                        </b-table>
+                    </b-col>
+                </b-row>
+            </b-container>
+            <b-container fluid v-if="navbar_items[1].isActive">
+                <b-row>
+
+                </b-row>
+            </b-container>
+            <b-container fluid v-if="navbar_items[2].isActive">
+                <b-row>
+                    
+                </b-row>
             </b-container>
         </div>
 
-        <template id="story-edit">
-            <div>
-                <b-nav vertical class="sidebar col-md-3 col-lg-2">
-                    <div class="sidebar-sticky">
-                        <b-nav-item class="mt-3">
-                            <b>Generale</b>
-                        </b-nav-item>
-                        <b-nav-item>
-                            Grafica
-                        </b-nav-item>
-                        <b-nav-item>
-                            Impostazioni
-                        </b-nav-item>
-                        <b-nav-item>
-                            Altro
-                        </b-nav-item>
-                        <b-nav-item class="mt-3">
-                            <div class="d-flex justify-content-between">
-                                <b>Missioni</b>
-                                <b-icon-plus-circle
-                                    @click="$bvModal.show('add-mission-modal')"
-                                ></b-icon-plus-circle>
-                                <add-mission-modal-template></add-mission-modal-template>
-                            </div>
-                        </b-nav-item>
-                        <nav-item-content
-                            v-for="stage in story.stages"
-                            :stage="stage"
-                        ></nav-item-content>
-                    </div>
-                </b-nav>
-                <div class="col-md-9 col-lg-10 ml-sm-auto mt-3 px-md-4">
-                    <div v-if="!selected_stage" align-v="center">
-                        <h2>Nessuno stage selezionato...</h2>
-                    </div>
-                    <div v-else>
-                        <component :is="selected_stage.template"></component>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <template id="intro">
-            <b-container fluid class="mb-4">
-                <b-form>
-                    <b-form-group label="Genere">
-                        <b-form-radio name="some-radios" value="A"
-                            >Testo</b-form-radio
-                        >
-                        <b-form-radio name="some-radios" value="B"
-                            >Domanda</b-form-radio
-                        >
-                        <b-form-radio name="some-radios" value="B"
-                            >Collega</b-form-radio
-                        >
-                        <b-form-radio name="some-radios" value="B"
-                            >Seleziona</b-form-radio
-                        >
-                        <b-form-radio name="some-radios" value="B"
-                            >Foto</b-form-radio
-                        >
-                    </b-form-group>
-                    <b-form-group label="Titolo" label-for="title">
-                        <b-form-input
-                            id="title"
-                            type="text"
-                            required
-                            v-model="stage.title"
-                        ></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="Descrizione" label-for="description">
-                        <b-form-textarea
-                            id="description"
-                            required
-                            v-model="stage.description"
-                            rows="6"
-                            no-resize
-                        ></b-form-textarea>
-                    </b-form-group>
-                    <b-form-group label="Nascondi" label-for="check">
-                        <b-form-checkbox-group id="check">
-                            <b-form-checkbox
-                                value="accepted"
-                                unchecked-value="not_accepted"
-                                >Titolo</b-form-checkbox
-                            >
-                            <b-form-checkbox
-                                value="accepted"
-                                unchecked-value="not_accepted"
-                                >Descrizione</b-form-checkbox
-                            >
-                        </b-form-checkbox-group>
-                    </b-form-group>
-                    <b-button variant="secondary" type="reset"
-                        >Anteprima</b-button
-                    >
-                    <b-button variant="primary" type="submit">Salva</b-button>
-                    <b-button variant="danger" type="reset">Elimina</b-button>
-                </b-form>
-            </b-container>
-        </template>
-
-        <template id="connect">
-            <div>
-                <h1>{{ stage.title }}</h1>
-            </div>
-        </template>
-
-        <template id="multi">
-            <div>
-                <h1>{{ stage.title }}</h1>
-            </div>
-        </template>
-
-        <template id="place">
-            <div>
-                <h1>{{ stage.title }}</h1>
-            </div>
-        </template>
-
-        <template id="question">
-            <div>
-                <h1>{{ stage.title }}</h1>
-            </div>
-        </template>
-
-        <template id="nav-item-content">
-            <b-nav-item>
-                <div @click="select">
-                    {{ stage.title }}
-                </div>
+        <template id="custom-navbar-item">
+            <b-nav-item
+                :class="{ active : item.isActive }"
+                @click="onClick"
+                class="py-2 px-4"
+            >
+                {{item.name}}
             </b-nav-item>
         </template>
 
-        <template id="add-mission-modal-template">
-            <b-modal
-                size="lg"
-                id="add-mission-modal"
-                title="Aggiungi una pagina"
-                hide-footer
+        <template id="custom-list-item">
+            <b-list-group-item
+                button
+                class="px-2"
+                :class="{ active : item.isActive }"
+                @click="onClick"
             >
-                <b-form @submit="onSubmit" @reset="onReset">
-                    <b-form-group label="Seleziona il tipo di storia">
-                        <b-form-radio-group required>
-                            <b-form-radio v-model="selected" value="intro"
-                                >Introduzione</b-form-radio
-                            >
-                            <b-form-radio v-model="selected" value="connect"
-                                >Connect</b-form-radio
-                            >
-                            <b-form-radio v-model="selected" value="multi"
-                                >Risposta multipla</b-form-radio
-                            >
-                            <b-form-radio v-model="selected" value="place"
-                                >Completa testo</b-form-radio
-                            >
-                            <b-form-radio v-model="selected" value="question"
-                                >Domanda</b-form-radio
-                            >
-                        </b-form-radio-group>
-                    </b-form-group>
-                    <b-form-group>
-                        <b-button variant="primary" type="submit"
-                            >Conferma</b-button
-                        >
-                        <b-button variant="secondary" type="reset"
-                            >Indietro</b-button
-                        >
-                    </b-form-group>
-                </b-form>
-            </b-modal>
-        </template>
-
-        <template id="story-table">
-            <b-row class="mt-3">
-                <b-col cols="6">
-                    <b-table
-                        hover
-                        selectable
-                        outlined
-                        :busy="isBusy"
-                        :items="stories"
-                        :fields="fields"
-                        select-mode="single"
-                        @row-selected="onRowSelected"
-                    >
-                        <template v-slot:table-busy>
-                            <div class="text-center text-danger my-2">
-                                <b-spinner class="align-middle"></b-spinner>
-                                <strong>Loading...</strong>
-                            </div>
-                        </template></b-table
-                    >
-                </b-col>
-                <b-col cols="6">
-                    <info-panel v-bind:story="selected"></info-panel>
-                </b-col>
-            </b-row>
-        </template>
-
-        <template id="info-panel">
-            <b-card header="Dettagli">
-                <b-card-text v-if="!story" class="text-center"
-                    >Nessuna storia selezionata</b-card-text
-                >
-                <div v-else>
-                    <b-list-group flush>
-                        <b-list-group-item
-                            >Numero di missioni:
-                            {{story.stages.length}}</b-list-group-item
-                        >
-                        <b-list-group-item
-                            >Inserisci qui un altra
-                            caratteristica</b-list-group-item
-                        >
-                        <b-list-group-item></b-list-group-item>
-                    </b-list-group>
-                    <b-button
-                        class="float-right mx-1"
-                        variant="danger"
-                        @click="onDelete"
-                        >Elimina</b-button
-                    >
-                    <b-button
-                        class="float-right mx-1"
-                        variant="secondary"
-                        @click="onModify"
-                        >Modifica</b-button
-                    >
-                    <b-button
-                        class="float-right mx-1"
-                        variant="primary"
-                        @click="onPublish"
-                        >Pubblica</b-button
-                    >
-                </div>
-            </b-card>
+                <h3>{{ item.name }}</h3>
+            </b-list-group-item>
         </template>
 
         <template id="add-simple-story-modal">
@@ -347,12 +268,6 @@
                     </b-form>
                 </b-container>
             </b-modal>
-        </template>
-
-        <template id="loading">
-            <div class="text-center">
-                <b-spinner class="m-5" label="Loading..."></b-spinner>
-            </div>
         </template>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

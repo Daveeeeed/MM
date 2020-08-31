@@ -1,73 +1,35 @@
-Vue.component("loading", {
-    template: "#loading",
-});
-
-Vue.component("story-table", {
-    data() {
-        return {
-            fields: [
-                {
-                    key: "title",
-                    label: "Titolo",
-                },
-            ],
-            selected: null,
-            isBusy: false,
-        };
-    },
-    computed: {
-        stories() {
-            return this.$root.stories;
+Vue.component("custom-navbar-item", {
+    props: {
+        item: {
+            type: Object,
         },
     },
     methods: {
-        onRowSelected(items) {
-            this.selected = items.length ? items[0] : null;
+        onClick() {
+            this.$root.navbar_items.forEach((element) => {
+                if (element.name !== this.item.name) element.isActive = false;
+                else element.isActive = true;
+            });
         },
     },
-    template: "#story-table",
+    template: "#custom-navbar-item",
 });
 
-Vue.component("info-panel", {
-    computed: {
-        story() {
-            return this.$parent.selected;
+Vue.component("custom-list-item", {
+    props: {
+        item: {
+            type: Object,
         },
     },
     methods: {
-        onDelete() {
-            this.$parent.isBusy = true;
-            fetch("/api/stories/delete?key=" + this.story.key)
-                .then((response) => {
-                    if (!response.ok)
-                        throw new Error("Network response was not ok");
-                    else return fetch("/api/stories");
-                })
-                .then((response) => {
-                    if (!response.ok)
-                        throw new Error("Network response was not ok");
-                    else return response.json();
-                })
-                .then((data) => {
-                    this.$root.stories = data;
-                    this.$parent.isBusy = false;
-                })
-                .catch((error) => {
-                    console.error(
-                        "There has been a problem with your fetch operation",
-                        error
-                    );
-                    this.$root.stories = null;
-                });
-            this.$parent.selected = null;
+        onClick() {
+            this.$root.list_items_stories.forEach((element) => {
+                if (element.name !== this.item.name) element.isActive = false;
+                else element.isActive = true;
+            });
         },
-        onModify() {
-            this.$root.modified_story = this.story;
-            this.$root.edit_mode = true;
-        },
-        onPublish() {},
     },
-    template: "#info-panel",
+    template: "#custom-list-item",
 });
 
 Vue.component("add-simple-story-modal", {
@@ -139,119 +101,266 @@ Vue.component("add-simple-story-modal", {
     template: "#add-simple-story-modal",
 });
 
-Vue.component("story-edit", {
-    data() {
-        return {
-            selected_stage: null,
-            story: JSON.parse(JSON.stringify(this.$root.modified_story)),
-        };
-    },
-    methods: {
-        addNewStage() {
-            this.story.stages.push({
-                title: "Senza Titolo",
-                template: null,
-                props: {},
-            });
-        },
-    },
-    template: "#story-edit",
-});
-
-Vue.component("add-mission-modal-template", {
-    data() {
-        return {
-            selected: null,
-        };
-    },
-    methods: {
-        onSubmit() {
-            event.preventDefault();
-            this.$parent.$parent.story.stages.push({
-                title: "Senza Titolo",
-                template: this.selected,
-                props: null,
-            });
-            this.$bvModal.hide("add-mission-modal");
-            this.selected = null;
-        },
-        onReset() {
-            event.preventDefault();
-            this.$bvModal.hide("add-mission-modal");
-            this.selected = null;
-        },
-    },
-    template: "#add-mission-modal-template",
-});
-
-Vue.component("nav-item-content", {
-    props: {
-        stage: {
-            type: Object,
-        },
-    },
-    methods: {
-        select() {
-            this.$parent.selected_stage = this.stage;
-        },
-    },
-    template: "#nav-item-content",
-});
-
-Vue.component("intro", {
-    computed: {
-        stage() {
-            return this.$parent.selected_stage;
-        },
-    },
-    template: "#intro",
-});
-
-Vue.component("connect", {
-    computed: {
-        stage() {
-            return this.$parent.selected_stage;
-        },
-    },
-    template: "#connect",
-});
-
-Vue.component("multi", {
-    computed: {
-        stage() {
-            return this.$parent.selected_stage;
-        },
-    },
-    template: "#multi",
-});
-
-Vue.component("place", {
-    computed: {
-        stage() {
-            return this.$parent.selected_stage;
-        },
-    },
-    template: "#place",
-});
-
-Vue.component("question", {
-    computed: {
-        stage() {
-            return this.$parent.selected_stage;
-        },
-    },
-    template: "#question",
-});
-
 var vm = new Vue({
     el: "#app",
     data: {
+        isBusy: true,
         stories: null,
-        modified_story: null,
-        edit_mode: false,
+        story_filter: null,
+        story_filter_field: ["title"],
+        navbar_items: [
+            {
+                name: "Storie",
+                isActive: true,
+            },
+            {
+                name: "Missioni",
+                isActive: false,
+            },
+            {
+                name: "Attività",
+                isActive: false,
+            },
+        ],
+        stories_fields: [
+            {
+                key: "title",
+                label: "Titolo",
+                tdClass: "titleFormatter",
+                thStyle: "width: 33%;",
+            },
+            {
+                key: "settings.published",
+                label: "Pubblicata",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 14%;",
+            },
+            {
+                key: "settings.player.single",
+                label: "Singolo",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.group",
+                label: "Gruppo",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.class",
+                label: "Classe",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.7_10",
+                label: "7-10",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.11_14",
+                label: "11-14",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.15_18",
+                label: "15-18",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center;  width: 6%;",
+            },
+            {
+                key: "actions",
+                label: "Azioni",
+                thStyle: "width: 17%;",
+            },
+        ],
+        list_items_stories: [
+            {
+                name: "Storie",
+                isActive: true,
+            },
+            {
+                name: "Archiviate",
+                isActive: false,
+            },
+        ],
     },
-    computed: {},
-    methods: {},
+    computed: {
+        archivedStories() {
+            if (this.stories) {
+                let a = [];
+                this.stories.forEach((element) => {
+                    if (element.settings.archived) a.push(element);
+                });
+                return a;
+            } else return null;
+        },
+        availableStories() {
+            if (this.stories) {
+                let a = [];
+                this.stories.forEach((element) => {
+                    if (!element.settings.archived) a.push(element);
+                });
+                return a;
+            } else return null;
+        },
+    },
+    methods: {
+        tableFormatter(value) {
+            return value ? "✓ Yes" : "✗ No";
+        },
+        titleFormatter() {
+            return "cell-title";
+        },
+        cellFormatter(value) {
+            return value ? "cell-true" : "cell-false";
+        },
+        onPublish(data) {
+            data.item.settings.published = !data.item.settings.published;
+            this.isBusy = true;
+            fetch("/api/stories/edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data.item),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/stories");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.stories = data;
+                    this.isBusy = false;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.stories = null;
+                });
+        },
+        onArchive(data) {
+            data.item.settings.archived = !data.item.settings.archived;
+            this.isBusy = true;
+            fetch("/api/stories/edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data.item),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/stories");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.stories = data;
+                    this.isBusy = false;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.stories = null;
+                });
+        },
+        onDelete(data) {
+            this.isBusy = true;
+            fetch("/api/stories/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ key : data.item.key}),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/stories");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.stories = data;
+                    this.isBusy = false;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.stories = null;
+                });
+        },
+        onEdit(data) {
+            console.log(data);
+        },
+        onClone(data) {
+            this.isBusy = true;
+            let cloned = {
+                key: Date.now(),
+                title: data.item.title,
+                stages: data.item.stages,
+                settings: data.item.settings,
+            };
+            fetch("/api/stories/new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(cloned),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/stories");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.stories = data;
+                    this.isBusy = false;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.stories = null;
+                });
+        },
+    },
 });
 
 function fetchData() {
