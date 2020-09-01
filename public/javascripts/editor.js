@@ -104,7 +104,7 @@ Vue.component("add-simple-story-modal", {
 var vm = new Vue({
     el: "#app",
     data: {
-        isBusy: true,
+        isBusy: false,
         stories: null,
         story_filter: null,
         story_filter_field: ["title"],
