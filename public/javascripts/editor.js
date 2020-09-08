@@ -54,13 +54,13 @@ Vue.component("add-simple-story-modal", {
             return (this.giocatore.indexOf("classe") != -1)
         },
         sette(){
-            return (this.giocatore.indexOf("sette") != -1)
+            return (this.eta.indexOf("sette") != -1)
         },
         undici(){
-            return (this.giocatore.indexOf("undici") != -1)
+            return (this.eta.indexOf("undici") != -1)
         },
         quindici(){
-            return (this.giocatore.indexOf("quindici") != -1)
+            return (this.eta.indexOf("quindici") != -1)
         }
     },
     methods: {
@@ -78,9 +78,9 @@ Vue.component("add-simple-story-modal", {
                         single: this.singolo,
                         group: this.gruppo,
                         class: this.classe,
-                        7_10: this.sette,
-                        11_14: this.undici,
-                        15_18: this.quindici,
+                        "7_10": this.sette,
+                        "11_14": this.undici,
+                        "15_18": this.quindici,
                     }
                 },
             };
