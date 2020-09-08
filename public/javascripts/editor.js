@@ -37,10 +37,31 @@ Vue.component("add-simple-story-modal", {
         return {
             form: {
                 title: null,
-                nr: null,
             },
+            eta: [],
+            giocatore: [],
             show: false,
         };
+    },
+    computed: {
+        singolo(){
+            return (this.giocatore.indexOf("singolo") != -1)
+        },
+        gruppo(){
+            return (this.giocatore.indexOf("gruppo") != -1)
+        },
+        classe(){
+            return (this.giocatore.indexOf("classe") != -1)
+        },
+        sette(){
+            return (this.giocatore.indexOf("sette") != -1)
+        },
+        undici(){
+            return (this.giocatore.indexOf("undici") != -1)
+        },
+        quindici(){
+            return (this.giocatore.indexOf("quindici") != -1)
+        }
     },
     methods: {
         onSubmit(event) {
@@ -50,15 +71,19 @@ Vue.component("add-simple-story-modal", {
                 key: Date.now(),
                 title: this.form.title,
                 stages: [],
-                settings: {},
+                settings: {
+                    archived: false,
+                    published: false,
+                    player: {
+                        single: this.singolo,
+                        group: this.gruppo,
+                        class: this.classe,
+                        7_10: this.sette,
+                        11_14: this.undici,
+                        15_18: this.quindici,
+                    }
+                },
             };
-            let max = parseInt(this.form.nr);
-            for (let i = 0; i < max; i++) {
-                new_story.stages.push({
-                    template: "",
-                    props: {},
-                });
-            }
             fetch("/api/stories/new", {
                 method: "POST",
                 headers: {

@@ -244,7 +244,23 @@
                                 placeholder="Inserisci il titolo..."
                             ></b-form-input>
                         </b-form-group>
-                        <b-form-group
+                            <div>
+                              <b-form-group label="Età">
+                                <b-form-checkbox-group v-model="eta">
+                                  <b-form-checkbox value="sette">7-10</b-form-checkbox>
+                                  <b-form-checkbox value="undici">11-14</b-form-checkbox>
+                                  <b-form-checkbox value="quindici">15-18</b-form-checkbox>
+                                </b-form-checkbox-group>
+                              </b-form-group>
+                              <b-form-group label="Giocatore">
+                                <b-form-checkbox-group v-model="giocatore">
+                                  <b-form-checkbox value="singolo">Singolo</b-form-checkbox>
+                                  <b-form-checkbox value="gruppo">Gruppo</b-form-checkbox>
+                                  <b-form-checkbox value="classe">Classe</b-form-checkbox>
+                                </b-form-checkbox-group>
+                              </b-form-group>
+                            </div>
+                       <!--- <b-form-group
                             id="stage_nr"
                             label="Numero di stage:"
                             label-for="stage_nr"
@@ -257,7 +273,7 @@
                                 required
                                 placeholder="Inserisci il numero di attività da svolgere..."
                             ></b-form-input>
-                        </b-form-group>
+                        </b-form-group> -->
                         <b-button variant="primary" type="submit"
                             >Salva</b-button
                         >
