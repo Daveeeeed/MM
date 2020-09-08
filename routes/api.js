@@ -63,4 +63,12 @@ router.get("/stories", (req, res) => {
         });
 });
 
+router.get("/missions", (req, res) => {
+    db.get("missions")
+        .find(req.query)
+        .then((response) => {
+            res.send(response);
+        });
+});
+
 module.exports = router;

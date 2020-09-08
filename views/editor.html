@@ -44,7 +44,10 @@
                     />
                 </b-navbar-brand>
                 <b-navbar-nav>
-                    <custom-navbar-item :item="item" v-for="item in navbar_items">
+                    <custom-navbar-item
+                        :item="item"
+                        v-for="item in navbar_items"
+                    >
                     </custom-navbar-item>
                 </b-navbar-nav>
             </b-navbar>
@@ -72,9 +75,21 @@
                         </b-input-group>
                     </b-col>
                     <b-col cols="auto" class="my-2 mr-3 px-0">
-                        <b-button class="px-4" @click="$bvModal.show('modal-add-simple-story')">Crea Nuova Storia</b-button>
-                        <b-button class="px-4" @click="$bvModal.show('modal-add-simple-story')">Importa</b-button>
-                        <b-button class="px-4" @click="$bvModal.show('modal-add-simple-story')">Esporta</b-button>
+                        <b-button
+                            class="px-4"
+                            @click="$bvModal.show('modal-add-simple-story')"
+                            >Crea Nuova Storia</b-button
+                        >
+                        <b-button
+                            class="px-4"
+                            @click="$bvModal.show('modal-add-simple-story')"
+                            >Importa</b-button
+                        >
+                        <b-button
+                            class="px-4"
+                            @click="$bvModal.show('modal-add-simple-story')"
+                            >Esporta</b-button
+                        >
                         <add-simple-story-modal></add-simple-story-modal>
                     </b-col>
                 </b-row>
@@ -86,7 +101,7 @@
                             hover
                             :busy="isBusy"
                             :filter="story_filter"
-                            :filter-included-fields="story_filter_field"
+                            :filter-included-fields="filter_field"
                             :items="availableStories"
                             :fields="stories_fields"
                             tbody-tr-class="table-row"
@@ -95,35 +110,37 @@
                             <template v-slot:cell(actions)="data">
                                 <b-button
                                     size="sm"
-                                    style="background-color: #8f65fc;"
+                                    style="background-color: #8f65fc"
                                     @click="onPublish(data)"
                                 >
                                     <b-icon-play-fill></b-icon-play-fill>
                                 </b-button>
                                 <b-button
                                     size="sm"
-                                    style="background-color: #003086;"
+                                    style="background-color: #003086"
                                     @click="onArchive(data)"
                                 >
                                     <b-icon-archive-fill></b-icon-archive-fill>
                                 </b-button>
                                 <b-button
                                     size="sm"
-                                    style="background-color: #ff3d4a;"
+                                    style="background-color: #ff3d4a"
                                     @click="onDelete(data)"
                                 >
                                     <b-icon-trash-fill></b-icon-trash-fill>
                                 </b-button>
                                 <b-button
                                     size="sm"
-                                    style="background-color: #00bec8;"
+                                    style="background-color: #00bec8"
                                     @click="onEdit(data)"
-                                >
+                                    >
+                                    <modal-edit-story :storia="data.item"></modal-edit-story>
                                     <b-icon-pencil-square></b-icon-pencil-square>
                                 </b-button>
+                                
                                 <b-button
                                     size="sm"
-                                    style="background-color: #ffa300;"
+                                    style="background-color: #ffa300"
                                     @click="onClone(data)"
                                 >
                                     <b-icon-back></b-icon-back>
@@ -135,50 +152,52 @@
                                     <strong>Loading...</strong>
                                 </div>
                             </template>
+                            
                         </b-table>
                         <b-table
-                        v-if="list_items_stories[1].isActive"
-                        borderless
-                        hover
-                        :busy="isBusy"
-                        :filter="story_filter"
-                        :items="archivedStories"
-                        :fields="stories_fields"
-                        tbody-tr-class="table-row"
-                        thead-class="cell-title"
+                            v-if="list_items_stories[1].isActive"
+                            borderless
+                            hover
+                            :busy="isBusy"
+                            :filter="story_filter"
+                            :filter-included-fields="filter_field"
+                            :items="archivedStories"
+                            :fields="stories_fields"
+                            tbody-tr-class="table-row"
+                            thead-class="cell-title"
                         >
                             <template v-slot:cell(actions)="data">
                                 <b-button
                                     size="sm"
-                                    style="background-color: #8f65fc;"
+                                    style="background-color: #8f65fc"
                                     @click="onPublish(data)"
                                 >
                                     <b-icon-play-fill></b-icon-play-fill>
                                 </b-button>
                                 <b-button
                                     size="sm"
-                                    style="background-color: #003086;"
+                                    style="background-color: #003086"
                                     @click="onArchive(data)"
                                 >
                                     <b-icon-archive-fill></b-icon-archive-fill>
                                 </b-button>
                                 <b-button
                                     size="sm"
-                                    style="background-color: #ff3d4a;"
+                                    style="background-color: #ff3d4a"
                                     @click="onDelete(data)"
                                 >
                                     <b-icon-trash-fill></b-icon-trash-fill>
                                 </b-button>
                                 <b-button
                                     size="sm"
-                                    style="background-color: #00bec8;"
+                                    style="background-color: #00bec8"
                                     @click="onEdit(data)"
                                 >
                                     <b-icon-pencil-square></b-icon-pencil-square>
                                 </b-button>
                                 <b-button
                                     size="sm"
-                                    style="background-color: #ffa300;"
+                                    style="background-color: #ffa300"
                                     @click="onClone(data)"
                                 >
                                     <b-icon-back></b-icon-back>
@@ -196,13 +215,69 @@
             </b-container>
             <b-container fluid v-if="navbar_items[1].isActive">
                 <b-row>
-
+                    <b-col cols="auto" class="mr-auto ml-4">
+                        <b-list-group horizontal>
+                            <custom-list-item
+                                :item="item"
+                                v-for="item in list_items_missions"
+                            ></custom-list-item>
+                        </b-list-group>
+                    </b-col>
+                    <b-col cols="4" class="my-2 px-0">
+                        <b-input-group id="searchbar" class="px-1">
+                            <b-input-group-prepend is-text>
+                                <b-icon-search></b-icon-search>
+                            </b-input-group-prepend>
+                            <b-form-input
+                                spellcheck="false"
+                                type="search"
+                                placeholder="Cerca missioni..."
+                                v-model="mission_filter"
+                            ></b-form-input>
+                        </b-input-group>
+                    </b-col>
+                    <b-col cols="auto" class="my-2 mr-3 px-0">
+                        <b-button
+                            class="px-4"
+                            @click="$bvModal.show('modal-add-mission')"
+                            >Aggiungi Nuova Missione</b-button
+                        >
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-table
+                            borderless
+                            hover
+                            :busy="isBusy"
+                            :filter="mission_filter"
+                            :filter-included-fields="filter_field"
+                            :items="missions"
+                            :fields="missions_fields"
+                            tbody-tr-class="table-row"
+                            thead-class="cell-title"
+                        >
+                            <template v-slot:cell(actions)="data">
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #8f65fc"
+                                    @click="onPublish(data)"
+                                >
+                                    <b-icon-play-fill></b-icon-play-fill>
+                                </b-button>
+                            </template>
+                            <template v-slot:table-busy>
+                                <div class="text-center text-danger my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Loading...</strong>
+                                </div>
+                            </template>
+                        </b-table>
+                    </b-col>
                 </b-row>
             </b-container>
             <b-container fluid v-if="navbar_items[2].isActive">
-                <b-row>
-                    
-                </b-row>
+                <b-row> </b-row>
             </b-container>
         </div>
 
@@ -244,23 +319,35 @@
                                 placeholder="Inserisci il titolo..."
                             ></b-form-input>
                         </b-form-group>
-                            <div>
-                              <b-form-group label="Età">
+                        <div>
+                            <b-form-group label="Età">
                                 <b-form-checkbox-group v-model="eta">
-                                  <b-form-checkbox value="sette">7-10</b-form-checkbox>
-                                  <b-form-checkbox value="undici">11-14</b-form-checkbox>
-                                  <b-form-checkbox value="quindici">15-18</b-form-checkbox>
+                                    <b-form-checkbox value="sette"
+                                        >7-10</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="undici"
+                                        >11-14</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="quindici"
+                                        >15-18</b-form-checkbox
+                                    >
                                 </b-form-checkbox-group>
-                              </b-form-group>
-                              <b-form-group label="Giocatore">
+                            </b-form-group>
+                            <b-form-group label="Giocatore">
                                 <b-form-checkbox-group v-model="giocatore">
-                                  <b-form-checkbox value="singolo">Singolo</b-form-checkbox>
-                                  <b-form-checkbox value="gruppo">Gruppo</b-form-checkbox>
-                                  <b-form-checkbox value="classe">Classe</b-form-checkbox>
+                                    <b-form-checkbox value="singolo"
+                                        >Singolo</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="gruppo"
+                                        >Gruppo</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="classe"
+                                        >Classe</b-form-checkbox
+                                    >
                                 </b-form-checkbox-group>
-                              </b-form-group>
-                            </div>
-                       <!--- <b-form-group
+                            </b-form-group>
+                        </div>
+                        <!--- <b-form-group
                             id="stage_nr"
                             label="Numero di stage:"
                             label-for="stage_nr"
@@ -284,6 +371,10 @@
                     </b-form>
                 </b-container>
             </b-modal>
+        </template>
+
+        <template id="modal-edit-story">
+            <b-modal :id="modalId" size="xl" :title="storia.title"> </b-modal>
         </template>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

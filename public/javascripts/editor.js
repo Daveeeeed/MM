@@ -44,24 +44,24 @@ Vue.component("add-simple-story-modal", {
         };
     },
     computed: {
-        singolo(){
-            return (this.giocatore.indexOf("singolo") != -1)
+        singolo() {
+            return this.giocatore.indexOf("singolo") != -1;
         },
-        gruppo(){
-            return (this.giocatore.indexOf("gruppo") != -1)
+        gruppo() {
+            return this.giocatore.indexOf("gruppo") != -1;
         },
-        classe(){
-            return (this.giocatore.indexOf("classe") != -1)
+        classe() {
+            return this.giocatore.indexOf("classe") != -1;
         },
-        sette(){
-            return (this.eta.indexOf("sette") != -1)
+        sette() {
+            return this.eta.indexOf("sette") != -1;
         },
-        undici(){
-            return (this.eta.indexOf("undici") != -1)
+        undici() {
+            return this.eta.indexOf("undici") != -1;
         },
-        quindici(){
-            return (this.eta.indexOf("quindici") != -1)
-        }
+        quindici() {
+            return this.eta.indexOf("quindici") != -1;
+        },
     },
     methods: {
         onSubmit(event) {
@@ -81,7 +81,7 @@ Vue.component("add-simple-story-modal", {
                         "7_10": this.sette,
                         "11_14": this.undici,
                         "15_18": this.quindici,
-                    }
+                    },
                 },
             };
             fetch("/api/stories/new", {
@@ -126,13 +126,34 @@ Vue.component("add-simple-story-modal", {
     template: "#add-simple-story-modal",
 });
 
+Vue.component("modal-edit-story", {
+    data() {
+        return {
+			
+			
+        };
+    },
+    props: {
+        storia: null,
+    },
+    computed: {
+        modalId(){
+            return String(this.storia.key)
+        }
+    },
+    methods: {},
+    template: "#modal-edit-story",
+});
+
 var vm = new Vue({
     el: "#app",
     data: {
         isBusy: false,
         stories: null,
+        missions: null,
         story_filter: null,
-        story_filter_field: ["title"],
+        mission_filter: null,
+        filter_field: ["title"],
         navbar_items: [
             {
                 name: "Storie",
@@ -145,6 +166,61 @@ var vm = new Vue({
             {
                 name: "Attività",
                 isActive: false,
+            },
+        ],
+        missions_fields: [
+            {
+                key: "title",
+                label: "Titolo",
+                tdClass: "titleFormatter",
+                thStyle: "width: 47%;",
+            },
+            {
+                key: "settings.player.single",
+                label: "Singolo",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.group",
+                label: "Gruppo",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.class",
+                label: "Classe",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.7_10",
+                label: "7-10",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.11_14",
+                label: "11-14",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center; width: 6%;",
+            },
+            {
+                key: "settings.player.15_18",
+                label: "15-18",
+                formatter: "tableFormatter",
+                tdClass: "cellFormatter",
+                thStyle: "text-align:center;  width: 6%;",
+            },
+            {
+                key: "actions",
+                label: "Azioni",
+                thStyle: "width: 17%;",
             },
         ],
         stories_fields: [
@@ -217,6 +293,12 @@ var vm = new Vue({
             {
                 name: "Archiviate",
                 isActive: false,
+            },
+        ],
+        list_items_missions: [
+            {
+                name: "Missioni",
+                isActive: true,
             },
         ],
     },
@@ -321,7 +403,7 @@ var vm = new Vue({
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ key : data.item.key}),
+                body: JSON.stringify({ key: data.item.key }),
             })
                 .then((response) => {
                     if (!response.ok)
@@ -346,7 +428,9 @@ var vm = new Vue({
                 });
         },
         onEdit(data) {
-            console.log(data);
+            console.log(data)
+            this.$bvModal.show(String(data.item.key));
+
         },
         onClone(data) {
             this.isBusy = true;
@@ -393,6 +477,11 @@ function fetchData() {
         .then((response) => response.json())
         .then((data) => {
             vm.$data.stories = data;
+        });
+    fetch("/api/missions")
+        .then((response) => response.json())
+        .then((data) => {
+            vm.$data.missions = data;
         });
 }
 
