@@ -2,8 +2,17 @@ body {
     background-color: #121421;
 }
 
+.modal-edit-story{
+    background-color: #121421;
+}
+
 #topbar {
     background-color: #1C1E2B;
+}
+
+.modal-content{
+    background-color: #121421;
+    color: #FFFFFF;
 }
 
 .nav-item {
@@ -21,20 +30,20 @@ body {
     background-color: #28293D;
 }
 
-.list-group-item {
+.tabs .list-group-item {
     background-color: transparent;
     border: 0px;
     color: #848689;
     white-space:nowrap;
 }
 
-.list-group-item:hover {
+.tabs .list-group-item:hover {
     background-color: transparent;
     border: 0px;
     color: #848689;
 }
 
-.list-group-item:focus {
+.tabs .list-group-item:focus {
     background-color: transparent;
     border: 0px;
     color: #848689;
@@ -43,7 +52,7 @@ body {
     outline: 0;
 }
 
-.list-group-item.active {
+.tabs .list-group-item.active {
     background-color: transparent;
     border: 0px;
     color: white;
@@ -126,4 +135,105 @@ body {
     overflow-x: hidden;
     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
     background-color: gainsboro;
+}
+/*
+.colonnaprova {
+    border: 1px;
+    border-color: white;
+    border-style: solid;
+    
+}
+*/
+
+/* ATTIVI */
+.mission-group-item .list-group-item {
+    background-color: #171926;
+    color: #ffffff;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 2px 0 #00BD58;
+    overflow-y: auto;
+    outline: 0;
+}
+
+/* NON ATTIVI */
+.mission-group-item .list-group-item.unavailable {
+    color: #848689;
+    box-shadow: 0 2px 0 #848689;
+}
+
+
+.mission-group-item .list-group-item:hover {
+    background-color:#1C1E2B;
+}
+
+.menu {
+    margin-left: 0px;
+    border-right: solid 1px white;
+    height: calc(100vh - 64px - 68px - 56px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.menu .list-group-item {
+    background-color: transparent;
+    border: 0px;
+    color: #848689;
+    box-sizing: border-box;
+    transition: 0.5s;
+    border-radius: 0px;
+    outline: 0;
+}
+
+.menu .list-group-item:hover {
+    background-color: #28293D;
+    
+}
+.menu .list-group-item.active{
+   color: white;
+   box-shadow: 0px 3px 0px  #00BD58;
+}
+
+.modal-body {
+    padding: 0px;
+    height: calc(100vh - 64px - 68px - 56px);
+}
+
+.scrollable {
+    height: calc(100vh - 64px - 68px - 56px - 54px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.modal-header {
+    padding:  0px;
+}
+/*
+.no-scroll {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+}
+*/
+/*.disp .list-group{
+
+    background-color: #FFFFFF;
+}*/
+
+.selezionate{
+    border-right-color: white;
+    border-right-width: 1px;
+    border-right-style: solid;
+    color: #ffffff;
+    text-align: center;
+    overflow-y: auto;
+    height: calc(100vh - 64px - 68px - 56px);
+    
+}
+.info{
+    height: calc(100vh - 64px - 68px - 56px);
+}
+.edit-title{
+    display: inline-block
 }

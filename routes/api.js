@@ -33,9 +33,21 @@ router.post("/stories/delete", (req, res) => {
         .then((response) => res.send(response));
 });
 
+router.post("/missions/delete", (req, res) => {
+    db.get("missions")
+        .findOneAndDelete({ key: req.body.key })
+        .then((response) => res.send(response));
+});
+
 /* CREATE a new story */
 router.post("/stories/new", (req, res) => {
     db.get("stories")
+        .insert(req.body)
+        .then((response) => res.send(response));
+});
+
+router.post("/missions/new", (req, res) => {
+    db.get("missions")
         .insert(req.body)
         .then((response) => res.send(response));
 });
@@ -48,6 +60,19 @@ router.post("/stories/edit", (req, res) => {
                     title: req.body.title,
                     stages: req.body.stages,
                     settings: req.body.settings,
+                },
+            }
+        )
+        .then((response) => res.send(response));
+});
+
+router.post("/missions/edit", (req, res) => {
+    db.get("missions")
+        .update({ key: req.body.key },{
+                $set: {
+                    title: req.body.title,
+                    activities: req.body.activities,
+                    player: req.body.player,
                 },
             }
         )

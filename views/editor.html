@@ -54,7 +54,7 @@
             <b-container fluid v-if="navbar_items[0].isActive">
                 <b-row>
                     <b-col cols="auto" class="mr-auto ml-4">
-                        <b-list-group horizontal>
+                        <b-list-group class="tabs" horizontal>
                             <custom-list-item
                                 :item="item"
                                 v-for="item in list_items_stories"
@@ -133,11 +133,14 @@
                                     size="sm"
                                     style="background-color: #00bec8"
                                     @click="onEdit(data)"
-                                    >
-                                    <modal-edit-story :storia="data.item"></modal-edit-story>
+                                >
+                                    <modal-edit-story
+                                        :storia="data.item"
+                                        :missions="missions"
+                                    ></modal-edit-story>
                                     <b-icon-pencil-square></b-icon-pencil-square>
                                 </b-button>
-                                
+
                                 <b-button
                                     size="sm"
                                     style="background-color: #ffa300"
@@ -152,7 +155,6 @@
                                     <strong>Loading...</strong>
                                 </div>
                             </template>
-                            
                         </b-table>
                         <b-table
                             v-if="list_items_stories[1].isActive"
@@ -216,7 +218,7 @@
             <b-container fluid v-if="navbar_items[1].isActive">
                 <b-row>
                     <b-col cols="auto" class="mr-auto ml-4">
-                        <b-list-group horizontal>
+                        <b-list-group class="tabs" horizontal>
                             <custom-list-item
                                 :item="item"
                                 v-for="item in list_items_missions"
@@ -260,10 +262,27 @@
                             <template v-slot:cell(actions)="data">
                                 <b-button
                                     size="sm"
-                                    style="background-color: #8f65fc"
-                                    @click="onPublish(data)"
+                                    style="background-color: #ff3d4a"
+                                    @click="onDeleteMission(data)"
                                 >
-                                    <b-icon-play-fill></b-icon-play-fill>
+                                    <b-icon-trash-fill></b-icon-trash-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #00bec8"
+                                    @click="onEditMission(data)"
+                                >
+                                    <b-icon-pencil-square></b-icon-pencil-square>
+                                    <modal-edit-mission
+                                        :mission="data.item"
+                                    ></modal-edit-mission>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #ffa300"
+                                    @click="onCloneMission(data)"
+                                >
+                                    <b-icon-back></b-icon-back>
                                 </b-button>
                             </template>
                             <template v-slot:table-busy>
@@ -300,6 +319,86 @@
             >
                 <h3>{{ item.name }}</h3>
             </b-list-group-item>
+        </template>
+
+        <template id="modal-edit-mission-template">
+            <b-modal size="xl" :id="modalId">
+                <template v-slot:modal-header>
+                    <b-container>
+                        <b-row>
+                            <b-col cols="auto" class="mr-auto my-auto ml-4">
+                                <h4>{{ mission.title }}</h4>
+                            </b-col>
+                            <b-col cols="auto" class="mr-3 px-0">
+                                <b-button
+                                    class="px-4"
+                                    @click="$bvModal.hide(modalId)"
+                                    >X</b-button
+                                >
+                            </b-col>
+                        </b-row>
+                    </b-container>
+                </template>
+                <template v-slot:modal-footer="{ ok ,hide}">
+                    <b-button @click="ok()"> Salva </b-button>
+                    <b-button @click="hide()"> Chiudi </b-button>
+                </template>
+                <template v-slot:default>
+                    <b-container>
+                        <b-row>
+                            <b-col>
+                                <b-list-group>
+                                    <b-list-group-item
+                                        >Percorso 1</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Percorso 2</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Percorso 3</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Percorso 4</b-list-group-item
+                                    >
+                                </b-list-group>
+                            </b-col>
+                            <b-col>
+                                <b-list-group>
+                                    <b-list-group-item
+                                        >Attività 1</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Attività 2</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Attività 3</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Attività 4</b-list-group-item
+                                    >
+                                </b-list-group>
+                            </b-col>
+                            <b-col>
+                                <b-list-group>
+                                    <b-list-group-item
+                                        >Attività 1</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Attività 2</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Attività 3</b-list-group-item
+                                    >
+                                    <b-list-group-item
+                                        >Attività 4</b-list-group-item
+                                    >
+                                </b-list-group>
+                            </b-col>
+                            <b-col> Info </b-col>
+                        </b-row>
+                    </b-container>
+                </template>
+            </b-modal>
         </template>
 
         <template id="add-simple-story-modal">
@@ -347,20 +446,6 @@
                                 </b-form-checkbox-group>
                             </b-form-group>
                         </div>
-                        <!--- <b-form-group
-                            id="stage_nr"
-                            label="Numero di stage:"
-                            label-for="stage_nr"
-                        >
-                            <b-form-input
-                                id="stage_nr"
-                                type="number"
-                                min="1"
-                                v-model="form.nr"
-                                required
-                                placeholder="Inserisci il numero di attività da svolgere..."
-                            ></b-form-input>
-                        </b-form-group> -->
                         <b-button variant="primary" type="submit"
                             >Salva</b-button
                         >
@@ -374,11 +459,192 @@
         </template>
 
         <template id="modal-edit-story">
-            <b-modal :id="modalId" size="xl" :title="storia.title"> </b-modal>
+            <b-modal :id="modalId" size="xl" :title="storia.title">
+                <template v-slot:modal-header>
+                    <b-container fluid class="px-0 py-0 mx-0 my-0">
+                        <b-row class="px-0 py-0 mx-0 my-0">
+                            <b-col
+                                cols="auto"
+                                class="mr-auto my-auto ml-4 px-0 py-3"
+                            >
+                                <h4 class="my-0">{{ storia.title }}</h4>
+                            </b-col>
+                            <b-col
+                                cols="auto"
+                                class="mr-3 my-auto ml-4 py-auto"
+                            >
+                                <b-button class="px-4" @click="showQrCode"
+                                    >QR CODE</b-button
+                                >
+                                <b-modal id="modal-qr-code" centered ok-only>
+                                    <template v-slot:modal-header>
+                                        <b-row class="py-2 mx-auto">
+                                            QR CODE
+                                        </b-row>
+                                    </template>
+                                    <template v-slot:default>
+                                        <b-container
+                                            fluid
+                                            class="d-flex justify-content-center"
+                                        >
+                                            <b-row
+                                                class="d-flex justify-content-center"
+                                            >
+                                                <b-col class="py-3">
+                                                    <span id="qrcode"></span>
+                                                </b-col>
+                                            </b-row>
+                                        </b-container>
+                                    </template>
+                                </b-modal>
+                            </b-col>
+                        </b-row>
+                    </b-container>
+                </template>
+                <template v-slot:default>
+                    <b-container fluid class="p-0 m-0">
+                        <b-row class="p-0 m-0">
+                            <b-col class="p-0 m-0 menu" cols="2">
+                                <b-list-group>
+                                    <b-list-group-item
+                                        button
+                                        v-for="item in list_item_edit_story"
+                                        @click="onEditStoryMenuClick"
+                                        :class="{ active : item.isActive }"
+                                    >
+                                        <h5>{{item.name}}</h5>
+                                    </b-list-group-item>
+                                </b-list-group>
+                            </b-col>
+                            <b-col
+                                class="mission-group-item disponibili"
+                                cols="6"
+                                v-if="list_item_edit_story[0].isActive"
+                            >
+                                <b-row class="m-0 p-0">
+                                    <b-col cols="auto" class="mr-auto p-0 mt-2">
+                                        <h3>Disponibili</h3>
+                                    </b-col>
+                                    <b-col cols="6" class="my-2 px-0">
+                                        <b-input-group class="px-0">
+                                            <b-form-input
+                                                spellcheck="false"
+                                                type="search"
+                                                placeholder="Cerca"
+                                                v-model="mission_filter"
+                                            ></b-form-input>
+                                        </b-input-group>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col class="scrollable px-3 py-3 m-0">
+                                        <b-list-group>
+                                            <b-list-group-item
+                                                v-for="mission in filteredMissions"
+                                                class="px-0 py-2 my-1"
+                                                button
+                                                @click="onAvailableMissionClick(mission)"
+                                                :class="checkMission(mission)"
+                                            >
+                                                {{ mission.title }}
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                    </b-col>
+                                </b-row>
+                            </b-col>
+                            <b-col
+                                class="mission-group-item disponibili"
+                                cols="4"
+                                v-if="list_item_edit_story[0].isActive"
+                            >
+                                <b-row class="m-0 p-0">
+                                    <b-col class="p-0 mt-2 mb-1">
+                                        <h3 style="height: 34px">Aggiunte</h3>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col class="scrollable px-3 py-3 m-0">
+                                        <h6 v-if="storia.missions.length == 0">Aggiungi qualche missione...</h6>
+                                        <b-list-group v-else>
+                                            <b-list-group-item
+                                                v-for="mission in storia.missions "
+                                                class="px-0 py-2 my-1"
+                                                button
+                                            >
+                                                {{ mission.title }}
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                    </b-col>
+                                </b-row>
+                            </b-col>
+
+                            <b-col
+                                class="mission-group-item selezionate"
+                                v-if="list_item_edit_story[1].isActive"
+                                cols="3"
+                            >
+                                <b-row class="m-0 p-0">
+                                    <b-col class="p-0 mt-2 mb-1">
+                                        <h3 style="height: 34px">Missioni</h3>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col class="scrollable px-3 py-3 m-0">
+                                        <h6 v-if="storia.missions.length == 0">Aggiungi qualche missione...</h6>
+                                        <b-list-group v-else>
+                                            <b-list-group-item
+                                                v-for="mission in storia.missions "
+                                                class="px-0 py-2 my-1"
+                                                button
+                                                @click="showMissionInfos(mission)"
+                                            >
+                                                {{ mission.title }}
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                    </b-col>
+                                </b-row>
+                            </b-col>
+                            <b-col
+                                class="mission-group-item disponibili"
+                                v-if="list_item_edit_story[1].isActive"
+                                cols="7"
+                            >
+                            </b-col>
+
+                            <b-col
+                                class="info"
+                                v-if="list_item_edit_story[2].isActive"
+                                cols="7"
+                            >
+                                <b-container fluid>
+                                    <b-row>
+                                        <b-col cols="auto" class="mx-0 px-0 pt-2 mt-1">
+                                            <label>
+                                            <h4>Titolo della storia:</h4>
+                                            </label>
+                                         </b-col> 
+                                         <b-col cols="auto" class="mx-0 px-0 pt-2 pl-2"> 
+                                           <b-form-input
+                                            class="edit-title"
+                                            type="text"
+                                            required
+                                            :placeholder="storia.title"
+                                            maxlength="20"
+                                            ></b-form-input>
+                                         </b-col>  
+                                    </b-row>
+                                </b-container>
+                            </b-col>
+                        </b-row>
+                    </b-container>
+                </template>
+                <template v-slot:modal-footer> </template>
+            </b-modal>
         </template>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- CUSTOM -->
         <script src="/public/javascripts/editor.js"></script>
+        <script src="../public/javascripts/kjua-0.9.0.min.js"></script>
     </body>
 </html>

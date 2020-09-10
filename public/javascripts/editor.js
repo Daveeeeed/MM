@@ -15,6 +15,22 @@ Vue.component("custom-navbar-item", {
     template: "#custom-navbar-item",
 });
 
+Vue.component("modal-edit-mission", {
+    props: {
+        mission: {
+            type: Object,
+        },
+    },
+    computed: {
+        modalId(){
+            return String(this.mission.key)
+        }
+    },
+    methods: {
+    },
+    template: "#modal-edit-mission-template",
+});
+
 Vue.component("custom-list-item", {
     props: {
         item: {
@@ -129,19 +145,93 @@ Vue.component("add-simple-story-modal", {
 Vue.component("modal-edit-story", {
     data() {
         return {
-			
-			
-        };
+            list_item_edit_story: [
+                {
+                    name: "Selezione Missioni",
+                    isActive: true,
+                },
+                {
+                    name: "Collega Missioni",
+                    isActive: false,
+                },
+                {
+                    name: "Impostazioni",
+                    isActive: false,
+                },
+            ],
+            mission_filter: "",
+        }
     },
     props: {
         storia: null,
+        missions: null,
     },
     computed: {
-        modalId(){
-            return String(this.storia.key)
+        filteredMissions() {
+            if (this.mission_filter){
+                let a = []
+                this.missions.forEach((element) => {
+                    if (element.title.includes(this.mission_filter)) a.push(element)
+                })
+                return a;
+            } else return this.missions
+        },
+        modalId() {
+            return String(this.storia.key);
+        },
+    },
+    methods: {
+        checkMission(mission) {
+            let available = true
+            if(this.storia.missions.indexOf(mission) != -1) available = false;
+            return {
+                unavailable: !available,
+            }
+        },
+        onAvailableMissionClick(mission) {
+            if(this.storia.missions.indexOf(mission) == -1) this.storia.missions.push(mission)
+            else for(let i = 0; i < this.storia.missions.length; i++){
+                if ( this.storia.missions[i] === mission) {
+                    this.storia.missions.splice(i, 1);
+                    i--;
+                }
+            }
+        },
+        onEditStoryMenuClick(data) {
+            console.log(data)
+            this.list_item_edit_story.forEach((element) => {
+                if (element.name !== data.srcElement.innerText) element.isActive = false;
+                else element.isActive = true;
+            });
+        },
+        showQrCode() {
+            new Promise((resolve,reject) => {
+                this.$bvModal.show('modal-qr-code')
+                resolve()
+            })
+            .then(() => {
+                $('#qrcode').kjua({
+                    render: 'svg',
+                    crisp: true,
+                    size: 200,
+                    ratio: null,
+                    fill: '#000',
+                    back: '#fff',
+                    text: 'ciao',
+                    rounded: 0,
+                    quiet: 0,
+                    // label/image size and pos in pc: 0..100
+                    mSize: 30,
+                    mPosX: 50,
+                    mPosY: 50,
+                    // label
+                    label: 'no label',
+                    fontname: 'sans',
+                    fontcolor: '#333',
+                });
+            })
         }
     },
-    methods: {},
     template: "#modal-edit-story",
 });
 
@@ -173,54 +263,54 @@ var vm = new Vue({
                 key: "title",
                 label: "Titolo",
                 tdClass: "titleFormatter",
-                thStyle: "width: 47%;",
+                thStyle: "width: 34%;",
             },
             {
-                key: "settings.player.single",
+                key: "player.single",
                 label: "Singolo",
                 formatter: "tableFormatter",
                 tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
+                thStyle: "text-align:center; width: 9%;",
             },
             {
-                key: "settings.player.group",
+                key: "player.group",
                 label: "Gruppo",
                 formatter: "tableFormatter",
                 tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
+                thStyle: "text-align:center; width: 9%;",
             },
             {
-                key: "settings.player.class",
+                key: "player.class",
                 label: "Classe",
                 formatter: "tableFormatter",
                 tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
+                thStyle: "text-align:center; width: 9%;",
             },
             {
-                key: "settings.player.7_10",
+                key: "player.7_10",
                 label: "7-10",
                 formatter: "tableFormatter",
                 tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
+                thStyle: "text-align:center; width: 9%;",
             },
             {
-                key: "settings.player.11_14",
+                key: "player.11_14",
                 label: "11-14",
                 formatter: "tableFormatter",
                 tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
+                thStyle: "text-align:center; width: 9%;",
             },
             {
-                key: "settings.player.15_18",
+                key: "player.15_18",
                 label: "15-18",
                 formatter: "tableFormatter",
                 tdClass: "cellFormatter",
-                thStyle: "text-align:center;  width: 6%;",
+                thStyle: "text-align:center;  width: 9%;",
             },
             {
                 key: "actions",
                 label: "Azioni",
-                thStyle: "width: 17%;",
+                thStyle: "width: 12%;",
             },
         ],
         stories_fields: [
@@ -428,9 +518,7 @@ var vm = new Vue({
                 });
         },
         onEdit(data) {
-            console.log(data)
             this.$bvModal.show(String(data.item.key));
-
         },
         onClone(data) {
             this.isBusy = true;
@@ -469,6 +557,79 @@ var vm = new Vue({
                     this.stories = null;
                 });
         },
+        onDeleteMission(data) {
+            is;
+            this.isBusy = true;
+            fetch("/api/missions/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ key: data.item.key }),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/missions");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.missions = data;
+                    this.isBusy = false;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.missions = null;
+                });
+        },
+        onEditMission(data) {
+            console.log(data)
+            this.$bvModal.show(String(data.item.key));
+        },
+        onCloneMission(data) {
+            this.isBusy = true;
+            let cloned = {
+                key: Date.now(),
+                title: data.item.title,
+                activities: data.item.activities,
+                player: data.item.player,
+            };
+            fetch("/api/missions/new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(cloned),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/missions");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.missions = data;
+                    this.isBusy = false;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.missions = null;
+                });
+        },
     },
 });
 
@@ -483,6 +644,15 @@ function fetchData() {
         .then((data) => {
             vm.$data.missions = data;
         });
+    /* http://localhost:8000/api/stories
+       4 colonne di tipo b-col
+       ogni colonna ha l'overflow nell'asse y ovvero la puoi scorrere in su e giu
+       la prima boh
+       la seconda ha tanti elementi quante le missioni disponibili
+       la terza tanti elementi quante le missioni selezionate
+       la quarta ha diversi elementi come se fosse una pagina a parte, ha il titolo in alto, sotto alcuni dettagli
+       e sotto ancora la tabella degli esiti
+       */
 }
 
 $(document).ready(fetchData);
