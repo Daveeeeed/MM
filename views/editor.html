@@ -51,6 +51,7 @@
                     </custom-navbar-item>
                 </b-navbar-nav>
             </b-navbar>
+
             <b-container fluid v-if="navbar_items[0].isActive">
                 <b-row>
                     <b-col cols="auto" class="mr-auto ml-4">
@@ -105,7 +106,7 @@
                             :items="availableStories"
                             :fields="stories_fields"
                             tbody-tr-class="table-row"
-                            thead-class="cell-title"
+                            thead-class="cell-default"
                         >
                             <template v-slot:cell(actions)="data">
                                 <b-button
@@ -125,7 +126,7 @@
                                 <b-button
                                     size="sm"
                                     style="background-color: #ff3d4a"
-                                    @click="onDelete(data)"
+                                    @click="onDelete(data,'stories')"
                                 >
                                     <b-icon-trash-fill></b-icon-trash-fill>
                                 </b-button>
@@ -144,7 +145,7 @@
                                 <b-button
                                     size="sm"
                                     style="background-color: #ffa300"
-                                    @click="onClone(data)"
+                                    @click="onClone(data,'stories')"
                                 >
                                     <b-icon-back></b-icon-back>
                                 </b-button>
@@ -166,7 +167,7 @@
                             :items="archivedStories"
                             :fields="stories_fields"
                             tbody-tr-class="table-row"
-                            thead-class="cell-title"
+                            thead-class="cell-default"
                         >
                             <template v-slot:cell(actions)="data">
                                 <b-button
@@ -186,7 +187,7 @@
                                 <b-button
                                     size="sm"
                                     style="background-color: #ff3d4a"
-                                    @click="onDelete(data)"
+                                    @click="onDelete(data,'stories')"
                                 >
                                     <b-icon-trash-fill></b-icon-trash-fill>
                                 </b-button>
@@ -200,7 +201,7 @@
                                 <b-button
                                     size="sm"
                                     style="background-color: #ffa300"
-                                    @click="onClone(data)"
+                                    @click="onClone(data,'stories')"
                                 >
                                     <b-icon-back></b-icon-back>
                                 </b-button>
@@ -215,6 +216,7 @@
                     </b-col>
                 </b-row>
             </b-container>
+
             <b-container fluid v-if="navbar_items[1].isActive">
                 <b-row>
                     <b-col cols="auto" class="mr-auto ml-4">
@@ -241,9 +243,10 @@
                     <b-col cols="auto" class="my-2 mr-3 px-0">
                         <b-button
                             class="px-4"
-                            @click="$bvModal.show('modal-add-mission')"
+                            @click="$bvModal.show('modal-add-simple-mission')"
                             >Aggiungi Nuova Missione</b-button
                         >
+                        <add-simple-mission-modal></add-simple-mission-modal>
                     </b-col>
                 </b-row>
                 <b-row>
@@ -257,30 +260,31 @@
                             :items="missions"
                             :fields="missions_fields"
                             tbody-tr-class="table-row"
-                            thead-class="cell-title"
+                            thead-class="cell-default"
                         >
                             <template v-slot:cell(actions)="data">
                                 <b-button
                                     size="sm"
                                     style="background-color: #ff3d4a"
-                                    @click="onDeleteMission(data)"
+                                    @click="onDelete(data,'missions')"
                                 >
                                     <b-icon-trash-fill></b-icon-trash-fill>
                                 </b-button>
                                 <b-button
                                     size="sm"
                                     style="background-color: #00bec8"
-                                    @click="onEditMission(data)"
+                                    @click="onEdit(data)"
                                 >
                                     <b-icon-pencil-square></b-icon-pencil-square>
                                     <modal-edit-mission
                                         :mission="data.item"
+                                        :activities="activities"
                                     ></modal-edit-mission>
                                 </b-button>
                                 <b-button
                                     size="sm"
                                     style="background-color: #ffa300"
-                                    @click="onCloneMission(data)"
+                                    @click="onClone(data,'missions')"
                                 >
                                     <b-icon-back></b-icon-back>
                                 </b-button>
@@ -295,8 +299,86 @@
                     </b-col>
                 </b-row>
             </b-container>
+
             <b-container fluid v-if="navbar_items[2].isActive">
-                <b-row> </b-row>
+                <b-row>
+                    <b-col cols="auto" class="mr-auto ml-4">
+                        <b-list-group class="tabs" horizontal>
+                            <custom-list-item
+                                :item="item"
+                                v-for="item in list_items_activities"
+                            ></custom-list-item>
+                        </b-list-group>
+                    </b-col>
+                    <b-col cols="4" class="my-2 px-0">
+                        <b-input-group id="searchbar" class="px-1">
+                            <b-input-group-prepend is-text>
+                                <b-icon-search></b-icon-search>
+                            </b-input-group-prepend>
+                            <b-form-input
+                                spellcheck="false"
+                                type="search"
+                                placeholder="Cerca missioni..."
+                                v-model="activity_filter"
+                            ></b-form-input>
+                        </b-input-group>
+                    </b-col>
+                    <b-col cols="auto" class="my-2 mr-3 px-0">
+                        <b-button
+                            class="px-4"
+                            @click="$bvModal.show('modal-add-activity')"
+                            >Aggiungi Nuova Attività</b-button
+                        ><add-simple-activity-modal></add-simple-activity-modal>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-table
+                            borderless
+                            hover
+                            :busy="isBusy"
+                            :filter="activity_filter"
+                            :filter-included-fields="filter_field"
+                            :items="activities"
+                            :fields="activities_fields"
+                            tbody-tr-class="table-row"
+                            thead-class="cell-default"
+                        >
+                            <template v-slot:cell(actions)="data">
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #ff3d4a"
+                                    @click="onDelete(data,'activities')"
+                                >
+                                    <b-icon-trash-fill></b-icon-trash-fill>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #00bec8"
+                                    @click="onEdit(data)"
+                                >
+                                    <b-icon-pencil-square></b-icon-pencil-square>
+                                    <modal-edit-activity
+                                        :activity="data.item"
+                                    ></modal-edit-activity>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    style="background-color: #ffa300"
+                                    @click="onClone(data,'activities')"
+                                >
+                                    <b-icon-back></b-icon-back>
+                                </b-button>
+                            </template>
+                            <template v-slot:table-busy>
+                                <div class="text-center text-danger my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Loading...</strong>
+                                </div>
+                            </template>
+                        </b-table>
+                    </b-col>
+                </b-row>
             </b-container>
         </div>
 
@@ -324,77 +406,99 @@
         <template id="modal-edit-mission-template">
             <b-modal size="xl" :id="modalId">
                 <template v-slot:modal-header>
-                    <b-container>
-                        <b-row>
-                            <b-col cols="auto" class="mr-auto my-auto ml-4">
-                                <h4>{{ mission.title }}</h4>
-                            </b-col>
-                            <b-col cols="auto" class="mr-3 px-0">
-                                <b-button
-                                    class="px-4"
-                                    @click="$bvModal.hide(modalId)"
-                                    >X</b-button
-                                >
+                    <b-container fluid class="px-0 py-0 mx-0 my-0">
+                        <b-row class="px-0 py-0 mx-0 my-0">
+                            <b-col
+                                cols="auto"
+                                class="mr-auto my-auto ml-4 px-0 py-3"
+                            >
+                                <h4 class="my-0">{{ mission.title }}</h4>
                             </b-col>
                         </b-row>
                     </b-container>
                 </template>
-                <template v-slot:modal-footer="{ ok ,hide}">
-                    <b-button @click="ok()"> Salva </b-button>
-                    <b-button @click="hide()"> Chiudi </b-button>
-                </template>
                 <template v-slot:default>
-                    <b-container>
-                        <b-row>
-                            <b-col>
+                    <b-container fluid class="p-0 m-0">
+                        <b-row class="p-0 m-0">
+                            <b-col class="p-0 m-0 menu-column" cols="2">
                                 <b-list-group>
                                     <b-list-group-item
-                                        >Percorso 1</b-list-group-item
+                                        button
+                                        v-for="item in list_item_edit_mission"
+                                        :class="{ active : item.isActive }"
                                     >
-                                    <b-list-group-item
-                                        >Percorso 2</b-list-group-item
-                                    >
-                                    <b-list-group-item
-                                        >Percorso 3</b-list-group-item
-                                    >
-                                    <b-list-group-item
-                                        >Percorso 4</b-list-group-item
-                                    >
+                                        <h6 class="my-0">{{item.name}}</h6>
+                                    </b-list-group-item>
                                 </b-list-group>
                             </b-col>
-                            <b-col>
-                                <b-list-group>
-                                    <b-list-group-item
-                                        >Attività 1</b-list-group-item
+                            <b-col
+                                cols="6"
+                                v-if="list_item_edit_mission[0].isActive"
+                            >
+                                <b-row class="m-0 p-0">
+                                    <b-col cols="auto" class="mr-auto p-0 mt-2">
+                                        <h3>Disponibili</h3>
+                                    </b-col>
+                                    <b-col cols="6" class="my-2 px-0">
+                                        <b-input-group class="px-0">
+                                            <b-form-input
+                                                spellcheck="false"
+                                                type="search"
+                                                placeholder="Cerca"
+                                                v-model="activity_filter"
+                                            ></b-form-input>
+                                        </b-input-group>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col
+                                        class="mission-group-item scrollable px-3 py-3 m-0"
                                     >
-                                    <b-list-group-item
-                                        >Attività 2</b-list-group-item
-                                    >
-                                    <b-list-group-item
-                                        >Attività 3</b-list-group-item
-                                    >
-                                    <b-list-group-item
-                                        >Attività 4</b-list-group-item
-                                    >
-                                </b-list-group>
+                                        <b-list-group>
+                                            <b-list-group-item
+                                                v-for="activity in filteredActivities"
+                                                class="px-0 py-2 my-1"
+                                                button
+                                                @click="onAvailableActivityClick(activity)"
+                                                :class="checkActivity(activity)"
+                                            >
+                                                {{ activity.title }}
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                    </b-col>
+                                </b-row>
                             </b-col>
-                            <b-col>
-                                <b-list-group>
-                                    <b-list-group-item
-                                        >Attività 1</b-list-group-item
+                            <b-col
+                                cols="4"
+                                v-if="list_item_edit_mission[0].isActive"
+                            >
+                                <b-row class="m-0 p-0">
+                                    <b-col class="p-0 mt-2 mb-1">
+                                        <h3 style="height: 34px">Aggiunte</h3>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                   
+                                    <b-col
+                                        class="mission-group-item scrollable px-3 py-3 m-0"
                                     >
-                                    <b-list-group-item
-                                        >Attività 2</b-list-group-item
-                                    >
-                                    <b-list-group-item
-                                        >Attività 3</b-list-group-item
-                                    >
-                                    <b-list-group-item
-                                        >Attività 4</b-list-group-item
-                                    >
-                                </b-list-group>
+                                    <h6
+                                            v-if="mission.activities.length == 0"
+                                        >
+                                            Aggiungi qualche attività...
+                                        </h6>
+                                        <b-list-group v-else>
+                                            <b-list-group-item
+                                                v-for="activity in mission.activities"
+                                                class="px-0 py-2 my-1"
+                                                
+                                            >
+                                                {{ activity.title }}
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                    </b-col>
+                                </b-row>
                             </b-col>
-                            <b-col> Info </b-col>
                         </b-row>
                     </b-container>
                 </template>
@@ -434,13 +538,13 @@
                             </b-form-group>
                             <b-form-group label="Giocatore">
                                 <b-form-checkbox-group v-model="giocatore">
-                                    <b-form-checkbox value="singolo"
+                                    <b-form-checkbox value="single"
                                         >Singolo</b-form-checkbox
                                     >
-                                    <b-form-checkbox value="gruppo"
+                                    <b-form-checkbox value="group"
                                         >Gruppo</b-form-checkbox
                                     >
-                                    <b-form-checkbox value="classe"
+                                    <b-form-checkbox value="class"
                                         >Classe</b-form-checkbox
                                     >
                                 </b-form-checkbox-group>
@@ -454,6 +558,84 @@
                         >
                         <b-overlay :show="show" no-wrap></b-overlay>
                     </b-form>
+                </b-container>
+            </b-modal>
+        </template>
+
+        <template id="add-simple-mission-modal">
+            <b-modal
+                size="lg"
+                id="modal-add-simple-mission"
+                title="Aggiungi una nuova missione"
+                hide-footer
+            >
+                <b-container fluid>
+                    <b-form @submit="onSubmit" @reset="onReset">
+                        <b-form-group label="Titolo:" label-for="title">
+                            <b-form-input
+                                type="text"
+                                v-model="form.title"
+                                required
+                                placeholder="Inserisci il titolo..."
+                            ></b-form-input>
+                        </b-form-group>
+                        <div>
+                            <b-form-group label="Età">
+                                <b-form-checkbox-group v-model="eta">
+                                    <b-form-checkbox value="sette"
+                                        >7-10</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="undici"
+                                        >11-14</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="quindici"
+                                        >15-18</b-form-checkbox
+                                    >
+                                </b-form-checkbox-group>
+                            </b-form-group>
+                            <b-form-group label="Giocatore">
+                                <b-form-checkbox-group v-model="giocatore">
+                                    <b-form-checkbox value="single"
+                                        >Singolo</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="group"
+                                        >Gruppo</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="class"
+                                        >Classe</b-form-checkbox
+                                    >
+                                </b-form-checkbox-group>
+                            </b-form-group>
+                        </div>
+                        <b-button variant="primary" type="submit"
+                            >Salva</b-button
+                        >
+                        <b-button variant="secondary" type="reset"
+                            >Indietro</b-button
+                        >
+                        <b-overlay :show="show" no-wrap></b-overlay>
+                    </b-form>
+                </b-container>
+            </b-modal>
+        </template>
+
+        <template id="modal-edit-path-name-template">
+            <b-modal
+                @hide="onHide"
+                @ok="onOk"
+                title="Titolo del percorso"
+                ok-only
+                :id="path.key"
+            >
+                <b-container fluid>
+                    <b-row>
+                        <b-col class="py-3">
+                            <b-form-input
+                                v-model="pathName"
+                                placeholder="Nome del percorso"
+                            ></b-form-input>
+                        </b-col>
+                    </b-row>
                 </b-container>
             </b-modal>
         </template>
@@ -473,7 +655,9 @@
                                 cols="auto"
                                 class="mr-3 my-auto ml-4 py-auto"
                             >
-                                <b-button class="px-4" @click="showQrCode"
+                                <b-button
+                                    class="px-4 darker"
+                                    @click="showQrCode"
                                     >QR CODE</b-button
                                 >
                                 <b-modal id="modal-qr-code" centered ok-only>
@@ -504,22 +688,76 @@
                 <template v-slot:default>
                     <b-container fluid class="p-0 m-0">
                         <b-row class="p-0 m-0">
-                            <b-col class="p-0 m-0 menu" cols="2">
+                            <b-col class="p-0 m-0 menu-column" cols="2">
                                 <b-list-group>
                                     <b-list-group-item
                                         button
                                         v-for="item in list_item_edit_story"
-                                        @click="onEditStoryMenuClick"
+                                        @click="onEditStoryMenuClick(item)"
                                         :class="{ active : item.isActive }"
                                     >
-                                        <h5>{{item.name}}</h5>
+                                        <h6 class="my-0">{{item.name}}</h6>
                                     </b-list-group-item>
                                 </b-list-group>
                             </b-col>
                             <b-col
-                                class="mission-group-item disponibili"
-                                cols="6"
+                                cols="10"
                                 v-if="list_item_edit_story[0].isActive"
+                            >
+                                <b-row style="height: 54px">
+                                    <b-col
+                                        cols="auto"
+                                        class="mr-auto ml-3 my-2 p-0"
+                                    >
+                                        <h3 class="m-0">Percorsi</h3>
+                                    </b-col>
+                                    <b-col cols="auto" class="my-2 mr-3 px-0">
+                                        <b-button class="px-4" @click="addPath"
+                                            >Nuovo Percorso</b-button
+                                        >
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col
+                                        class="mission-group-item scrollable px-3 py-3 m-0"
+                                    >
+                                        <b-list-group>
+                                            <b-list-group-item
+                                                v-for="path in storia.paths"
+                                                class="px-0 py-2 my-1"
+                                                :class="pathClass(path)"
+                                                button
+                                                @click="onPathClick(path)"
+                                            >
+                                                <b-row
+                                                    align-v="center"
+                                                    class="p-0 m-0"
+                                                >
+                                                    <b-col
+                                                        cols="auto"
+                                                        class="mr-auto ml-2"
+                                                    >
+                                                        {{path.name}}
+                                                    </b-col>
+                                                    <b-col>
+                                                        <b-button
+                                                            @click="$bvModal.show(path.key)"
+                                                        >
+                                                            <b-icon-pencil></b-icon-pencil>
+                                                        </b-button>
+                                                        <modal-edit-path-name
+                                                            :path="path"
+                                                        ></modal-edit-path-name>
+                                                    </b-col>
+                                                </b-row>
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                    </b-col>
+                                </b-row>
+                            </b-col>
+                            <b-col
+                                cols="6"
+                                v-if="list_item_edit_story[1].isActive"
                             >
                                 <b-row class="m-0 p-0">
                                     <b-col cols="auto" class="mr-auto p-0 mt-2">
@@ -537,7 +775,9 @@
                                     </b-col>
                                 </b-row>
                                 <b-row>
-                                    <b-col class="scrollable px-3 py-3 m-0">
+                                    <b-col
+                                        class="mission-group-item scrollable px-3 py-3 m-0"
+                                    >
                                         <b-list-group>
                                             <b-list-group-item
                                                 v-for="mission in filteredMissions"
@@ -553,9 +793,8 @@
                                 </b-row>
                             </b-col>
                             <b-col
-                                class="mission-group-item disponibili"
                                 cols="4"
-                                v-if="list_item_edit_story[0].isActive"
+                                v-if="list_item_edit_story[1].isActive"
                             >
                                 <b-row class="m-0 p-0">
                                     <b-col class="p-0 mt-2 mb-1">
@@ -563,13 +802,18 @@
                                     </b-col>
                                 </b-row>
                                 <b-row>
-                                    <b-col class="scrollable px-3 py-3 m-0">
-                                        <h6 v-if="storia.missions.length == 0">Aggiungi qualche missione...</h6>
+                                    <b-col
+                                        class="mission-group-item scrollable px-3 py-3 m-0"
+                                    >
+                                        <h6
+                                            v-if="selected_path.missions.length == 0"
+                                        >
+                                            Aggiungi qualche missione...
+                                        </h6>
                                         <b-list-group v-else>
                                             <b-list-group-item
-                                                v-for="mission in storia.missions "
-                                                class="px-0 py-2 my-1"
-                                                button
+                                                v-for="mission in selected_path.missions"
+                                                class="px-0 py-2 my-1"                                                
                                             >
                                                 {{ mission.title }}
                                             </b-list-group-item>
@@ -577,10 +821,8 @@
                                     </b-col>
                                 </b-row>
                             </b-col>
-
                             <b-col
-                                class="mission-group-item selezionate"
-                                v-if="list_item_edit_story[1].isActive"
+                                v-if="list_item_edit_story[2].isActive"
                                 cols="3"
                             >
                                 <b-row class="m-0 p-0">
@@ -589,11 +831,17 @@
                                     </b-col>
                                 </b-row>
                                 <b-row>
-                                    <b-col class="scrollable px-3 py-3 m-0">
-                                        <h6 v-if="storia.missions.length == 0">Aggiungi qualche missione...</h6>
+                                    <b-col
+                                        class="mission-group-item scrollable px-3 py-3 m-0"
+                                    >
+                                        <h6
+                                            v-if="selected_path.missions.length == 0"
+                                        >
+                                            Aggiungi qualche missione...
+                                        </h6>
                                         <b-list-group v-else>
                                             <b-list-group-item
-                                                v-for="mission in storia.missions "
+                                                v-for="mission in selected_path.missions "
                                                 class="px-0 py-2 my-1"
                                                 button
                                                 @click="showMissionInfos(mission)"
@@ -605,33 +853,150 @@
                                 </b-row>
                             </b-col>
                             <b-col
-                                class="mission-group-item disponibili"
-                                v-if="list_item_edit_story[1].isActive"
-                                cols="7"
-                            >
-                            </b-col>
-
-                            <b-col
-                                class="info"
                                 v-if="list_item_edit_story[2].isActive"
                                 cols="7"
                             >
-                                <b-container fluid>
-                                    <b-row>
-                                        <b-col cols="auto" class="mx-0 px-0 pt-2 mt-1">
-                                            <label>
+                                <h6 v-if="!selected_mission">
+                                    Nessuna missione selezionata
+                                </h6>
+                                <b-container
+                                    fluid
+                                    class="m-0 p-0"
+                                    v-if="selected_mission"
+                                >
+                                    <b-row
+                                        class="m-0 p-0"
+                                        style="
+                                            height: calc(100vh - 75vh);
+                                            overflow-y: auto;
+                                        "
+                                    >
+                                        <b-col class="p-0 m-0">
+                                            <h4 class="mt-2 mb-0">
+                                                {{selected_mission.title}}
+                                            </h4>
+                                            <p class="mt-2 mb-0">
+                                                {{selected_mission.description}}
+                                            </p>
+                                        </b-col>
+                                    </b-row>
+                                </b-container>
+                                <b-container
+                                    fluid
+                                    class="m-0 p-0"
+                                    v-if="selected_mission"
+                                >
+                                    <b-row class="p-0 m-0">
+                                        <b-col
+                                            cols="auto"
+                                            class="mr-auto p-0 mt-2"
+                                        >
+                                            <h3>Esiti</h3>
+                                        </b-col>
+                                        <b-col cols="auto" class="my-2 px-0">
+                                            <b-button
+                                                @click="addSuccessiveMission"
+                                            >
+                                                Aggiungi
+                                            </b-button>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row
+                                        class="p-0 m-0"
+                                        style="
+                                            height: calc(100vh - 51, 4vh);
+                                            overflow-y: auto;
+                                        "
+                                    >
+                                        <b-table
+                                            borderless
+                                            :fields="successive_fields"
+                                            tbody-tr-class="table-row"
+                                            thead-class="cell-default"
+                                            :items="selected_mission.successive"
+                                        >
+                                            <template
+                                                v-slot:cell(selectableMissions)="data"
+                                            >
+                                                <b-form-select
+                                                    :options="selectMission(data)"
+                                                    class="mb-3"
+                                                >
+                                                </b-form-select>
+                                            </template>
+                                        </b-table>
+                                    </b-row>
+                                </b-container>
+                            </b-col>
+
+                            <b-col
+                                class="m-0 p-0"
+                                v-if="list_item_edit_story[3].isActive"
+                                cols="10"
+                            >
+                                <b-container fluid class="m-0 p-0">
+                                    <b-row
+                                        style="margin-top: 5vw"
+                                        class="p-0 justify-content-md-center mt-5"
+                                    >
+                                        <label>
                                             <h4>Titolo della storia:</h4>
-                                            </label>
-                                         </b-col> 
-                                         <b-col cols="auto" class="mx-0 px-0 pt-2 pl-2"> 
-                                           <b-form-input
-                                            class="edit-title"
-                                            type="text"
-                                            required
-                                            :placeholder="storia.title"
-                                            maxlength="20"
+                                        </label>
+                                    </b-row>
+                                    <b-row class="p-0 mt-0">
+                                        <b-col cols="4" offset="4">
+                                            <b-form-input
+                                                class="edit-title"
+                                                type="text"
+                                                required
+                                                :placeholder="storia.title"
+                                                maxlength="20"
                                             ></b-form-input>
-                                         </b-col>  
+                                        </b-col>
+                                    </b-row>
+                                    <b-row style="margin-top: 5vw" class="p-0">
+                                        <b-col cols="4" offset="4">
+                                            <b-form-group label="Età">
+                                                <b-form-checkbox-group
+                                                    v-model="story_settings"
+                                                >
+                                                    <b-form-checkbox
+                                                        value="sette"
+                                                        >7-10</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="undici"
+                                                        >11-14</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="quindici"
+                                                        >15-18</b-form-checkbox
+                                                    >
+                                                </b-form-checkbox-group>
+                                            </b-form-group>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row style="margin-top: 5vw" class="p-0">
+                                        <b-col cols="4" offset="4">
+                                            <b-form-group label="Giocatore">
+                                                <b-form-checkbox-group
+                                                    v-model="story_settings"
+                                                >
+                                                    <b-form-checkbox
+                                                        value="single"
+                                                        >Singolo</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="group"
+                                                        >Gruppo</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="class"
+                                                        >Classe</b-form-checkbox
+                                                    >
+                                                </b-form-checkbox-group>
+                                            </b-form-group>
+                                        </b-col>
                                     </b-row>
                                 </b-container>
                             </b-col>
@@ -639,6 +1004,245 @@
                     </b-container>
                 </template>
                 <template v-slot:modal-footer> </template>
+            </b-modal>
+        </template>
+
+        <template id="add-simple-activity-modal">
+            <b-modal
+                size="lg"
+                id="modal-add-activity"
+                title="Aggiungi una nuova attività"
+                hide-footer
+            >
+                <b-container fluid>
+                    <b-form @submit="onSubmit" @reset="onReset">
+                        <b-form-group label="Titolo:" label-for="title">
+                            <b-form-input
+                                type="text"
+                                v-model="form.title"
+                                required
+                                placeholder="Inserisci il titolo..."
+                            ></b-form-input>
+                        </b-form-group>
+                        <div>
+                            <b-form-group label="Età">
+                                <b-form-checkbox-group v-model="eta">
+                                    <b-form-checkbox value="sette"
+                                        >7-10</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="undici"
+                                        >11-14</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="quindici"
+                                        >15-18</b-form-checkbox
+                                    >
+                                </b-form-checkbox-group>
+                            </b-form-group>
+                            <b-form-group label="Giocatore">
+                                <b-form-checkbox-group v-model="giocatore">
+                                    <b-form-checkbox value="single"
+                                        >Singolo</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="group"
+                                        >Gruppo</b-form-checkbox
+                                    >
+                                    <b-form-checkbox value="class"
+                                        >Classe</b-form-checkbox
+                                    >
+                                </b-form-checkbox-group>
+                            </b-form-group>
+                        </div>
+                        <b-button variant="primary" type="submit"
+                            >Salva</b-button
+                        >
+                        <b-button variant="secondary" type="reset"
+                            >Indietro</b-button
+                        >
+                        <b-overlay :show="show" no-wrap></b-overlay>
+                    </b-form>
+                </b-container>
+            </b-modal>
+        </template>
+
+        <template id="modal-edit-activity">
+            <b-modal size="xl" :id="modalId" :title="activity.title">
+                <template v-slot:modal-header>
+                    <b-container fluid class="px-0 py-0 mx-0 my-0">
+                        <b-row class="px-0 py-0 mx-0 my-0">
+                            <b-col
+                                cols="auto"
+                                class="mr-auto my-auto ml-4 px-0 py-3"
+                            >
+                                <h4 class="my-0">{{ activity.title }}</h4>
+                            </b-col>
+                        </b-row>
+                    </b-container>
+                </template>
+
+                <template v-slot:default>
+                    <b-container fluid class="p-0 m-0">
+                        <b-row class="p-0 m-0">
+                            <b-col class="p-0 m-0 menu-column" cols="2">
+                                <b-list-group>
+                                    <b-list-group-item
+                                        button
+                                        v-for="item in list_item_edit_activity"
+                                        @click="onEditMenuClick(item)"
+                                        :class="{ active : item.isActive }"
+                                    >
+                                        <h6 class="my-0">{{item.name}}</h6>
+                                    </b-list-group-item>
+                                </b-list-group>
+                            </b-col>
+                            <b-col
+                                cols="3"
+                                v-if="list_item_edit_activity[0].isActive"
+                            >
+                                <b-row class="m-0 p-0">
+                                    <b-col class="p-0 mt-2 mb-1">
+                                        <h3 style="height: 34px">Componenti</h3>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col
+                                        class="mission-group-item scrollable px-3 pb-3 m-0"
+                                    >
+                                        <h3 class="my-2">Obbligatori</h3>
+                                        <b-list-group>
+                                            <b-list-group-item
+                                                v-for="item in list_item_activity_component_special"
+                                                class="px-0 py-2 my-1"
+                                                :class="checkItem(item)"
+                                                button
+                                                @click="onComponentClick(item)"
+                                            >
+                                                {{ item.name }}
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                        <h3 class="my-2">Aggiuntivi</h3>
+                                        <b-list-group>
+                                            <b-list-group-item
+                                                v-for="item in list_item_activity_component"
+                                                class="px-0 py-2 my-1"
+                                                :class="checkItem(item)"
+                                                button
+                                                @click="onComponentClick(item)"
+                                            >
+                                                {{ item.name }}
+                                            </b-list-group-item>
+                                        </b-list-group>
+                                    </b-col>
+                                </b-row>
+                            </b-col>
+                            <b-col
+                                cols="7"
+                                v-if="list_item_edit_activity[0].isActive"
+                            >
+                                <b-row class="m-0 p-0">
+                                    <b-col class="p-0 mt-2 mb-1">
+                                        <h3 style="height: 34px">Anteprima</h3>
+                                    </b-col>
+                                </b-row>
+                                <b-row
+                                    class="d-flex flex-column align-items-center justify-content-center scrollable-both p-0 m-0"
+                                    style="
+                                        border: steelblue 1px solid;
+                                    "
+                                >
+                                        <b-button @click="addSelectedItem" class="my-1 activity-button">
+                                            
+                                        </b-button>
+                                        <b-button @click="addSelectedItem" class="my-1 activity-button">
+                                            
+                                        </b-button>
+                                        <b-button @click="addSelectedItem" class="my-1 activity-button">
+                                            
+                                        </b-button>
+                                    
+                                </b-row>
+                            </b-col>
+
+                            <b-col
+                                class="m-0 p-0"
+                                v-if="list_item_edit_activity[1].isActive"
+                                cols="10"
+                            >
+                                <b-container fluid class="m-0 p-0">
+                                    <b-row
+                                        style="margin-top: 5vw"
+                                        class="p-0 justify-content-md-center mt-5"
+                                    >
+                                        <label>
+                                            <h4>Titolo dell' attività:</h4>
+                                        </label>
+                                    </b-row>
+                                    <b-row class="p-0 mt-0">
+                                        <b-col cols="4" offset="4">
+                                            <b-form-input
+                                                class="edit-title"
+                                                type="text"
+                                                required
+                                                :placeholder="activity.title"
+                                                maxlength="20"
+                                            ></b-form-input>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row style="margin-top: 5vw" class="p-0">
+                                        <b-col cols="4" offset="4">
+                                            <b-form-group label="Età">
+                                                <b-form-checkbox-group
+                                                    v-model="activity_settings"
+                                                >
+                                                    <b-form-checkbox
+                                                        value="sette"
+                                                        >7-10</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="undici"
+                                                        >11-14</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="quindici"
+                                                        >15-18</b-form-checkbox
+                                                    >
+                                                </b-form-checkbox-group>
+                                            </b-form-group>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row style="margin-top: 5vw" class="p-0">
+                                        <b-col cols="4" offset="4">
+                                            <b-form-group label="Giocatore">
+                                                <b-form-checkbox-group
+                                                    v-model="activity_settings"
+                                                >
+                                                    <b-form-checkbox
+                                                        value="single"
+                                                        >Singolo</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="group"
+                                                        >Gruppo</b-form-checkbox
+                                                    >
+                                                    <b-form-checkbox
+                                                        value="class"
+                                                        >Classe</b-form-checkbox
+                                                    >
+                                                </b-form-checkbox-group>
+                                            </b-form-group>
+                                        </b-col>
+                                    </b-row>
+                                </b-container>
+                            </b-col>
+                        </b-row>
+                    </b-container>
+                </template>
+
+                <template v-slot:modal-footer>
+                    <b-row d-flex justify-content-end>
+                        <b-button class="darker mx-1"> Indietro </b-button>
+                        <b-button class="darker mx-1"> Salva </b-button>
+                    </b-row>
+                </template>
             </b-modal>
         </template>
 

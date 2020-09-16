@@ -2,34 +2,27 @@ body {
     background-color: #121421;
 }
 
-.modal-edit-story{
-    background-color: #121421;
-}
-
-#topbar {
+/* NAVBAR E SUOI ELEMENTI */
+.navbar {
     background-color: #1C1E2B;
 }
 
-.modal-content{
-    background-color: #121421;
-    color: #FFFFFF;
-}
-
-.nav-item {
+.navbar .nav-item {
     box-sizing: border-box;
     transition: 0.5s;
     color: #848689;
 }
 
-.nav-item.active {
+.navbar .nav-item.active {
     box-shadow: 0 2px 0 #00BD58;
     color: #FFFFFF;
 }
 
-.nav-item:hover {
+.navbar .nav-item:hover {
     background-color: #28293D;
 }
 
+/* TAB DELLE SCHERMATE (es. Storie e Archiviate) */
 .tabs .list-group-item {
     background-color: transparent;
     border: 0px;
@@ -37,33 +30,26 @@ body {
     white-space:nowrap;
 }
 
-.tabs .list-group-item:hover {
-    background-color: transparent;
-    border: 0px;
-    color: #848689;
-}
-
 .tabs .list-group-item:focus {
-    background-color: transparent;
-    border: 0px;
-    color: #848689;
-    border: none;
-    box-shadow: none;
     outline: 0;
 }
 
 .tabs .list-group-item.active {
-    background-color: transparent;
-    border: 0px;
     color: white;
 }
 
+/* BOTTONE */
 .btn {
     background-color: #1A1C2C;
     border: none;
     border-radius: 10px;
 }
 
+.btn.darker {
+    background-color: #090A11;
+}
+
+/* LENTE INGRANDIMENTO INPUT */
 .input-group-text {
     background-color: #1A1C2C;
     color: #848689;
@@ -71,6 +57,7 @@ body {
     border-radius: 10px;
 }
 
+/* TEXT BOX INPUT */
 .form-control {
     background-color: #1A1C2C;
     color: #FFFFFF;
@@ -85,10 +72,19 @@ body {
     box-shadow: none;
 }
 
+/* TABELLA STORIE/MISSIONI/ATTIVITA' */
 .b-table {
     border-collapse: separate;
     border-spacing: 0px 15px;
-    
+}
+
+.table-row {
+    background-color: #171926;
+    color: #FFFFFF;
+}
+
+.cell-default {
+    color: #FFFFFF;
 }
 
 .cell-true {
@@ -103,49 +99,52 @@ body {
     text-align: center;
 }
 
-.cell-title {
+/* MODAL */
+
+.modal-header {
+    background-color: #1C1E2B;
+    border: 0px;
+}
+
+.modal-footer {
+    background-color: #1C1E2B;
+    border: 0px;
+}
+
+.modal-content{
+    background-color: #121421;
     color: #FFFFFF;
 }
 
-.table-row {
-    background-color: #171926;
+.modal-body {
+    padding: 0px;
+}
+
+.modal-xl .modal-header {
+    padding:  0px;
+    background-color: #1C1E2B;
+    border: 0px;
+    height: 60px;
+}
+
+.modal-xl .modal-footer {
+    background-color: #1C1E2B;
+    border: 0px;
+    height: 68px;
+}
+
+.modal-xl .modal-content{
+    background-color: #121421;
     color: #FFFFFF;
-}
-
-.title-table {
-    width: 32%;
-}
-
-.sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 100; /* Behind the navbar */
-    padding: 56px 0 0; /* Height of navbar */
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
-    background-color: yellow;
-}
-
-.sidebar-sticky {
-    position: relative;
-    top: 0;
     height: calc(100vh - 56px);
-    padding-top: 0%;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: gainsboro;
 }
-/*
-.colonnaprova {
-    border: 1px;
-    border-color: white;
-    border-style: solid;
-    
-}
-*/
 
-/* ATTIVI */
+.modal-xl .modal-body {
+    padding: 0px;
+    height: calc(100vh - 60px - 68px - 56px);
+}
+
+/* ELEMENTO MISSIONE NEL MODAL */
 .mission-group-item .list-group-item {
     background-color: #171926;
     color: #ffffff;
@@ -156,70 +155,71 @@ body {
     outline: 0;
 }
 
-/* NON ATTIVI */
+.mission-group-item .list-group-item:hover {
+    background-color:#1C1E2B;
+}
+
+.mission-group-item .list-group-item:focus {
+    background-color:#1C1E2B;
+}
+
+/* ELEMENTO INATTIVO MISSIONE NEL MODAL */
 .mission-group-item .list-group-item.unavailable {
     color: #848689;
     box-shadow: 0 2px 0 #848689;
 }
 
-
-.mission-group-item .list-group-item:hover {
-    background-color:#1C1E2B;
-}
-
-.menu {
-    margin-left: 0px;
-    border-right: solid 1px white;
-    height: calc(100vh - 64px - 68px - 56px);
+/* PRIMA COLONNA DEL MODAL */
+.menu-column {
+    height: calc(100vh - 60px - 68px - 28px - 28px);
     overflow-y: auto;
     overflow-x: hidden;
+    background-color: #090A11;
 }
 
-.menu .list-group-item {
+.menu-column .list-group-item {
     background-color: transparent;
     border: 0px;
     color: #848689;
     box-sizing: border-box;
     transition: 0.5s;
-    border-radius: 0px;
     outline: 0;
+    border-radius: 0px;
 }
 
-.menu .list-group-item:hover {
-    background-color: #28293D;
-    
+.menu-column .list-group-item:hover {
+    background-color: #28293D; 
 }
-.menu .list-group-item.active{
+
+.menu-column .list-group-item:focus {
+    background-color: #28293D;
+}
+
+.menu-column .list-group-item.active{
    color: white;
    box-shadow: 0px 3px 0px  #00BD58;
 }
 
-.modal-body {
-    padding: 0px;
-    height: calc(100vh - 64px - 68px - 56px);
+.activity-button {
+    width: 200px;
+    height: 100px;
 }
 
 .scrollable {
-    height: calc(100vh - 64px - 68px - 56px - 54px);
+    height: calc(100vh - 60px - 68px - 56px - 54px);
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-.modal-header {
-    padding:  0px;
+.scrollable-both {
+    height: calc(100vh - 60px - 68px - 56px - 54px);
+    overflow-y: auto;
+    overflow-x: auto;
 }
-/*
-.no-scroll {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-}
-*/
-/*.disp .list-group{
 
-    background-color: #FFFFFF;
-}*/
+.mission-group-item .list-group-item.selected_path {
+    background-color: #00BD58;
+}
 
 .selezionate{
     border-right-color: white;
@@ -228,12 +228,32 @@ body {
     color: #ffffff;
     text-align: center;
     overflow-y: auto;
+    overflow-x: hidden;
     height: calc(100vh - 64px - 68px - 56px);
     
 }
-.info{
-    height: calc(100vh - 64px - 68px - 56px);
-}
+
 .edit-title{
     display: inline-block
+}
+
+.bv-no-focus-ring{
+    text-align: center;
+}
+
+.path-label {
+    color: #FFFFFF;
+    background-color: transparent;
+}
+
+.unavailable .path-label {
+    color: #848689;
+}
+
+.path-label:disabled {
+    background-color: transparent;
+}
+
+.path-label:hover {
+    background-color: transparent;
 }
