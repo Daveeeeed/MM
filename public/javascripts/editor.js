@@ -1,333 +1,171 @@
-Vue.component("custom-navbar-item", {
-    props: {
-        item: {
-            type: Object,
-        },
-    },
-    methods: {
-        onClick() {
-            this.$root.navbar_items.forEach((element) => {
-                if (element.name !== this.item.name) element.isActive = false;
-                else element.isActive = true;
-            });
-        },
-    },
-    template: "#custom-navbar-item",
-});
-
-Vue.component("modal-edit-mission", {
-    data(){
-        return{
-            list_item_edit_mission: [
-                {
-                    name: "Attività",
-                    isActive: true,
-                },
-                {
-                    name: "Esiti",
-                    isActive: false,
-                },
-                {
-                    name: "Impostazioni",
-                    isActive: false,
-                },
-            ],
-            successive_fields: [
-                {
-                    key: "min",
-                    label: "Min",
-                    tdClass: "titleFormatter",
-                    thStyle: "width: 20%;",
-                },
-                {
-                    key: "max",
-                    label: "Max",
-                    tdClass: "titleFormatter",
-                    thStyle: "width: 20%;",
-                },
-                {
-                    key: "selectableMissions",
-                    label: "Attivita",
-                    thStyle: "width: 60%;",
-                },
-            ],
-            activity_filter: "",
-            selected_path: null,
-            selected_activity: null,
-            mission_settings: [],
+Vue.component("add-new-element", {
+    data() {
+        return {
+            title: "",
+            sette: false,
+            undici: false,
+            quindici: false,
+            singolo: false,
+            gruppo: false,
+            classe: false,
         };
     },
     props: {
-        activities: {
-            type: Array,
-        },
-        mission: {
-            type: Object,
-        },
-    },
-    computed: {
-        filteredActivities() {
-            if (this.activity_filter) {
-                let a = [];
-                this.activities.forEach((element) => {
-                    if (element.title.includes(this.activity_filter))
-                        a.push(element);
-                });
-                return a;
-            } else return this.activities;
-        },
-        modalId() {
-            return String(this.mission.key);
+        category: {
+            type: String,
         },
     },
     methods: {
-        checkActivity(activity) {
-            let available = true;
-            if (this.mission.activities.indexOf(activity) != -1)
-                available = false;
-            return {
-                unavailable: !available,
-            };
+        collectionName() {
+            switch (this.category) {
+                case "Storie":
+                    return "stories";
+                case "Missioni":
+                    return "missions";
+                case "Attività":
+                    return "activities";
+            }
         },
-        onAvailableActivityClick(activity) {
-            if (this.mission.activities.indexOf(activity) == -1) {
-                this.mission.activities.push(activity);
-            } else
-                for (let i = 0; i < this.mission.activities.length; i++) {
-                    if (this.mission.activities[i] === activity) {
-                        this.mission.activities.splice(i, 1);
-                        i--;
+        newElement() {
+            switch (this.category) {
+                case "Storie":
+                    return {
+                        key: String(Date.now()),
+                        title: this.title,
+                        paths: [],
+                        settings: {
+                            published: false,
+                            archived: false,
+                            player: {
+                                sette: this.sette,
+                                undici: this.undici,
+                                quindici: this.quindici,
+                                single: this.singolo,
+                                group: this.gruppo,
+                                class: this.classe,
+                            },
+                        },
+                    };
+                case "Missioni":
+                    return {
+                        key: String(Date.now()),
+                        title: this.title,
+                        activities: [],                        
+                        player: {
+                            sette: this.sette,
+                            undici: this.undici,
+                            quindici: this.quindici,
+                            single: this.singolo,
+                            group: this.gruppo,
+                            class: this.classe,
+                        },
+                        first_activity: null,
+                    };
+                case "Attività":
+                    return {
+                        key: String(Date.now()),
+                        title: this.title,
+                        elements: [
+                            {
+                                key: String(Date.now()),
+                                type: "",
+                            },
+                        ],
+                        player: {
+                            sette: this.sette,
+                            undici: this.undici,
+                            quindici: this.quindici,
+                            single: this.singolo,
+                            group: this.gruppo,
+                            class: this.classe,
+                        },
+                        correct: {
+                            key: null,
+                            points: null,
+                        },
+                        wrong: {
+                            key: null,
+                            points: null,
+                        },
+                    };
+            }
+        },
+        onSave() {
+            fetch("/api/" + this.collectionName() + "/new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(this.newElement()),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/" + this.collectionName());
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    switch (this.category) {
+                        case "Storie": {
+                            this.$root.stories = data;
+                            break;
+                        }
+                        case "Missioni": {
+                            this.$root.missions = data;
+                            break;
+                        }
+                        case "Attività": {
+                            this.$root.activities = data;
+                            break;
+                        }
                     }
-                }
-        },
-    },
-    template: "#modal-edit-mission-template",
-});
-
-Vue.component("custom-list-item", {
-    props: {
-        item: {
-            type: Object,
-        },
-    },
-    methods: {
-        onClick() {
-            this.$root.list_items_stories.forEach((element) => {
-                if (element.name !== this.item.name) element.isActive = false;
-                else element.isActive = true;
-            });
-        },
-    },
-    template: "#custom-list-item",
-});
-
-Vue.component("add-simple-story-modal", {
-    data() {
-        return {
-            form: {
-                title: null,
-            },
-            eta: [],
-            giocatore: [],
-            show: false,
-        };
-    },
-    computed: {
-        singolo() {
-            return this.giocatore.indexOf("single") != -1;
-        },
-        gruppo() {
-            return this.giocatore.indexOf("group") != -1;
-        },
-        classe() {
-            return this.giocatore.indexOf("class") != -1;
-        },
-        sette() {
-            return this.eta.indexOf("sette") != -1;
-        },
-        undici() {
-            return this.eta.indexOf("undici") != -1;
-        },
-        quindici() {
-            return this.eta.indexOf("quindici") != -1;
-        },
-    },
-    methods: {
-        onSubmit(event) {
-            event.preventDefault();
-            this.show = true;
-            let new_story = {
-                key: Date.now(),
-                title: this.form.title,
-                stages: [],
-                settings: {
-                    archived: false,
-                    published: false,
-                    player: {
-                        single: this.singolo,
-                        group: this.gruppo,
-                        class: this.classe,
-                        sette: this.sette,
-                        undici: this.undici,
-                        quindici: this.quindici,
-                    },
-                },
-            };
-            fetch("/api/stories/new", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(new_story),
-            })
-                .then((response) => {
-                    if (!response.ok)
-                        throw new Error("Network response was not ok");
-                    else return fetch("/api/stories");
-                })
-                .then((response) => {
-                    if (!response.ok)
-                        throw new Error("Network response was not ok");
-                    else return response.json();
-                })
-                .then((data) => {
-                    this.$root.stories = data;
                 })
                 .catch((error) => {
                     console.error(
                         "There has been a problem with your fetch operation",
                         error
                     );
-                    this.$root.stories = null;
+                    switch (this.category) {
+                        case "Storie": {
+                            this.$root.stories = null;
+                            break;
+                        }
+                        case "Missioni": {
+                            this.$root.missions = null;
+                            break;
+                        }
+                        case "Attività": {
+                            this.$root.activities = null;
+                            break;
+                        }
+                    }
                 });
-            this.show = false;
-            this.$bvModal.hide("modal-add-simple-story");
-            this.form.title = null;
-            this.form.nr = null;
+            this.$bvModal.hide("modal-add-new-element");
+            this.title = "";
+            this.sette = false;
+            this.undici = false;
+            this.quindici = false;
+            this.singolo = false;
+            this.gruppo = false;
+            this.classe = false;
         },
-        onReset(event) {
-            event.preventDefault();
-            this.$bvModal.hide("modal-add-simple-story");
-            this.form.title = null;
-            this.form.nr = null;
+        onCancel() {
+            this.$bvModal.hide("modal-add-new-element");
+            this.title = "";
+            this.sette = false;
+            this.undici = false;
+            this.quindici = false;
+            this.singolo = false;
+            this.gruppo = false;
+            this.classe = false;
         },
     },
-    template: "#add-simple-story-modal",
+    template: "#add-new-element",
 });
-
-Vue.component("add-simple-mission-modal", {
-    data() {
-        return {
-            form: {
-                title: null,
-            },
-            eta: [],
-            giocatore: [],
-            show: false,
-        };
-    },
-    computed: {
-        singolo() {
-            return this.giocatore.indexOf("single") != -1;
-        },
-        gruppo() {
-            return this.giocatore.indexOf("group") != -1;
-        },
-        classe() {
-            return this.giocatore.indexOf("class") != -1;
-        },
-        sette() {
-            return this.eta.indexOf("sette") != -1;
-        },
-        undici() {
-            return this.eta.indexOf("undici") != -1;
-        },
-        quindici() {
-            return this.eta.indexOf("quindici") != -1;
-        },
-    },
-    methods: {
-        onSubmit(event) {
-            event.preventDefault();
-            this.show = true;
-            let new_mission = {
-                key: Date.now(),
-                title: this.form.title,
-                stages: [],
-                player: {
-                        single: this.singolo,
-                        group: this.gruppo,
-                        class: this.classe,
-                        sette: this.sette,
-                        undici: this.undici,
-                        quindici: this.quindici,
-                    },
-                
-            };
-            fetch("/api/missions/new", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(new_mission),
-            })
-                .then((response) => {
-                    if (!response.ok)
-                        throw new Error("Network response was not ok");
-                    else return fetch("/api/missions");
-                })
-                .then((response) => {
-                    if (!response.ok)
-                        throw new Error("Network response was not ok");
-                    else return response.json();
-                })
-                .then((data) => {
-                    this.$root.missions = data;
-                })
-                .catch((error) => {
-                    console.error(
-                        "There has been a problem with your fetch operation",
-                        error
-                    );
-                    this.$root.missions = null;
-                });
-            this.show = false;
-            this.$bvModal.hide("modal-add-simple-mission");
-            this.form.title = null;
-            this.form.nr = null;
-        },
-        onReset(event) {
-            event.preventDefault();
-            this.$bvModal.hide("modal-add-simple-mission");
-            this.form.title = null;
-            this.form.nr = null;
-        },
-    },
-    template: "#add-simple-mission-modal",
-});
-
-Vue.component("modal-edit-path-name", {
-    data() {
-        return {
-            pathName: null,
-        }
-    },
-    props: {
-        path: null,
-    },
-    methods: {
-        onHide(){
-            this.pathName = JSON.parse(JSON.stringify(this.path.name))
-        },
-        onOk(){
-        this.path.name = this.pathName;
-        }
-    },
-    mounted() {
-        if (this.path) this.pathName = JSON.parse(JSON.stringify(this.path.name))
-    },
-    template: "#modal-edit-path-name-template",
-})
 
 Vue.component("modal-edit-story", {
     data() {
@@ -346,7 +184,11 @@ Vue.component("modal-edit-story", {
                     isActive: false,
                 },
                 {
-                    name: "Impostazioni",
+                    name: "Impostazioni percorso",
+                    isActive: false,
+                },
+                {
+                    name: "Impostazioni storia",
                     isActive: false,
                 },
             ],
@@ -372,11 +214,12 @@ Vue.component("modal-edit-story", {
             mission_filter: "",
             selected_path: null,
             selected_mission: null,
-            story_settings: [],
+            story: null,
+            isSaved: false,
         };
     },
     props: {
-        storia: null,
+        story_to_edit: null,
         missions: null,
         activities: null,
     },
@@ -391,24 +234,23 @@ Vue.component("modal-edit-story", {
                 return a;
             } else return this.missions;
         },
-        modalId() {
-            return String(this.storia.key);
-        },
     },
     methods: {
-        selectMission(data){
+        selectMission(data) {
             let a = [];
-            this.selected_path.missions.forEach(mission => {
-                if (data.item.key != mission.key) a.push({
-                    value: mission.key,
-                    text: mission.title
-                })
+            this.selected_path.missions.forEach((mission) => {
+                if (data.item.key != mission.key)
+                    a.push({
+                        value: mission.key,
+                        text: mission.title,
+                    });
             });
             return a;
         },
         addPath() {
-            this.storia.paths.push({
+            this.story.paths.push({
                 name: "Senza nome",
+                entry_point: null,
                 missions: [],
                 key: String(Date.now()),
             });
@@ -454,13 +296,14 @@ Vue.component("modal-edit-story", {
             if (
                 (item.name == "Missioni" && this.selected_path) ||
                 (item.name == "Esiti" && this.selected_path) ||
-                (item.name != "Missioni" && item.name != "Esiti")
+                (item.name == "Impostazioni percorso" && this.selected_path) ||
+                (item.name != "Missioni" && item.name != "Esiti" && item.name != "Impostazioni percorso")
             ) {
                 this.list_item_edit_story.forEach(
                     (element) => (element.isActive = false)
                 );
                 item.isActive = true;
-            } else console.log("Error: no path selected");
+            }
         },
         showQrCode() {
             new Promise((resolve, reject) => {
@@ -488,80 +331,412 @@ Vue.component("modal-edit-story", {
                 });
             });
         },
-    },
-    mounted() {
-        if (this.storia.settings.player.single)
-            this.story_settings.push("single");
-        if (this.storia.settings.player.group)
-            this.story_settings.push("group");
-        if (this.storia.settings.player.class)
-            this.story_settings.push("class");
-        if (this.storia.settings.player.sette)
-            this.story_settings.push("sette");
-        if (this.storia.settings.player.undici)
-            this.story_settings.push("undici");
-        if (this.storia.settings.player.quindici)
-            this.story_settings.push("quindici");
-    },
-    template: "#modal-edit-story",
-});
-
-/* MODIFICARE */
-Vue.component("add-simple-activity-modal", {
-    data() {
-        return {
-            form: {
-                title: null,
-            },
-            eta: [],
-            giocatore: [],
-            show: false,
-        };
-    },
-    computed: {
-        singolo() {
-            return this.giocatore.indexOf("single") != -1;
+        onHide() {
+            this.$bvModal.hide(this.story_to_edit.key);
+            this.onEditStoryMenuClick(this.list_item_edit_story[0]);
+            this.mission_filter = "";
+            this.selected_path =  null;
+            this.selected_mission = null;
+            if (!this.isSaved) {
+                this.storiy = JSON.parse(
+                    JSON.stringify(this.story_to_edit)
+                );
+            }
+            this.isSaved = false;
         },
-        gruppo() {
-            return this.giocatore.indexOf("group") != -1;
-        },
-        classe() {
-            return this.giocatore.indexOf("class") != -1;
-        },
-        sette() {
-            return this.eta.indexOf("sette") != -1;
-        },
-        undici() {
-            return this.eta.indexOf("undici") != -1;
-        },
-        quindici() {
-            return this.eta.indexOf("quindici") != -1;
-        },
-    },
-    methods: {
-        onSubmit(event) {
-            event.preventDefault();
-            this.show = true;
-            let new_activity = {
-                key: Date.now(),
-                title: this.form.title,
-                stages: [],
-                player: {
-                        single: this.singolo,
-                        group: this.gruppo,
-                        class: this.classe,
-                        sette: this.sette,
-                        undici: this.undici,
-                        quindici: this.quindici,
-                    },
-                
-            };
-            fetch("/api/activities/new", {
+        onSave() {
+            this.isSaved = true;
+            fetch("/api/stories/edit", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(new_activity),
+                body: JSON.stringify(this.story),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/stories");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.$root.stories = data;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.$root.stories = null;
+                });
+        },
+    },
+    mounted() {
+        this.story = JSON.parse(
+            JSON.stringify(this.story_to_edit)
+        );
+    },
+    template: "#modal-edit-story",
+});
+
+Vue.component("modal-edit-path-name", {
+    data() {
+        return {
+            pathName: null,
+        };
+    },
+    props: {
+        path: null,
+    },
+    methods: {
+        onHide() {
+            this.pathName = JSON.parse(JSON.stringify(this.path.name));
+        },
+        onOk() {
+            this.path.name = this.pathName;
+        },
+    },
+    mounted() {
+        if (this.path)
+            this.pathName = JSON.parse(JSON.stringify(this.path.name));
+    },
+    template: "#modal-edit-path-name-template",
+});
+
+Vue.component("modal-edit-mission", {
+    data() {
+        return {
+            list_item_edit_mission: [
+                {
+                    name: "Attività",
+                    isActive: true,
+                },
+                {
+                    name: "Esiti",
+                    isActive: false,
+                },
+                {
+                    name: "Impostazioni",
+                    isActive: false,
+                },
+            ],
+            successive_fields: [
+                {
+                    key: "min",
+                    label: "Min",
+                    tdClass: "titleFormatter",
+                    thStyle: "width: 20%;",
+                },
+                {
+                    key: "max",
+                    label: "Max",
+                    tdClass: "titleFormatter",
+                    thStyle: "width: 20%;",
+                },
+                {
+                    key: "selectableMissions",
+                    label: "Attivita",
+                    thStyle: "width: 60%;",
+                },
+            ],
+            activity_filter: "",
+            selected_activity: null,
+            mission: null,
+            isSaved: false,
+        };
+    },
+    props: {
+        activities: {
+            type: Array,
+        },
+        mission_to_edit: {
+            type: Object,
+        },
+    },
+    computed: {
+        filteredActivities: function() {
+            if (this.activity_filter) {
+                let a = [];
+                this.activities.forEach((element) => {
+                    if (element.title.includes(this.activity_filter))
+                        a.push(element);
+                });
+                return a;
+            } else return this.activities;
+        },
+    },
+    methods: {
+        showActivityInfos(activity){
+            this.selected_activity = activity;
+        },
+        onEditMenuClick(item) {
+            this.list_item_edit_mission.forEach(
+                (element) => (element.isActive = false)
+            );
+            item.isActive = true;
+        },
+        checkActivity(activity) {
+            let available = true;
+            if (this.mission.activities.indexOf(activity) != -1)
+                available = false;
+            return {
+                //unavailable: !available,
+            };
+        },
+        onAvailableActivityClick(activity) {
+            let a = JSON.parse(JSON.stringify(activity));
+            a.key = String(Date.now());
+            console.log(a)
+            this.mission.activities.push(a);
+            /*
+            if (this.mission.activities.indexOf(activity) == -1) {
+                this.mission.activities.push(activity);
+            } else
+                for (let i = 0; i < this.mission.activities.length; i++) {
+                    if (this.mission.activities[i] === activity) {
+                        this.mission.activities.splice(i, 1);
+                        i--;
+                    }
+                }
+            */
+        },
+        removeActivity(activity){
+            for (let i = 0; i < this.mission.activities.length; i++) {
+                if (this.mission.activities[i].key === activity.key) {
+                    this.mission.activities.splice(i, 1);
+                    i--;
+                }
+            }
+        },
+        onHide() {
+            this.$bvModal.hide(this.mission.key);
+            this.onEditMenuClick(this.list_item_edit_mission[0]);
+            this.activity_filter = "";
+            this.selected_activity = null;
+            if (!this.isSaved) {
+                this.mission = JSON.parse(
+                    JSON.stringify(this.mission_to_edit)
+                );
+            }
+            this.isSaved = false;
+        },
+        onSave() {
+            this.isSaved = true;
+            fetch("/api/missions/edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(this.mission),
+            })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return fetch("/api/missions");
+                })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("Network response was not ok");
+                    else return response.json();
+                })
+                .then((data) => {
+                    this.$root.missions = data;
+                })
+                .catch((error) => {
+                    console.error(
+                        "There has been a problem with your fetch operation",
+                        error
+                    );
+                    this.$root.missions = null;
+                });
+        },
+    },
+    mounted(){
+        this.mission = JSON.parse(
+            JSON.stringify(this.mission_to_edit));
+    },
+    template: "#modal-edit-mission-template",
+});
+
+Vue.component("modal-edit-activity", {
+    data() {
+        return {
+            list_item_edit_activity: [
+                {
+                    name: "Componenti",
+                    isActive: true,
+                },
+                {
+                    name: "Impostazioni",
+                    isActive: false,
+                },
+            ],
+            components_special: [
+                {
+                    type: "Domanda",
+                    question: "",
+                    answers: [],
+                },
+                {
+                    type: "Scelta Multipla",
+                    text: "",
+                    answers: ["","","",""],
+                    correct_answer: null,
+                },
+                {
+                    type: "Foto",
+                    question: "",
+                },
+                {
+                    type: "Testo",
+                    text: "",
+                },
+                {
+                    type: "Collega",
+                    answers: [
+                        {
+                            first: "",
+                            second: "",
+                        },
+                        {
+                            first: "",
+                            second: "",
+                        },
+                        {
+                            first: "",
+                            second: "",
+                        },
+                        {
+                            first: "",
+                            second: "",
+                        },
+                    ]
+                },
+                {
+                    type: "Riempi",
+                    text: "",
+                },
+            ],
+            components: [
+                {
+                    type: "Descrizione",
+                    text: "",
+                },
+                {
+                    type: "Immagine",
+                    text: "",
+                },
+                {
+                    type: "Video",
+                    text: "",
+                },
+                {
+                    type: "Custom",
+                },
+            ],
+            activity: null,
+            isSaved: false,
+            component_selected: null,
+            element_selected: null,
+        };
+    },
+    props: {
+        activity_prop: {
+            type: Object,
+        },
+    },
+    computed:{
+        disableSpecial: function(){
+            // Serve per "forzare" l'update della computed
+            if (this.element_selected) ;
+            let a = false;
+            this.activity.elements.forEach(element => {
+                this.components_special.forEach(component => {
+                    if (element.type == component.type) a = true;
+                });
+            });
+            return a;
+        },
+    },
+    methods: {
+        onEditMenuClick(item) {
+            this.list_item_edit_activity.forEach(
+                (element) => (element.isActive = false)
+            );
+            item.isActive = true;
+        },
+        onComponentClick(component){
+            if (this.component_selected){
+                if (this.component_selected.type == component.type) {
+                    this.component_selected = null;
+                } else {
+                    this.component_selected = JSON.parse(JSON.stringify(component));
+                }
+            } else {
+                this.component_selected = JSON.parse(JSON.stringify(component));
+            }
+        },
+        addElement() {
+            this.activity.elements.push({
+                key: String(Date.now()),
+                type: "",
+            });
+        },
+        removeElement(element) {
+            for (let i = 0; i < this.activity.elements.length; i++) {
+                if (this.activity.elements[i] === element) {
+                    this.activity.elements.splice(i, 1);
+                    i--;
+                }
+            }
+        },
+        openComponentModal(element) {
+            if (this.component_selected) {
+                this.element_selected = element;
+                this.$bvModal.show("edit-component-modal");
+            }
+        },
+        editComponent(element){
+            this.element_selected = element;
+            this.component_selected = element;
+            this.$bvModal.show("edit-component-modal");
+        },
+        onHideComponentModal(){
+            this.element_selected = null;
+            this.$bvModal.hide("edit-component-modal");
+        },
+        onSaveComponentModal(){
+            for (let i = 0; i < this.activity.elements.length; i++) {
+                if (this.activity.elements[i].key === this.element_selected.key) {
+                    let key = this.element_selected.key;
+                    this.activity.elements[i] = this.component_selected;
+                    this.activity.elements[i].key = key;
+                }
+            }
+        },
+        onHide() {
+            this.$bvModal.hide(this.modalId);
+            this.component_selected = null;
+            this.element_selected = null;
+            if (!this.isSaved) {
+                this.activity = JSON.parse(
+                    JSON.stringify(this.activity_prop)
+                );
+            }
+            this.isSaved = false;
+        },
+        onSave() {
+            this.isSaved = true;
+            fetch("/api/activities/edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(this.activity),
             })
                 .then((response) => {
                     if (!response.ok)
@@ -570,7 +745,7 @@ Vue.component("add-simple-activity-modal", {
                 })
                 .then((response) => {
                     if (!response.ok)
-                        throw new Error("activityrk response was not ok");
+                        throw new Error("Network response was not ok");
                     else return response.json();
                 })
                 .then((data) => {
@@ -583,351 +758,228 @@ Vue.component("add-simple-activity-modal", {
                     );
                     this.$root.activities = null;
                 });
-            this.show = false;
-            this.$bvModal.hide("modal-add-activity");
-            this.form.title = null;
-            this.form.nr = null;
         },
-        onReset(event) {
-            event.preventDefault();
-            this.$bvModal.hide("modal-add-activity");
-            this.form.title = null;
-            this.form.nr = null;
-        },
-    },
-    template: "#add-simple-activity-modal",
-});
-
-Vue.component("modal-edit-activity", {
-    data(){
-        return {
-            grid_row: 2,
-            grid_column: 15,
-            list_item_edit_activity: [
-                {
-                    name: "Attività",
-                    isActive: true,
-                },
-                {
-                    name: "Impostazioni",
-                    isActive: false,
-                },
-            ],
-            list_item_activity_component: [
-                {
-                    name: "Testo"
-                },
-                {
-                    name: "Immagine"
-                },
-                {
-                    name: "Video"
-                },
-                {
-                    name: "Custom"
-                },
-            ],
-            list_item_activity_component_special: [
-                {
-                    name: "Domanda"
-                },
-                {
-                    name: "Scelta Multipla"
-                },
-                {
-                    name: "Foto"
-                },
-                {
-                    name: "Testo"
-                },
-                {
-                    name: "Collega"
-                },
-                {
-                    name: "Riempi"
-                },
-            ],
-            activity_settings: [],
-            selected_item: null,
-        }
-    },
-    props: {
-        activity: {
-            type: Object
-        }
-    },
-    computed: {
-        modalId(){
-            return String(this.activity.key)
-        },
-    },
-    methods: {
-        checkItem(item){
-            let selected = true;
-            if (this.selected_item != item)
-                selected = false;
-            return {
-                active: selected,
-            };
-        },
-        onComponentClick(item){
-            this.selected_item = (this.selected_item == item) ? null : item;
-        },
-        onEditMenuClick(item) {
-            this.list_item_edit_activity.forEach(
-                (element) => (element.isActive = false)
-            );
-            item.isActive = true;
-        },
-        addSelectedItem(evt){
-            if (this.selected_item){
-                evt.srcElement.innerHTML = this.selected_item.name
-            }
-        }
     },
     mounted() {
-        if (this.activity.player.single)
-            this.activity_settings.push("single");
-        if (this.activity.player.group)
-            this.activity_settings.push("group");
-        if (this.activity.player.class)
-            this.activity_settings.push("class");
-        if (this.activity.player.sette)
-            this.activity_settings.push("sette");
-        if (this.activity.player.undici)
-            this.activity_settings.push("undici");
-        if (this.activity.player.quindici)
-            this.activity_settings.push("quindici");
+        this.activity = JSON.parse(
+            JSON.stringify(this.activity_prop)
+        );
     },
     template: "#modal-edit-activity",
 });
 
-
 var vm = new Vue({
     el: "#app",
     data: {
-        isBusy: false,
+        // MAIN ARRAYS
         stories: null,
         missions: null,
         activities: null,
-        story_filter: null,
-        mission_filter: null,
-        activity_filter: null,
+
+        // SECTIONS
+        raw_sections: [
+            {
+                add_new_placeholder: "Crea Nuova Storia",
+                navbar_name: "Storie",
+                tab_active: "Storie",
+                table_fields: [
+                    {
+                        key: "title",
+                        label: "Titolo",
+                        tdClass: "titleFormatter",
+                        thStyle: "width: 32%;",
+                    },
+                    {
+                        key: "settings.published",
+                        label: "Pubblicata",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 14%;",
+                    },
+                    {
+                        key: "settings.player.single",
+                        label: "Singolo",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 6%;",
+                    },
+                    {
+                        key: "settings.player.group",
+                        label: "Gruppo",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 6%;",
+                    },
+                    {
+                        key: "settings.player.class",
+                        label: "Classe",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 6%;",
+                    },
+                    {
+                        key: "settings.player.sette",
+                        label: "7-10",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 6%;",
+                    },
+                    {
+                        key: "settings.player.undici",
+                        label: "11-14",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 6%;",
+                    },
+                    {
+                        key: "settings.player.quindici",
+                        label: "15-18",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center;  width: 6%;",
+                    },
+                    {
+                        key: "actions",
+                        label: "Azioni",
+                        thStyle: "width: 17%;",
+                    },
+                ],
+                table_filter: null,
+                table_items: null,
+                tabs: ["Storie", "Archiviate"],
+            },
+            {
+                add_new_placeholder: "Crea Nuova Missione",
+                navbar_name: "Missioni",
+                tab_active: "Missioni",
+                table_fields: [
+                    {
+                        key: "title",
+                        label: "Titolo",
+                        tdClass: "titleFormatter",
+                        thStyle: "width: 34%;",
+                    },
+                    {
+                        key: "player.single",
+                        label: "Singolo",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.group",
+                        label: "Gruppo",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.class",
+                        label: "Classe",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.sette",
+                        label: "7-10",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.undici",
+                        label: "11-14",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.quindici",
+                        label: "15-18",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center;  width: 9%;",
+                    },
+                    {
+                        key: "actions",
+                        label: "Azioni",
+                        thStyle: "width: 12%;",
+                    },
+                ],
+                table_filter: null,
+                table_items: null,
+                tabs: ["Missioni"],
+            },
+            {
+                add_new_placeholder: "Crea Nuova Attività",
+                navbar_name: "Attività",
+                tab_active: "Attività",
+                table_fields: [
+                    {
+                        key: "title",
+                        label: "Titolo",
+                        tdClass: "titleFormatter",
+                        thStyle: "width: 34%;",
+                    },
+                    {
+                        key: "player.single",
+                        label: "Singolo",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.group",
+                        label: "Gruppo",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.class",
+                        label: "Classe",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.sette",
+                        label: "7-10",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.undici",
+                        label: "11-14",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center; width: 9%;",
+                    },
+                    {
+                        key: "player.quindici",
+                        label: "15-18",
+                        formatter: "tableFormatter",
+                        tdClass: "cellFormatter",
+                        thStyle: "text-align:center;  width: 9%;",
+                    },
+                    {
+                        key: "actions",
+                        label: "Azioni",
+                        thStyle: "width: 12%;",
+                    },
+                ],
+                table_filter: null,
+                table_items: null,
+                tabs: ["Attività"],
+            },
+        ],
+        active_section: null,
+
+        //TABLES
         filter_field: ["title"],
-        navbar_items: [
-            {
-                name: "Storie",
-                isActive: true,
-            },
-            {
-                name: "Missioni",
-                isActive: false,
-            },
-            {
-                name: "Attività",
-                isActive: false,
-            },
-        ],
-        missions_fields:[
-            {
-                key: "title",
-                label: "Titolo",
-                tdClass: "titleFormatter",
-                thStyle: "width: 34%;",
-            },
-            {
-                key: "player.single",
-                label: "Singolo",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.group",
-                label: "Gruppo",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.class",
-                label: "Classe",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.sette",
-                label: "7-10",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.undici",
-                label: "11-14",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.quindici",
-                label: "15-18",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center;  width: 9%;",
-            },
-            {
-                key: "actions",
-                label: "Azioni",
-                thStyle: "width: 12%;",
-            },
-        ],
-        
-        stories_fields: [
-            {
-                key: "title",
-                label: "Titolo",
-                tdClass: "titleFormatter",
-                thStyle: "width: 32%;",
-            },
-            {
-                key: "settings.published",
-                label: "Pubblicata",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 14%;",
-            },
-            {
-                key: "settings.player.single",
-                label: "Singolo",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
-            },
-            {
-                key: "settings.player.group",
-                label: "Gruppo",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
-            },
-            {
-                key: "settings.player.class",
-                label: "Classe",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
-            },
-            {
-                key: "settings.player.sette",
-                label: "7-10",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
-            },
-            {
-                key: "settings.player.undici",
-                label: "11-14",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 6%;",
-            },
-            {
-                key: "settings.player.quindici",
-                label: "15-18",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center;  width: 6%;",
-            },
-            {
-                key: "actions",
-                label: "Azioni",
-                thStyle: "width: 17%;",
-            },
-        ],
-        
-        activities_fields: [ 
-            {
-                key: "title",
-                label: "Titolo",
-                tdClass: "titleFormatter",
-                thStyle: "width: 34%;",
-            },
-            {
-                key: "player.single",
-                label: "Singolo",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.group",
-                label: "Gruppo",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.class",
-                label: "Classe",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.sette",
-                label: "7-10",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.undici",
-                label: "11-14",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center; width: 9%;",
-            },
-            {
-                key: "player.quindici",
-                label: "15-18",
-                formatter: "tableFormatter",
-                tdClass: "cellFormatter",
-                thStyle: "text-align:center;  width: 9%;",
-            },
-            {
-                key: "actions",
-                label: "Azioni",
-                thStyle: "width: 12%;",
-            },
-    ],
-
-
-
-
-        list_items_stories: [
-            {
-                name: "Storie",
-                isActive: true,
-            },
-            {
-                name: "Archiviate",
-                isActive: false,
-            },
-        ],
-        list_items_missions: [
-            {
-                name: "Missioni",
-                isActive: true,
-            },
-        ],
-        list_items_activities: [
-            {
-                name: "Attivita",
-                isActive: true,
-            },
-        ],
+        isBusy: false,
     },
     computed: {
         archivedStories() {
@@ -948,16 +1000,32 @@ var vm = new Vue({
                 return a;
             } else return null;
         },
+        sections() {
+            this.raw_sections[0].table_items =
+                this.raw_sections[0].tab_active == "Storie"
+                    ? this.availableStories
+                    : this.archivedStories;
+            this.raw_sections[1].table_items = this.missions;
+            this.raw_sections[2].table_items = this.activities;
+            return this.raw_sections;
+        },
     },
     methods: {
         tableFormatter(value) {
-            return value ? "✓ Yes" : "✗ No";
+            return value ? "✓" : "✗";
         },
         titleFormatter() {
             return "cell-default";
         },
         cellFormatter(value) {
             return value ? "cell-true" : "cell-false";
+        },
+        collectionName(name) {
+            return name == "Storie"
+                ? "stories"
+                : name == "Missioni"
+                ? "missions"
+                : "activities";
         },
         onPublish(data) {
             data.item.settings.published = !data.item.settings.published;
@@ -1023,12 +1091,9 @@ var vm = new Vue({
                     this.stories = null;
                 });
         },
-        onEdit(data) {
-            this.$bvModal.show(String(data.item.key));
-        },
-        onDelete(data, collection) {
+        onDelete(data, name) {
             this.isBusy = true;
-            fetch("/api/" + collection + "/delete", {
+            fetch("/api/" + this.collectionName(name) + "/delete", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -1038,7 +1103,7 @@ var vm = new Vue({
                 .then((response) => {
                     if (!response.ok)
                         throw new Error("Network response was not ok");
-                    else return fetch("/api/" + collection);
+                    else return fetch("/api/" + this.collectionName(name));
                 })
                 .then((response) => {
                     if (!response.ok)
@@ -1046,16 +1111,16 @@ var vm = new Vue({
                     else return response.json();
                 })
                 .then((data) => {
-                    switch (collection) {
-                        case "stories": {
+                    switch (name) {
+                        case "Storie": {
                             this.stories = data;
                             break;
                         }
-                        case "missions": {
+                        case "Missioni": {
                             this.missions = data;
                             break;
                         }
-                        case "activities": {
+                        case "Attività": {
                             this.activities = data;
                             break;
                         }
@@ -1067,54 +1132,58 @@ var vm = new Vue({
                         "There has been a problem with your fetch operation",
                         error
                     );
-                    switch (collection) {
-                        case "stories": {
+                    switch (name) {
+                        case "Storie": {
                             this.stories = null;
                             break;
                         }
-                        case "missions": {
+                        case "Missioni": {
                             this.missions = null;
                             break;
                         }
-                        case "activities": {
+                        case "Attività": {
                             this.activities = null;
                             break;
                         }
                     }
                 });
         },
-        onClone(data,collection) {
+        onEdit(data) {
+            this.$bvModal.show(data.item.key);
+        },
+        onClone(data, name) {
             this.isBusy = true;
-            let cloned = {}
-            switch (collection){
-                case "stories": {
+            let cloned = {};
+            switch (name) {
+                case "Storie": {
                     cloned = {
-                        key: Date.now(),
+                        key: String(Date.now()),
                         title: data.item.title,
                         paths: data.item.paths,
                         settings: data.item.settings,
                     };
                     break;
                 }
-                case "missions": {
+                case "Missioni": {
                     cloned = {
-                        key: Date.now(),
+                        key: String(Date.now()),
                         title: data.item.title,
                         activities: data.item.activities,
                         player: data.item.player,
                     };
                     break;
                 }
-                case "activities": {
+                case "Attività": {
                     cloned = {
-                        key: Date.now(),
+                        key: String(Date.now()),
                         title: data.item.title,
                         player: data.item.player,
+                        elements: data.item.elements,
                     };
                     break;
                 }
             }
-            fetch("/api/" + collection + "/new", {
+            fetch("/api/" + this.collectionName(name) + "/new", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -1124,7 +1193,7 @@ var vm = new Vue({
                 .then((response) => {
                     if (!response.ok)
                         throw new Error("Network response was not ok");
-                    else return fetch("/api/" + collection);
+                    else return fetch("/api/" + this.collectionName(name));
                 })
                 .then((response) => {
                     if (!response.ok)
@@ -1132,16 +1201,16 @@ var vm = new Vue({
                     else return response.json();
                 })
                 .then((data) => {
-                    switch (collection) {
-                        case "stories": {
+                    switch (name) {
+                        case "Storie": {
                             this.stories = data;
                             break;
                         }
-                        case "missions": {
+                        case "Missioni": {
                             this.missions = data;
                             break;
                         }
-                        case "activities": {
+                        case "Attività": {
                             this.activities = data;
                             break;
                         }
@@ -1153,16 +1222,16 @@ var vm = new Vue({
                         "There has been a problem with your fetch operation",
                         error
                     );
-                    switch (collection) {
-                        case "stories": {
+                    switch (name) {
+                        case "Storie": {
                             this.stories = null;
                             break;
                         }
-                        case "missions": {
+                        case "Missioni": {
                             this.missions = null;
                             break;
                         }
-                        case "activities": {
+                        case "Attività": {
                             this.activities = null;
                             break;
                         }
@@ -1170,33 +1239,39 @@ var vm = new Vue({
                 });
         },
     },
+    mounted() {
+        this.active_section = this.sections[0];
+    },
 });
 
 function fetchData() {
+    fetchStories();
+    fetchMissions();
+    fetchActivities();
+}
+
+function fetchStories() {
     fetch("/api/stories")
         .then((response) => response.json())
         .then((data) => {
             vm.$data.stories = data;
         });
+}
+
+function fetchMissions() {
     fetch("/api/missions")
         .then((response) => response.json())
         .then((data) => {
             vm.$data.missions = data;
         });
+}
+
+function fetchActivities() {
     fetch("/api/activities")
         .then((response) => response.json())
         .then((data) => {
             vm.$data.activities = data;
         });
-    /* http://localhost:8000/api/stories
-       4 colonne di tipo b-col
-       ogni colonna ha l'overflow nell'asse y ovvero la puoi scorrere in su e giu
-       la prima boh
-       la seconda ha tanti elementi quante le missioni disponibili
-       la terza tanti elementi quante le missioni selezionate
-       la quarta ha diversi elementi come se fosse una pagina a parte, ha il titolo in alto, sotto alcuni dettagli
-       e sotto ancora la tabella degli esiti
-       */
 }
 
 $(document).ready(fetchData);

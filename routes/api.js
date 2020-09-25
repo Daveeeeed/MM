@@ -26,25 +26,6 @@ router.get("/", function (req, res, next) {
     res.send("api page");
 });
 
-/* DELETE a story */
-router.post("/stories/delete", (req, res) => {
-    db.get("stories")
-        .findOneAndDelete({ key: req.body.key })
-        .then((response) => res.send(response));
-});
-
-router.post("/missions/delete", (req, res) => {
-    db.get("missions")
-        .findOneAndDelete({ key: req.body.key })
-        .then((response) => res.send(response));
-});
-
-router.post("/activities/delete", (req, res) => {
-    db.get("activities")
-        .findOneAndDelete({ key: req.body.key })
-        .then((response) => res.send(response));
-});
-
 /* CREATE a new story */
 router.post("/stories/new", (req, res) => {
     db.get("stories")
@@ -64,13 +45,33 @@ router.post("/activities/new", (req, res) => {
         .then((response) => res.send(response));
 });
 
+
+/* DELETE a story */
+router.post("/stories/delete", (req, res) => {
+    db.get("stories")
+        .findOneAndDelete({ key: req.body.key })
+        .then((response) => res.send(response));
+});
+
+router.post("/missions/delete", (req, res) => {
+    db.get("missions")
+        .findOneAndDelete({ key: req.body.key })
+        .then((response) => res.send(response));
+});
+
+router.post("/activities/delete", (req, res) => {
+    db.get("activities")
+        .findOneAndDelete({ key: req.body.key })
+        .then((response) => res.send(response));
+});
+
 /* REPLACE/EDIT a story */
 router.post("/stories/edit", (req, res) => {
     db.get("stories")
         .update({ key: req.body.key },{
                 $set: {
                     title: req.body.title,
-                    stages: req.body.stages,
+                    paths: req.body.paths,
                     settings: req.body.settings,
                 },
             }
@@ -85,6 +86,22 @@ router.post("/missions/edit", (req, res) => {
                     title: req.body.title,
                     activities: req.body.activities,
                     player: req.body.player,
+                    first_activity: req.body.first_activity,
+                },
+            }
+        )
+        .then((response) => res.send(response));
+});
+
+router.post("/activities/edit", (req, res) => {
+    db.get("activities")
+        .update({ key: req.body.key },{
+                $set: {
+                    title: req.body.title,
+                    elements: req.body.elements,
+                    player: req.body.player,
+                    correct: req.body.correct,
+                    wrong: req.body.wrong,
                 },
             }
         )
