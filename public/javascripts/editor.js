@@ -317,7 +317,7 @@ Vue.component("modal-edit-story", {
                     ratio: null,
                     fill: "#000",
                     back: "#fff",
-                    text: "ciao",
+                    text: "http://192.168.178.21:8000/play?key=" + this.story.key,
                     rounded: 0,
                     quiet: 0,
                     // label/image size and pos in pc: 0..100

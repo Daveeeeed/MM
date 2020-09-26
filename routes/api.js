@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+var path = require("path");
 
 /* MONK setup */
 var monk = require("monk");
@@ -45,7 +46,6 @@ router.post("/activities/new", (req, res) => {
         .then((response) => res.send(response));
 });
 
-
 /* DELETE a story */
 router.post("/stories/delete", (req, res) => {
     db.get("stories")
@@ -68,7 +68,9 @@ router.post("/activities/delete", (req, res) => {
 /* REPLACE/EDIT a story */
 router.post("/stories/edit", (req, res) => {
     db.get("stories")
-        .update({ key: req.body.key },{
+        .update(
+            { key: req.body.key },
+            {
                 $set: {
                     title: req.body.title,
                     paths: req.body.paths,
@@ -81,7 +83,9 @@ router.post("/stories/edit", (req, res) => {
 
 router.post("/missions/edit", (req, res) => {
     db.get("missions")
-        .update({ key: req.body.key },{
+        .update(
+            { key: req.body.key },
+            {
                 $set: {
                     title: req.body.title,
                     activities: req.body.activities,
@@ -95,7 +99,9 @@ router.post("/missions/edit", (req, res) => {
 
 router.post("/activities/edit", (req, res) => {
     db.get("activities")
-        .update({ key: req.body.key },{
+        .update(
+            { key: req.body.key },
+            {
                 $set: {
                     title: req.body.title,
                     elements: req.body.elements,
@@ -131,6 +137,51 @@ router.get("/activities", (req, res) => {
         .then((response) => {
             res.send(response);
         });
+});
+
+router.get("/tutor", (req, res) => {
+    db.get("games")
+        .insert({
+            story_key: req.query.story_key,
+            game_key: req.query.game_key,
+            players: [],
+        })
+        .then(() => res.send());
+});
+
+router.get("/player", (req, res) => {
+    db.get("games")
+        .find({
+            game_key: req.query.game_key,
+        })
+        .then((response) => {
+            if (response.length == 1) {
+                console.log(response[0]);
+                response[0].players.push({
+                    player_id: req.query.player_id,
+                });
+                db.get("games")
+                    .update(
+                        { game_key: req.query.game_key },
+                        {
+                            $set: {
+                                players: response[0].players,
+                            },
+                        }
+                    )
+                    .then(() => {
+                        res.send({ ok: true });
+                    });
+            } else res.send({ ok: false });
+        });
+});
+
+router.get("/update", (req, res) => {
+    db.get("games")
+        .find({
+            game_key: req.query.game_key,
+        })
+        .then((response) => res.send(response));
 });
 
 module.exports = router;
