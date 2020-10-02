@@ -23,7 +23,7 @@
         <link
             type="text/css"
             rel="stylesheet"
-            href="../public/stylesheets/editor.css"
+            href="../public/stylesheets/tutor.css"
         />
         <!-- Load polyfills to support older browsers -->
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
@@ -35,36 +35,183 @@
     </head>
     <body>
         <div id="app">
-            <b-navbar sticky id="topbar" type="dark" class="py-0 px-0">
-                    <b-navbar-brand href="/" class="py-0 mx-5">
-                        <img
-                            src="../public/images/logo2.png"
-                            alt="Logo"
-                            height="46"
-                        />
-                    </b-navbar-brand>    
-            </b-navbar>
-            <b-container fluid>
-                <b-list-group>
-                    <b-list-group-item
-                        button
-                        v-for="(item,index) in game.players"
-                        :key="index"
-                        class="px-2"
+            <div style="height: 100vh; width: 100vw" class="d-flex flex-column">
+                <div
+                    class="align-self-start"
+                    style="height: 90vh; width: 100vw"
+                >
+                    <h4
+                        style="
+                            color: white;
+                            text-align: center;
+                            margin-top: 5vh;
+                        "
                     >
-                        {{ item.player_id }}
-                    </b-list-group-item>
-                </b-list-group>    
-            </b-container>
+                        LISTA DEI GIOCATORI
+                    </h4>
+                    <b-container class="padre" style="height: 87%">
+                        <b-list-group class="tut">
+                            <b-list-group-item
+                                v-for="(item,index) in game.players"
+                                :key="index"
+                                class="px-2"
+                            >
+                                <b-row align-v="center" class="p-0 m-0">
+                                    <b-col cols="auto" class="mr-auto ml-2">
+                                        {{ item.id }}
+                                    </b-col>
+                                    <b-col cols="auto" class="mr-auto">
+                                        <label
+                                            class="d-flex justify-content-center"
+                                            >nome in codice
+                                        </label>
+                                    </b-col>
+                                    <b-col
+                                        class="d-flex justify-content-end"
+                                        cols="auto"
+                                    >
+                                        <b-row>
+                                            <b-button
+                                                @click="showInfo(item)"
+                                                :class="setPlayerClass1(item)"
+                                            >
+                                                <b-icon-info-circle></b-icon-info-circle>
+                                            </b-button>
+                                            <b-button
+                                                @click="openChat(item)"
+                                                :class="setPlayerClass3(item)"
+                                            >
+                                                <b-icon-chat></b-icon-chat>
+                                            </b-button>
+                                            <b-button
+                                                @click="showPhoto(item)"
+                                                :class="setPlayerClass2(item)"
+                                            >
+                                                <b-icon-camera></b-icon-camera>
+                                            </b-button>
+                                            <b-button
+                                                :class="setPlayerClass4(item)"
+                                            >
+                                                <b-icon icon="bell"></b-icon>
+                                            </b-button>
+                                        </b-row>
+                                    </b-col>
+                                </b-row>
+                            </b-list-group-item>
+                        </b-list-group>
+                        <b-modal
+                            v-if="selected_player"
+                            id="chat-modal"
+                            size="lg"
+                            title="Chat"
+                        >
+                            <div style="height: 60vh">
+                                <div
+                                    class="d-flex flex-column"
+                                    style="
+                                        width: 100%;
+                                        height: 80%;
+                                        overflow-y: auto;
+                                    "
+                                >
+                                    <div
+                                        v-for="message in messages[selected_player.id]"
+                                        :class="message.sender ? 'player-message' : 'tutor-message'"
+                                        class="m-2 p-2 message"
+                                    >
+                                        {{ message.text }}
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row">
+                                    <b-button @click="sendMessage()" class="m-1"
+                                        >Invia</b-button
+                                    >
+                                    <b-form-input
+                                        class="m-1"
+                                        v-model="message"
+                                    ></b-form-input>
+                                </div>
+                            </div>
+                        </b-modal>
+
+                        <b-modal
+                            v-if="selected_player"
+                            id="info-modal"
+                            size="lg"
+                            @ok="updatePlayer()"
+                            @hide=""
+                            @show="setInfoModal"
+                            :title="selected_player.name"
+                        >
+                            <div style="height: 60vh">
+                                <h4 class="mt-4 ml-4">
+                                    Modifica il nome del giocatore
+                                </h4>
+                                <b-form-input
+                                    max-lenght="50"
+                                    style="width: 50%"
+                                    class="ml-4 mt-4"
+                                    type="text"
+                                    v-model="name_to_edit"
+                                    required
+                                    placeholder="Inserisci il nome..."
+                                ></b-form-input>
+                                <h4 class="mt-4 ml-4">Stato del giocatore</h4>
+                                <h5 class="mt-4 ml-4">Missione corrente</h5>
+                                <h5 class="mt-4 ml-4">
+                                    {{ selected_player.status.mission }}
+                                </h5>
+
+                                <h5 class="mt-4 ml-4">Attività corrente</h5>
+                                <h5 class="mt-4 ml-4">
+                                    {{ selected_player.status.activity }}
+                                </h5>
+
+                                <h5 class="mt-4 ml-4">Time stuck</h5>
+                                <h5 class="mt-4 ml-4">
+                                    {{ selected_player.status.time_stuck }}
+                                </h5>
+                            </div>
+                        </b-modal>
+                        <b-modal
+                            v-if="selected_player"
+                            id="photo-modal"
+                            size="lg"
+                            :title="selected_player.name"
+                            cancel-title="Rifiuta"
+                            ok-title="Accetta"
+                            @ok="acceptPhoto()"
+                            @cancel="declinePhoto()"
+                        >
+                            <h3>Foto</h3>
+                        </b-modal>
+                    </b-container>
+                </div>
+
+                <div
+                    class="align-self-end d-flex"
+                    style="width: 100%; height: 10%"
+                >
+                    <b-button autofocus class="flex-fill m-2 darker">
+                        <b-icon icon="person-fill"></b-icon>
+                    </b-button>
+                    <b-button class="flex-fill m-2 darker">
+                        <b-icon icon="bar-chart-fill"></b-icon>
+                    </b-button>
+                    <b-button class="flex-fill m-2 darker">
+                        <b-icon icon="gear-fill"></b-icon>
+                    </b-button>
+                </div>
+            </div>
         </div>
-
-
-
+        <!--
+                            http://192.168.178.21:8000/play?key=1601127169561
+                            http://192.168.178.21:8000/tutor?game_key=124&story_key=1601127169561
+                            -->
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- CUSTOM -->
         <script src="/public/javascripts/tutor.js"></script>
         <script src="../public/javascripts/kjua-0.9.0.min.js"></script>
-        
     </body>
 </html>

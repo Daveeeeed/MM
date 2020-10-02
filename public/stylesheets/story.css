@@ -1,0 +1,23 @@
+body {
+    color: #FFFFFF;
+    background-color: #121421;
+}
+
+.player-message {
+    color: #ffffff;
+    text-align: end;
+
+}
+
+.tutor-message {
+    color: #5affcb;
+    text-align: left;
+}
+
+.message {
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    background-color: #28293D;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}

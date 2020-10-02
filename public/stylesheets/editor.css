@@ -291,3 +291,28 @@ body {
   ::-webkit-scrollbar-thumb:hover {
     background: #555; 
   }
+
+  .tut .list-group-item {
+    background-color: #28293D;
+    border: 0px;
+    color:white;
+    white-space:nowrap;
+    text-align: left;
+    margin-top: 15px;
+}
+
+
+.tutst-group-item:focus {
+    outline: 0;
+}
+
+
+
+
+
+
+
+
+
+
+

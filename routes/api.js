@@ -1,8 +1,21 @@
 var express = require("express");
 var router = express.Router();
-var path = require("path");
 
-/* MONK setup */
+// WEB SOCKET
+var ws = require("ws");
+var webSocketServer = new ws.Server({ port: 8080 });
+
+webSocketServer.on("connection", (webSocket) => {
+    webSocket.on("message", (data) => {
+        webSocketServer.clients.forEach((client) => {
+            if (client.readyState === ws.OPEN) {
+                client.send(data);
+            }
+        });
+    });
+});
+
+// MONK
 var monk = require("monk");
 const { response } = require("express");
 var user = "davide";
@@ -22,12 +35,10 @@ var db = monk(url);
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
-/* GET api homapage */
 router.get("/", function (req, res, next) {
-    res.send("api page");
+    res.send("Api page - you shouldn't be here.");
 });
 
-/* CREATE a new story */
 router.post("/stories/new", (req, res) => {
     db.get("stories")
         .insert(req.body)
@@ -46,7 +57,6 @@ router.post("/activities/new", (req, res) => {
         .then((response) => res.send(response));
 });
 
-/* DELETE a story */
 router.post("/stories/delete", (req, res) => {
     db.get("stories")
         .findOneAndDelete({ key: req.body.key })
@@ -65,7 +75,6 @@ router.post("/activities/delete", (req, res) => {
         .then((response) => res.send(response));
 });
 
-/* REPLACE/EDIT a story */
 router.post("/stories/edit", (req, res) => {
     db.get("stories")
         .update(
@@ -114,7 +123,6 @@ router.post("/activities/edit", (req, res) => {
         .then((response) => res.send(response));
 });
 
-/* GET stories data */
 router.get("/stories", (req, res) => {
     db.get("stories")
         .find(req.query)
@@ -141,6 +149,16 @@ router.get("/activities", (req, res) => {
 
 router.get("/tutor", (req, res) => {
     db.get("games")
+    .find({
+        game_key: req.query.game_key,
+    })
+    .then((response) =>
+        res.send(response[0])
+    );
+});
+
+router.post("/tutor", (req, res) => {
+    db.get("games")
         .insert({
             story_key: req.query.story_key,
             game_key: req.query.game_key,
@@ -149,16 +167,61 @@ router.get("/tutor", (req, res) => {
         .then(() => res.send());
 });
 
+// Player esegue l'update dello status
+router.post("/player/update", (req, res) => {
+    db.get("games")
+        .find({
+            game_key: req.query.game_key,
+        })
+        .then((response) => {
+            let db_index = findPlayerIndex(
+                req.query.player_id,
+                response[0].players
+            );
+            response[0].players[db_index].status = req.body.status;
+            db.get("games")
+                .update(
+                    { game_key: req.query.game_key },
+                    {
+                        $set: {
+                            players: response[0].players,
+                        },
+                    }
+                )
+                .then(() => {
+                    res.send(response[0].players[db_index]);
+                });
+        });
+});
+
+// Chiamata solo una volta all'apertura del player
 router.get("/player", (req, res) => {
+    db.get("games")
+        .find({
+            game_key: req.query.game_key,
+        })
+        .then((response) =>
+            res.send(findPlayer(req.query.player_id, response[0].players))
+        );
+});
+
+// Chiamata alla creazione di un nuovo player
+router.post("/player", (req, res) => {
     db.get("games")
         .find({
             game_key: req.query.game_key,
         })
         .then((response) => {
             if (response.length == 1) {
-                console.log(response[0]);
                 response[0].players.push({
-                    player_id: req.query.player_id,
+                    id: req.query.player_id,
+                    name: req.query.player_id,
+                    username: "Nome in codice",
+                    status: {
+                        mission: null,
+                        activity: null,
+                        time_stuck: null,
+                    },
                 });
                 db.get("games")
                     .update(
@@ -176,12 +239,58 @@ router.get("/player", (req, res) => {
         });
 });
 
-router.get("/update", (req, res) => {
+// Ritorna l'oggetto player se trovato nella partita
+function findPlayer(player_id, players) {
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].id == player_id) return players[i];
+    }
+}
+
+// Ritorna l'indice dell'oggetto player se trovato nella partita
+function findPlayerIndex(player_id, players) {
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].id == player_id) return i;
+    }
+}
+
+// Tutor esegue fetch dei dati dei giocatori
+router.get("/tutor/update", (req, res) => {
     db.get("games")
         .find({
             game_key: req.query.game_key,
         })
         .then((response) => res.send(response));
+});
+
+router.post("/tutor/update", (req, res) => {
+    db.get("games")
+        .find({
+            game_key: req.query.game_key,
+        })
+        .then((response) => {
+            let player_on_db = findPlayer(
+                req.query.player_id,
+                response[0].players
+            );
+            let db_index = findPlayerIndex(
+                req.query.player_id,
+                response[0].players
+            );
+            player_on_db.name = req.body.name;
+            response[0].players[db_index] = player_on_db;
+            db.get("games")
+                .update(
+                    { game_key: req.query.game_key },
+                    {
+                        $set: {
+                            players: response[0].players,
+                        },
+                    }
+                )
+                .then(() => {
+                    res.send(player_on_db);
+                });
+        });
 });
 
 module.exports = router;

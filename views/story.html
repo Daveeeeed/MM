@@ -23,7 +23,7 @@
         <link
             type="text/css"
             rel="stylesheet"
-            href="../public/stylesheets/editor.css"
+            href="../public/stylesheets/story.css"
         />
         <!-- Load polyfills to support older browsers -->
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
@@ -35,6 +35,37 @@
     </head>
     <body>
         <div id="app">
+            <div
+                v-if="player"
+                style="height: 100vh; width: 100vw"
+                class="d-flex flex-column"
+            >
+                <div style="height: 80%; width: 100%">
+                    <div style="height: 100%; width: 100; background-color: grey;" class="d-flex align-items-center justify-content-center">
+                        <p style="font-size: 10vw; text-align: center;">STORY<br>CONTENT</p>
+                    </div>
+                </div>
+                <div
+                    class="d-flex flex-column"
+                    style="
+                        width: 100%;
+                        height: 20%;
+                        overflow-y: auto;
+                    "
+                >
+                    <div
+                        v-for="message in messages"
+                        :class="message.sender ? 'player-message' : 'tutor-message'"
+                        class="m-2 p-2 message"
+                    >
+                        {{ message.text }}
+                    </div>
+                </div>
+                <div class="d-flex flex-row m-2">
+                    <b-button class="mr-2" style="height: 100%;" @click="sendMessage">Invia</b-button>
+                    <b-form-input style="height: 100%;" v-model="message_input"></b-form-input>
+                </div>
+            </div>
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
