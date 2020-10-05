@@ -659,9 +659,17 @@
                         <b-button class="darker mx-1" @click="hide()">
                             Indietro
                         </b-button>
-                        <b-button class="darker mx-1" @click="ok()">
+                        <b-button
+                            class="darker mx-1"
+                            v-on="validateStory() ? { click: () => ok() } : { click: () => showAlertModal() }"
+                        >
                             Salva
                         </b-button>
+                        <unvalid-alert
+                            :empty_title="story.title == ''"
+                            :empty_paths="!validatePath()"
+                        >
+                        </unvalid-alert>
                     </b-row>
                 </template>
             </b-modal>
@@ -1021,13 +1029,21 @@
                         <b-button class="darker mx-1" @click="hide()">
                             Indietro
                         </b-button>
-                        <b-button class="darker mx-1" @click="ok()">
+                        <b-button class="darker mx-1" v-on="validatemission() ? { click: () => ok() } : { click: () => showAlertModal() }">
                             Salva
                         </b-button>
+                        <unvalid-alert
+                            :empty_title="mission.title == ''"
+                            :empty_start_activity="mission.first_activity == null"
+                            :empty_activity="mission.activities.length == 0"
+                            :empty_connection="!connectionActivities()"
+                        >                            
+                        </unvalid-alert>    
                     </b-row>
                 </template>
             </b-modal>
         </template>
+
 
         <template id="modal-edit-activity">
             <b-modal
@@ -1180,13 +1196,13 @@
                                             id="edit-component-modal"
                                             size="lg"
                                             :title="component_selected.type"
+                                            @ok="onSaveComponentModal()"
                                             @hide="onHideComponentModal()"
                                             @hidden="component_selected = null; disableSpecial"
-                                            @ok="onSaveComponentModal()"
+                                            hide-footer
                                         >
-                                            <template #default>
+                                            <template #default="{ hide, ok }">
                                                 <b-container
-                                                    fluid
                                                     class="my-3 d-flex flex-column justify-content-around"
                                                 >
                                                     <!-- DOMANDA -->
@@ -1454,28 +1470,26 @@
                                                             placeholder="Inserisci il titolo..."
                                                         ></b-form-input>
                                                     </div>
+                                                    
+                                                    <!-- BOTTONI -->
+                                                    <div
+                                                    class="d-flex justify-content-end mt-3"                                                       
+                                                    >
+                                                        <b-button
+                                                            class="darker mx-1"
+                                                            @click="hide()"
+                                                        >
+                                                            Indietro
+                                                        </b-button>
+                                                        <b-button
+                                                            class="darker mx-1"
+                                                            v-on="validateComponent() ? { click: () => ok() } : { click: () => showAlertModal() }"
+                                                        >
+                                                            Salva
+                                                        </b-button>
+                                                    </div>
+                                                    <unvalid-alert v-if="component_selected" :unvalid_component="!validateComponent()"></unvalid-alert>
                                                 </b-container>
-                                            </template>
-                                            <template
-                                                #modal-footer="{ hide, ok }"
-                                            >
-                                                <b-row
-                                                    d-flex
-                                                    justify-content-end
-                                                >
-                                                    <b-button
-                                                        class="darker mx-1"
-                                                        @click="hide()"
-                                                    >
-                                                        Indietro
-                                                    </b-button>
-                                                    <b-button
-                                                        class="darker mx-1"
-                                                        @click="ok()"
-                                                    >
-                                                        Salva
-                                                    </b-button>
-                                                </b-row>
                                             </template>
                                         </b-modal>
                                     </b-container>
@@ -1572,11 +1586,57 @@
                         <b-button class="darker mx-1" @click="hide()">
                             Indietro
                         </b-button>
-                        <b-button class="darker mx-1" @click="ok()">
+                        <b-button
+                            class="darker mx-1"
+                            v-on="validate() ? { click: () => ok() } : { click: () => showAlertModal() }"
+                        >
                             Salva
                         </b-button>
+                        <unvalid-alert
+                            v-if="!component_selected"
+                            :empty_title="activity.title == ''"
+                            :empty_time="activity.time == ''"
+                            :empty_element="!validateStructure()"
+                            :missing_special="!disableSpecial"
+                        >
+                        </unvalid-alert>
                     </b-row>
                 </template>
+            </b-modal>
+        </template>
+
+        <template id="unvalid-alert">
+            <b-modal id="non-valid" title="Attenzione">
+                <b-container class="mt-2" fluid>
+                    <h5>Sono stati trovati i seguenti errori:</h5>
+                    <ul>
+                        <li v-if="empty_title">
+                            Il titolo non può essere vuoto
+                        </li>
+                        <li v-if="empty_time">Il tempo non può essere nullo</li>
+                        <li v-if="empty_element">
+                            Una o più elementi dell'attività sono incompleti
+                        </li>
+                        <li v-if="missing_special">
+                            Seleziona un componente tra i necessari
+                        </li>
+                        <li v-if="empty_start_activity">
+                            Manca l'attività iniziale
+                        </li>
+                        <li v-if="empty_activity">
+                            Nessuna attività aggiunta
+                        </li>
+                        <li v-if="unvalid_component">
+                            Controlla di aver riempito correttamente tutti i campi
+                        </li>
+                        <li v-if="empty_paths">
+                            Inserisci almeno un percorso
+                        </li>
+                        <li v-if="empty_connection">
+                            Inserisci gli esiti delle attività
+                        </li>
+                    </ul>
+                </b-container>
             </b-modal>
         </template>
 

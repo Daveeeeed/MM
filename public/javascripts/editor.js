@@ -50,7 +50,7 @@ Vue.component("add-new-element", {
                     return {
                         key: String(Date.now()),
                         title: this.title,
-                        activities: [],                        
+                        activities: [],
                         player: {
                             sette: this.sette,
                             undici: this.undici,
@@ -65,8 +65,8 @@ Vue.component("add-new-element", {
                                 key: null,
                                 range_min: 0,
                                 range_max: null,
-                            }
-                        ]
+                            },
+                        ],
                     };
                 case "Attività":
                     return {
@@ -175,6 +175,48 @@ Vue.component("add-new-element", {
     template: "#add-new-element",
 });
 
+Vue.component("unvalid-alert", {
+    props: {
+        empty_title: {
+            type: Boolean,
+            default: false,
+        },
+        empty_time: {
+            type: Boolean,
+            default: false,
+        },
+        empty_element: {
+            type: Boolean,
+            default: false,
+        },
+        missing_special: {
+            type: Boolean,
+            default: false,
+        },
+        empty_start_activity: {
+            type: Boolean,
+            default: false,
+        },
+        empty_activity: {
+            type: Boolean,
+            default: false,
+        },
+        unvalid_component: {
+            type: Boolean,
+            default: false,
+        },
+        empty_paths: {
+            type: Boolean,
+            default: false,
+        },
+        empty_connection:{
+            type: Boolean,
+            default: false,
+        }
+    },
+    template: "#unvalid-alert",
+});
+
 Vue.component("modal-edit-story", {
     data() {
         return {
@@ -242,17 +284,32 @@ Vue.component("modal-edit-story", {
                 return a;
             } else return this.missions;
         },
-        resultsSelect: function(){
+        resultsSelect: function () {
             let a = JSON.parse(JSON.stringify(this.selected_path.missions));
             a.push({
                 key: "-1",
-                title: "Fine missione"
-            })
+                title: "Fine missione",
+            });
             return a;
-        }
+        },
     },
     methods: {
-        removePath(path){
+        validateStory() {
+            console.log(this.validatePath())
+            if ((this.story.title != "") && this.validatePath()) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        validatePath() {
+            if (this.story.paths.length != 0) return true;
+            else false;
+        },
+        showAlertModal() {
+            this.$bvModal.show("non-valid");
+        },
+        removePath(path) {
             for (let i = 0; i < this.story.paths.length; i++) {
                 if (this.story.paths[i].key === path.key) {
                     this.story.paths.splice(i, 1);
@@ -280,24 +337,24 @@ Vue.component("modal-edit-story", {
                 key: String(Date.now()),
             });
         },
-        maxResult(){
+        maxResult() {
             let a = 0;
-            this.selected_mission.activities.forEach(activity => {
-                a = a + parseInt(activity.correct.points)
+            this.selected_mission.activities.forEach((activity) => {
+                a = a + parseInt(activity.correct.points);
             });
             return a;
         },
-        addResult(){
-            if (this.selected_mission.results.length < 5){
+        addResult() {
+            if (this.selected_mission.results.length < 5) {
                 this.selected_mission.results.push({
                     id: String(Date.now()),
                     key: null,
                     range_min: null,
                     range_max: null,
-                })
+                });
             }
         },
-        removeResult(result){
+        removeResult(result) {
             for (let i = 0; i < this.selected_mission.results.length; i++) {
                 if (this.selected_mission.results[i].id === result.id) {
                     this.selected_mission.results.splice(i, 1);
@@ -305,11 +362,11 @@ Vue.component("modal-edit-story", {
                 }
             }
         },
-        rangeMin(index){
+        rangeMin(index) {
             let unit = this.maxResult() / this.selected_mission.results.length;
-            return Math.round(unit * (index) + 1);
+            return Math.round(unit * index + 1);
         },
-        rangeMax(index){
+        rangeMax(index) {
             let unit = this.maxResult() / this.selected_mission.results.length;
             return Math.round(unit * (index + 1));
         },
@@ -329,7 +386,7 @@ Vue.component("modal-edit-story", {
             a.key = String(Date.now());
             this.selected_path.missions.push(a);
         },
-        removeMission(mission){
+        removeMission(mission) {
             for (let i = 0; i < this.selected_path.missions.length; i++) {
                 if (this.selected_path.missions[i].key === mission.key) {
                     this.selected_path.missions.splice(i, 1);
@@ -349,7 +406,9 @@ Vue.component("modal-edit-story", {
                 (item.name == "Missioni" && this.selected_path) ||
                 (item.name == "Esiti" && this.selected_path) ||
                 (item.name == "Impostazioni percorso" && this.selected_path) ||
-                (item.name != "Missioni" && item.name != "Esiti" && item.name != "Impostazioni percorso")
+                (item.name != "Missioni" &&
+                    item.name != "Esiti" &&
+                    item.name != "Impostazioni percorso")
             ) {
                 this.list_item_edit_story.forEach(
                     (element) => (element.isActive = false)
@@ -369,7 +428,8 @@ Vue.component("modal-edit-story", {
                     ratio: null,
                     fill: "#000",
                     back: "#fff",
-                    text: "http://192.168.178.21:8000/play?key=" + this.story.key,
+                    text:
+                        "http://192.168.178.21:8000/play?key=" + this.story.key,
                     rounded: 0,
                     quiet: 0,
                     // label/image size and pos in pc: 0..100
@@ -387,12 +447,10 @@ Vue.component("modal-edit-story", {
             this.$bvModal.hide(this.story_to_edit.key);
             this.onEditStoryMenuClick(this.list_item_edit_story[0]);
             this.mission_filter = "";
-            this.selected_path =  null;
+            this.selected_path = null;
             this.selected_mission = null;
             if (!this.isSaved) {
-                this.storiy = JSON.parse(
-                    JSON.stringify(this.story_to_edit)
-                );
+                this.storiy = JSON.parse(JSON.stringify(this.story_to_edit));
             }
             this.isSaved = false;
         },
@@ -428,9 +486,7 @@ Vue.component("modal-edit-story", {
         },
     },
     mounted() {
-        this.story = JSON.parse(
-            JSON.stringify(this.story_to_edit)
-        );
+        this.story = JSON.parse(JSON.stringify(this.story_to_edit));
     },
     template: "#modal-edit-story",
 });
@@ -510,7 +566,7 @@ Vue.component("modal-edit-mission", {
         },
     },
     computed: {
-        filteredActivities: function() {
+        filteredActivities: function () {
             if (this.activity_filter) {
                 let a = [];
                 this.activities.forEach((element) => {
@@ -522,8 +578,32 @@ Vue.component("modal-edit-mission", {
         },
     },
     methods: {
-        showActivityInfos(activity){
-            console.log(activity)
+        connectionActivities() {
+            for (let i = 0; i < this.mission.activities.length; i++) {
+                if (this.mission.activities[i].correct.key == null || this.mission.activities[i].wrong.key == null)
+                    return false;
+            }
+            return true;
+        },
+        validatemission() {
+            console.log(this.connectionActivities())
+            if (
+                this.mission.title != "" &&
+                this.mission.first_activity != null &&
+                this.connectionActivities() &&
+                this.mission.activities.length > 0 
+                
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        showAlertModal() {
+            this.$bvModal.show("non-valid");
+        },
+        showActivityInfos(activity) {
+            console.log(activity);
             this.selected_activity = activity;
         },
         onEditMenuClick(item) {
@@ -537,13 +617,15 @@ Vue.component("modal-edit-mission", {
             a.key = String(Date.now());
             this.mission.activities.push(a);
         },
-        removeActivity(activity){
+        removeActivity(activity) {
             for (let i = 0; i < this.mission.activities.length; i++) {
                 if (this.mission.activities[i].key === activity.key) {
                     this.mission.activities.splice(i, 1);
                     i--;
                 }
             }
+            if (activity.key == this.mission.first_activity)
+                this.mission.first_activity = null;
         },
         onHide() {
             this.$bvModal.hide(this.mission.key);
@@ -551,9 +633,7 @@ Vue.component("modal-edit-mission", {
             this.activity_filter = "";
             this.selected_activity = null;
             if (!this.isSaved) {
-                this.mission = JSON.parse(
-                    JSON.stringify(this.mission_to_edit)
-                );
+                this.mission = JSON.parse(JSON.stringify(this.mission_to_edit));
             }
             this.isSaved = false;
         },
@@ -588,9 +668,8 @@ Vue.component("modal-edit-mission", {
                 });
         },
     },
-    mounted(){
-        this.mission = JSON.parse(
-            JSON.stringify(this.mission_to_edit));
+    mounted() {
+        this.mission = JSON.parse(JSON.stringify(this.mission_to_edit));
     },
     template: "#modal-edit-mission-template",
 });
@@ -616,8 +695,8 @@ Vue.component("modal-edit-activity", {
                 },
                 {
                     type: "Scelta Multipla",
-                    text: "",
-                    answers: ["","","",""],
+                    question: "",
+                    answers: ["", "", "", ""],
                     correct_answer: null,
                 },
                 {
@@ -647,7 +726,7 @@ Vue.component("modal-edit-activity", {
                             first: "",
                             second: "",
                         },
-                    ]
+                    ],
                 },
                 {
                     type: "Riempi",
@@ -682,13 +761,13 @@ Vue.component("modal-edit-activity", {
             type: Object,
         },
     },
-    computed:{
-        disableSpecial: function(){
+    computed: {
+        disableSpecial: function () {
             // Serve per "forzare" l'update della computed
-            if (this.element_selected) ;
+            if (this.element_selected);
             let a = false;
-            this.activity.elements.forEach(element => {
-                this.components_special.forEach(component => {
+            this.activity.elements.forEach((element) => {
+                this.components_special.forEach((component) => {
                     if (element.type == component.type) a = true;
                 });
             });
@@ -696,18 +775,92 @@ Vue.component("modal-edit-activity", {
         },
     },
     methods: {
+        validateStructure() {
+            for (let i = 0; i < this.activity.elements.length; i++) {
+                if (this.activity.elements[i].type == "") return false;
+            }
+            return true;
+        },
+        validate() {
+            if (
+                this.activity.title != "" &&
+                this.activity.time != "" &&
+                this.validateStructure() &&
+                this.disableSpecial
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        checkMultiple(){
+
+        },
+        validateComponent() {
+            switch (this.component_selected.type) {
+                case "Domanda": {
+                    if (
+                        this.component_selected.question != "" &&
+                        this.component_selected.answers.length > 0
+                    )
+                        return true;
+                    else return false;
+                }
+                case "Scelta multipla": {
+                    console.log(function () {
+                        for(let i = 0; i < this.component_selected.answers.length; i++){
+                            if (this.component_selected.answers[i] == "") return false;
+                        }
+                        return true;
+                    })
+                    if (
+                        this.component_selected.question != "" &&
+                        this.component_selected.correct_answer != null &&
+                        function () {
+                            for(let i = 0; i < this.component_selected.answers.length; i++){
+                                if (this.component_selected.answers[i] == "") return false;
+                            }
+                            return true;
+                        }
+                    ) {
+                        return true;
+                    } else return false;
+                }
+                case "Foto": {
+                }
+                case "Testo": {
+                }
+                case "Collega": {
+                }
+                case "Riempi": {
+                }
+                case "Descrizione": {
+                }
+                case "Immagine": {
+                }
+                case "Video": {
+                }
+                case "Custom": {
+                }
+            }
+        },
+        showAlertModal() {
+            this.$bvModal.show("non-valid");
+        },
         onEditMenuClick(item) {
             this.list_item_edit_activity.forEach(
                 (element) => (element.isActive = false)
             );
             item.isActive = true;
         },
-        onComponentClick(component){
-            if (this.component_selected){
+        onComponentClick(component) {
+            if (this.component_selected) {
                 if (this.component_selected.type == component.type) {
                     this.component_selected = null;
                 } else {
-                    this.component_selected = JSON.parse(JSON.stringify(component));
+                    this.component_selected = JSON.parse(
+                        JSON.stringify(component)
+                    );
                 }
             } else {
                 this.component_selected = JSON.parse(JSON.stringify(component));
@@ -733,18 +886,20 @@ Vue.component("modal-edit-activity", {
                 this.$bvModal.show("edit-component-modal");
             }
         },
-        editComponent(element){
+        editComponent(element) {
             this.element_selected = element;
             this.component_selected = element;
             this.$bvModal.show("edit-component-modal");
         },
-        onHideComponentModal(){
+        onHideComponentModal(evt) {
             this.element_selected = null;
             this.$bvModal.hide("edit-component-modal");
         },
-        onSaveComponentModal(){
+        onSaveComponentModal(evt) {
             for (let i = 0; i < this.activity.elements.length; i++) {
-                if (this.activity.elements[i].key === this.element_selected.key) {
+                if (
+                    this.activity.elements[i].key === this.element_selected.key
+                ) {
                     let key = this.element_selected.key;
                     this.activity.elements[i] = this.component_selected;
                     this.activity.elements[i].key = key;
@@ -756,9 +911,7 @@ Vue.component("modal-edit-activity", {
             this.component_selected = null;
             this.element_selected = null;
             if (!this.isSaved) {
-                this.activity = JSON.parse(
-                    JSON.stringify(this.activity_prop)
-                );
+                this.activity = JSON.parse(JSON.stringify(this.activity_prop));
             }
             this.isSaved = false;
         },
@@ -794,9 +947,7 @@ Vue.component("modal-edit-activity", {
         },
     },
     mounted() {
-        this.activity = JSON.parse(
-            JSON.stringify(this.activity_prop)
-        );
+        this.activity = JSON.parse(JSON.stringify(this.activity_prop));
     },
     template: "#modal-edit-activity",
 });
@@ -1209,8 +1360,8 @@ var vm = new Vue({
                                 key: null,
                                 range_min: 0,
                                 range_max: null,
-                            }
-                        ]
+                            },
+                        ],
                     };
                     break;
                 }
