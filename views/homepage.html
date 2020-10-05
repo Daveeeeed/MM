@@ -1,18 +1,53 @@
 <!DOCTYPE html>
 <html lang="it">
     <head>
-        <meta charset="UTF-8" />
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
         <title>Mistero al Museo</title>
+        <!-- BOOTSTRAP -->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../public/stylesheets/editor.css"
+        />
+        <!-- Load polyfills to support older browsers -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+
+        <!-- Required scripts -->
+        <script src="//unpkg.com/vue@latest/dist/vue.js"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     </head>
     <body>
-        <div>
-            <h1>Benvenuto in M&M</h1>
-            <a href="/editor">Vai all'editor di storie</a>
-            <a href="/story?_id=5f2eedb0eac34f0dd3c95986">Vai alla storia</a>
+        <div id="app">
+            <b-container
+                fluid
+                class="d-flex flex-column align-items-center justify-content-center"
+                style="height: 100vh;"
+            >
+                <img class="mb-5" src="../public/images/logo2.png" alt="Logo" height="200" />
+                <h1 class="m-5" style="color: white">Benvenuto in M&M</h1>
+                <a href="/mm/views/editor.html">Vai all'editor di storie</a>
+            </b-container>
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <!-- CUSTOM -->
         <script src="/public/javascripts/homepage.js"></script>
     </body>
 </html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+        <title>Gioca</title>
+        <!-- BOOTSTRAP -->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../public/stylesheets/access.css"
+        />
+        <!-- Load polyfills to support older browsers -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+
+        <!-- Required scripts -->
+        <script src="//unpkg.com/vue@latest/dist/vue.js"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <b-container
+                fluid
+                class="d-flex flex-column align-items-center justify-content-center"
+            >
+                <img
+                    class="mb-4 mt-3"
+                    src="../public/images/logo2.png"
+                    alt="Logo"
+                    height="150"
+                />
+                <b-button
+                    class="m-3 darker"
+                    style="height: 25vh; width: 90vw"
+                    @click="openPlayerModal"
+                >
+                    <h1>GIOCA</h1>
+                </b-button>
+                <b-modal id="player-modal" centered ok-only>
+                    <template #default>
+                        <b-container
+                            fluid
+                            class="d-flex flex-column align-items-center justify-content-center"
+                        >
+                            <h5>
+                                Inserisci il codice d'accesso fornito dal tutor
+                            </h5>
+                            <b-form-input
+                                class="m-1"
+                                required
+                                v-model="player_game_key"
+                                placeholder="Inserisci il codice"
+                                :state="correctInput"
+                            ></b-form-input>
+                            <b-form-invalid-feedback id="input-live-feedback">
+                                Controlla il codice e riprova.
+                              </b-form-invalid-feedback>
+                        </b-container>
+                    </template>
+                    <template #modal-footer>
+                        <b-row d-flex justify-content-end>
+                            <b-button @click="confirmPlayer"> Ok </b-button>
+                        </b-row>
+                    </template>
+                </b-modal>
+                <b-button
+                    class="m-3 darker"
+                    style="height: 25vh; width: 90vw"
+                    @click="openTutorModal"
+                >
+                    <h1>SNITCHA</h1>
+                </b-button>
+                <b-modal id="tutor-modal" centered ok-only @ok="confirmTutor">
+                    <b-container
+                        fluid
+                        class="d-flex flex-column align-items-center justify-content-center"
+                    >
+                        <h5>Fornisci il seguente codice agli utenti</h5>
+                        <h1>{{ tutor_game_key }}</h1>
+                    </b-container>
+                </b-modal>
+            </b-container>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!-- CUSTOM -->
+        <script src="/public/javascripts/access.js"></script>
+        <script src="../public/javascripts/kjua-0.9.0.min.js"></script>
+    </body>
+</html>

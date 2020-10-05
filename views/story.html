@@ -1,91 +1,114 @@
 <!DOCTYPE html>
 <html lang="it">
     <head>
-        <meta charset="UTF-8" />
-        <title>Nome della storia</title>
-        <link rel="stylesheet" href="../public/stylesheets/story.css" />
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+        <title>Storia</title>
+        <!-- BOOTSTRAP -->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="../public/stylesheets/story.css"
+        />
+        <!-- Load polyfills to support older browsers -->
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+
+        <!-- Required scripts -->
+        <script src="//unpkg.com/vue@latest/dist/vue.js"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     </head>
     <body>
         <div id="app">
-            <loading v-if="!story" text="Loading..."></loading>
-            <div v-else>
-                <component
-                    :is="mission_template"
-                    v-bind="mission_props"
-                    v-on:success="proceed"
-                ></component>
+            <div
+                v-if="player"
+                style="height: 100vh; width: 100vw"
+                class="d-flex flex-column"
+            >
+                <div style="height: 80%; width: 100%">
+                    <div
+                        style="
+                            height: 100%;
+                            width: 100%;
+                            overflow-y: auto;
+                            overflow-x: hidden;
+                        "
+                        class="d-flex flex-column"
+                    >
+                        <component
+                            v-for="(element,index) in current_activity.elements"
+                            :is="element.type"
+                            :element="element"
+                        >
+                        </component>
+                        <div class="d-flex mx-2 mt-5 mb-2">
+                            <b-button class="flex-grow-1"> Prosegui </b-button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="d-flex flex-column"
+                    style="width: 100%; height: 20%; overflow-y: auto"
+                >
+                    <div
+                        v-for="message in messages"
+                        :class="message.sender ? 'player-message' : 'tutor-message'"
+                        class="m-2 p-2 message"
+                    >
+                        {{ message.text }}
+                    </div>
+                </div>
+                <div class="d-flex flex-row m-2">
+                    <b-button
+                        class="mr-2"
+                        style="height: 100%"
+                        @click="sendMessage"
+                        >Invia</b-button
+                    >
+                    <b-form-input
+                        style="height: 100%"
+                        v-model="message_input"
+                    ></b-form-input>
+                </div>
+            </div>
+            <div
+                v-else
+                style="height: 100vh; width: 100vw"
+                class="d-flex flex-column justify-content-center align-items-center"
+            >
+                <b-spinner label="caricamento"></b-spinner>
+                <strong class="mt-2">Caricamento della storia in corso</strong>
             </div>
         </div>
 
-        <template id="intro">
-            <div>
-                <div>{{ text }}</div>
-                <button v-on:click="next">Avanti</button>
-            </div>
-        </template>
-
-        <template id="connect">
-            <div>
-                <div>{{ text }}</div>
-                <div class="wrapper">
-                    <div class="left-phrase">
-                        <div v-for="left in leftElements">{{left.text}}</div>
-                    </div>
-                    <div class="right-phrase">
-                        <div v-for="right in rightElements">{{right.text}}</div>
-                    </div>
+        <template id="Collega">
+            <div class="d-flex flex-column m-3">
+                <h3 class="my-2">Riunisci le frasi</h3>
+                <div v-for="answer in element.answers" class="d-flex flex-row justify-content-between my-2">
+                    <b-button>{{ answer.first }}</b-button>
+                    <b-button>{{ answer.second }}</b-button>
                 </div>
-                <button v-on:click="next">Avanti</button>
-            </div>
-        </template>
-
-        <template id="choice">
-            <div>
-                <div>{{ text }}</div>
-                <div class="wrapper">
-                    <div>{{ answers.first }}</div>
-                    <div>{{ answers.second }}</div>
-                    <div>{{ answers.third }}</div>
-                    <div>{{ answers.fourth }}</div>
-                </div>
-                <button v-on:click="next">Avanti</button>
-            </div>
-        </template>
-
-        <template id="question">
-            <div>
-                <div>{{ text }}</div>
-                <div class="wrapper">
-                    <label for="answer">Scrivi qui la tua risposta:</label>
-                    <input
-                        type="text"
-                        id="answer"
-                        name="answer"
-                        placeholder="Riposta..."
-                        autofocus
-                    />
-                </div>
-                <button v-on:click="next">Avanti</button>
-            </div>
-        </template>
-
-        <template id="ending">
-            <div>
-                <div>{{ text }}</div>
-                <div class="wrapper">
-                    <div v-if="game_time">
-                        Ecco il tuo tempo di gioco
-                    </div>
-                    <div v-if="game_points">
-                        Ecco i tuoi punti di merda
-                    </div>
-                </div>
-                <button v-on:click="next">Avanti</button>
             </div>
         </template>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <!-- CUSTOM -->
         <script src="/public/javascripts/story.js"></script>
+        <script src="../public/javascripts/kjua-0.9.0.min.js"></script>
     </body>
 </html>
