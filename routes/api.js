@@ -117,6 +117,7 @@ router.post("/activities/edit", (req, res) => {
                     player: req.body.player,
                     correct: req.body.correct,
                     wrong: req.body.wrong,
+                    time: req.body.time,
                 },
             }
         )
@@ -222,6 +223,8 @@ router.post("/player", (req, res) => {
                         activity: null,
                         time_stuck: null,
                     },
+                    points: 0,
+                    time: 0,
                 });
                 db.get("games")
                     .update(

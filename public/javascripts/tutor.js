@@ -96,6 +96,18 @@ var vm = new Vue({
         message: "",
         name_to_edit: "",
         messages: {},
+        sections: [
+            {
+                title: "GIOCATORI",
+            },
+            {
+                title: "CLASSIFICA",
+            },
+            {
+                title: "IMPOSTAZIONI",
+            }
+        ],
+        selected_section: null,
     },
     computed: {
         selected_player: function () {
@@ -108,6 +120,31 @@ var vm = new Vue({
                 return null;
             }
             return null;
+        },
+        ordinate_player: function () {
+            let a = JSON.parse(JSON.stringify(this.game.players));
+
+            for (let i = 0; i < a.length; i++) {
+                var swapped = new Boolean(false);
+                for (let j = 1; j < a.length - i; j++) {
+                    if(a[j - 1].points == a[j].points){
+                        if(a[j - 1].time > a[j].time){
+                            let temp = a[j - 1];
+                        a[j - 1] = a[j];
+                        a[j] = temp;
+                        swapped = true;
+                        }
+                    }
+                    if (a[j - 1].points < a[j].points) {
+                        let temp = a[j - 1];
+                        a[j - 1] = a[j];
+                        a[j] = temp;
+                        swapped = true;
+                    }
+                }
+                if (!swapped) break;
+                }
+            return a;
         },
     },
     methods: {
@@ -140,6 +177,7 @@ var vm = new Vue({
         openChat(item) {
             this.selected_player_id = item.id;
             this.$bvModal.show("chat-modal");
+            
         },
         showInfo(item) {
             this.selected_player_id = item.id;
@@ -185,12 +223,18 @@ var vm = new Vue({
             this.selected_player_id = item.id;
             this.$bvModal.show("photo-modal");
         },
-    },
+        confirmPhoto(){
 
+        },
+        rejectPhoto(){
+            
+        }
+    },
     created() {
         this.game = {
             players: [],
         };
+        this.selected_section = this.sections[0];
     },
 });
 
@@ -199,8 +243,9 @@ function updateTutor() {
         .then((response) => response.json())
         .then((data) => {
             vm.$data.game = data[0];
-            vm.$data.game.players.forEach(player => {
-                if (vm.$data.messages[player.id] == undefined) vm.$data.messages[player.id] = [];
+            vm.$data.game.players.forEach((player) => {
+                if (vm.$data.messages[player.id] == undefined)
+                    vm.$data.messages[player.id] = [];
             });
         });
 }
@@ -210,8 +255,9 @@ function fetchTutor() {
         .then((response) => response.json())
         .then((data) => {
             vm.$data.game = data;
-            vm.$data.game.players.forEach(player => {
-                if (vm.$data.messages[player.id] == undefined) vm.$data.messages[player.id] = [];
+            vm.$data.game.players.forEach((player) => {
+                if (vm.$data.messages[player.id] == undefined)
+                    vm.$data.messages[player.id] = [];
             });
             setInterval(updateTutor, 2000);
         });

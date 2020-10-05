@@ -37,93 +37,186 @@
         <div id="app">
             <div style="height: 100vh; width: 100vw" class="d-flex flex-column">
                 <div
-                    class="align-self-start"
-                    style="height: 90vh; width: 100vw"
+                    class="topbar d-flex align-items-center justify-content-center"
                 >
-                    <h4
-                        style="
-                            color: white;
-                            text-align: center;
-                            margin-top: 5vh;
-                        "
-                    >
-                        LISTA DEI GIOCATORI
-                    </h4>
-                    <b-container class="padre" style="height: 87%">
-                        <b-list-group class="tut">
+                    <div style="font-size: 5vh">
+                        <h4>{{ selected_section.title }}</h4>
+                    </div>
+                </div>
+                <div class="d-flex" style="height: 80%">
+                    <div class="scrollable mx-5">
+                        <b-list-group v-if="selected_section == sections[0]">
                             <b-list-group-item
                                 v-for="(item,index) in game.players"
                                 :key="index"
-                                class="px-2"
+                                class="px-2 player-row"
                             >
-                                <b-row align-v="center" class="p-0 m-0">
-                                    <b-col cols="auto" class="mr-auto ml-2">
-                                        {{ item.id }}
-                                    </b-col>
-                                    <b-col cols="auto" class="mr-auto">
-                                        <label
-                                            class="d-flex justify-content-center"
-                                            >nome in codice
-                                        </label>
-                                    </b-col>
-                                    <b-col
-                                        class="d-flex justify-content-end"
-                                        cols="auto"
-                                    >
-                                        <b-row>
-                                            <b-button
-                                                @click="showInfo(item)"
-                                                :class="setPlayerClass1(item)"
-                                            >
-                                                <b-icon-info-circle></b-icon-info-circle>
-                                            </b-button>
-                                            <b-button
-                                                @click="openChat(item)"
-                                                :class="setPlayerClass3(item)"
-                                            >
-                                                <b-icon-chat></b-icon-chat>
-                                            </b-button>
-                                            <b-button
-                                                @click="showPhoto(item)"
-                                                :class="setPlayerClass2(item)"
-                                            >
-                                                <b-icon-camera></b-icon-camera>
-                                            </b-button>
-                                            <b-button
-                                                :class="setPlayerClass4(item)"
-                                            >
-                                                <b-icon icon="bell"></b-icon>
-                                            </b-button>
-                                        </b-row>
-                                    </b-col>
-                                </b-row>
-                            </b-list-group-item>
-                        </b-list-group>
-                        <b-modal
-                            v-if="selected_player"
-                            id="chat-modal"
-                            size="lg"
-                            title="Chat"
-                        >
-                            <div style="height: 60vh">
-                                <div
-                                    class="d-flex flex-column"
-                                    style="
-                                        width: 100%;
-                                        height: 80%;
-                                        overflow-y: auto;
-                                    "
-                                >
-                                    <div
-                                        v-for="message in messages[selected_player.id]"
-                                        :class="message.sender ? 'player-message' : 'tutor-message'"
-                                        class="m-2 p-2 message"
-                                    >
-                                        {{ message.text }}
+                                <div class="d-flex align-items-center">
+                                    <div class="ml-3" style="width: 44%">
+                                        {{ item.name }}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        {{ item.username }}
+                                    </div>
+                                    <div class="mr-3">
+                                        <b-button
+                                            @click="showInfo(item)"
+                                            :class="setPlayerClass1(item)"
+                                        >
+                                            <b-icon-info-circle></b-icon-info-circle>
+                                        </b-button>
+                                        <b-button
+                                            @click="openChat(item)"
+                                            :class="setPlayerClass3(item)"
+                                        >
+                                            <b-icon-chat></b-icon-chat>
+                                        </b-button>
+                                        <b-button
+                                            @click="showPhoto(item)"
+                                            :class="setPlayerClass2(item)"
+                                        >
+                                            <b-icon-camera></b-icon-camera>
+                                        </b-button>
+                                        <b-button
+                                            :class="setPlayerClass4(item)"
+                                        >
+                                            <b-icon icon="bell"></b-icon>
+                                        </b-button>
                                     </div>
                                 </div>
-                                <div class="d-flex flex-row">
-                                    <b-button @click="sendMessage()" class="m-1"
+                            </b-list-group-item>
+                        </b-list-group>
+
+                        <b-list-group v-if="selected_section == sections[1]">
+                            <b-list-group-item
+                                v-for="(item,index) in ordinate_player"
+                                :key="index"
+                                class="px-2 player-row"
+                            >
+                                <div class="d-flex align-items-center">
+                                    <div class="ml-3" style="width: 30%">
+                                        {{ item.name }}
+                                    </div>
+                                    <div style="width: 30%">
+                                        {{ item.username }}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        Tempo totale: {{item.time}}
+                                    </div>
+                                    <div class="mr-3">
+                                        Punteggio: {{item.points}}
+                                    </div>
+                                </div>
+                            </b-list-group-item>
+                        </b-list-group>
+
+                        <b-modal
+                            id="info-modal"
+                            size="lg"
+                            @ok="updatePlayer()"
+                            @show="setInfoModal"
+                        >
+                            <template #modal-header>
+                                <h4 class="m-0" v-if="selected_player">
+                                    {{ selected_player.name }}
+                                </h4>
+                            </template>
+                            <template #default>
+                                <div
+                                    v-if="selected_player"
+                                    style="height: 60vh"
+                                >
+                                    <div
+                                        class="d-flex flex-column"
+                                        style="
+                                            width: 100%;
+                                            height: 100%;
+                                            overflow-y: auto;
+                                        "
+                                    >
+                                        <h4 class="mt-4 ml-4">
+                                            Modifica il nome del giocatore
+                                        </h4>
+                                        <b-form-input
+                                            max-lenght="50"
+                                            style="width: 50%"
+                                            class="ml-4 mt-4"
+                                            type="text"
+                                            v-model="name_to_edit"
+                                            placeholder="Inserisci il nome..."
+                                        ></b-form-input>
+                                        <h4 class="mt-4 ml-4">
+                                            Stato del giocatore
+                                        </h4>
+                                        <h5 class="mt-4 ml-4">
+                                            Missione corrente
+                                        </h5>
+                                        <h5 class="mt-4 ml-4">
+                                            {{ selected_player.status.mission }}
+                                        </h5>
+
+                                        <h5 class="mt-4 ml-4">
+                                            Attività corrente
+                                        </h5>
+                                        <h5 class="mt-4 ml-4">
+                                            {{ selected_player.status.activity}}
+                                        </h5>
+                                        <h5 class="mt-4 ml-4">Time stuck</h5>
+                                        <h5 class="mt-4 ml-4">
+                                            {{ selected_player.status.time_stuck}}
+                                        </h5>
+                                    </div>
+                                </div>
+                            </template>
+                            <template #modal-footer="{ hide, ok }">
+                                <div class="d-flex justify-content-end">
+                                    <b-button
+                                        class="darker m-1"
+                                        @click="hide()"
+                                    >
+                                        Indietro
+                                    </b-button>
+                                    <b-button class="darker m-1" @click="ok()">
+                                        Salva
+                                    </b-button>
+                                </div>
+                            </template>
+                        </b-modal>
+
+                        <b-modal id="chat-modal" size="lg">
+                            <template #modal-header>
+                                <h4 class="m-0" v-if="selected_player">
+                                    Chat con {{ selected_player.name }}
+                                </h4>
+                            </template>
+                            <template #default>
+                                <div
+                                    v-if="selected_player"
+                                    style="height: 60vh"
+                                >
+                                    <div
+                                        class="d-flex flex-column"
+                                        style="
+                                            width: 100%;
+                                            height: 100%;
+                                            overflow-y: auto;
+                                        "
+                                    >
+                                        <div
+                                            v-for="message in messages[selected_player.id]"
+                                            :class="message.sender ? 'player-message' : 'tutor-message'"
+                                            class="m-2 p-2 message"
+                                        >
+                                            {{ message.text }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template #modal-footer>
+                                <div class="d-flex" style="width: 100%">
+                                    <b-button
+                                        @click="sendMessage()"
+                                        class="m-1 darker"
                                         >Invia</b-button
                                     >
                                     <b-form-input
@@ -131,84 +224,93 @@
                                         v-model="message"
                                     ></b-form-input>
                                 </div>
-                            </div>
+                            </template>
                         </b-modal>
 
-                        <b-modal
-                            v-if="selected_player"
-                            id="info-modal"
-                            size="lg"
-                            @ok="updatePlayer()"
-                            @hide=""
-                            @show="setInfoModal"
-                            :title="selected_player.name"
-                        >
-                            <div style="height: 60vh">
-                                <h4 class="mt-4 ml-4">
-                                    Modifica il nome del giocatore
+                        <b-modal id="photo-modal" size="lg">
+                            <template #modal-header>
+                                <h4 class="m-0" v-if="selected_player">
+                                    {{ selected_player.name }}
                                 </h4>
-                                <b-form-input
-                                    max-lenght="50"
-                                    style="width: 50%"
-                                    class="ml-4 mt-4"
-                                    type="text"
-                                    v-model="name_to_edit"
-                                    required
-                                    placeholder="Inserisci il nome..."
-                                ></b-form-input>
-                                <h4 class="mt-4 ml-4">Stato del giocatore</h4>
-                                <h5 class="mt-4 ml-4">Missione corrente</h5>
-                                <h5 class="mt-4 ml-4">
-                                    {{ selected_player.status.mission }}
-                                </h5>
-
-                                <h5 class="mt-4 ml-4">Attività corrente</h5>
-                                <h5 class="mt-4 ml-4">
-                                    {{ selected_player.status.activity }}
-                                </h5>
-
-                                <h5 class="mt-4 ml-4">Time stuck</h5>
-                                <h5 class="mt-4 ml-4">
-                                    {{ selected_player.status.time_stuck }}
-                                </h5>
-                            </div>
+                            </template>
+                            <template #default>
+                                <div
+                                    v-if="selected_player"
+                                    style="height: 60vh"
+                                >
+                                    <div
+                                        class="d-flex flex-column"
+                                        style="
+                                            width: 100%;
+                                            height: 100%;
+                                            overflow-y: auto;
+                                        "
+                                    >
+                                        <h1>Foto</h1>
+                                    </div>
+                                </div>
+                            </template>
+                            <template #modal-footer="{ hide, ok }">
+                                <div
+                                    class="d-flex justify-content-center"
+                                    style="width: 100%"
+                                >
+                                    <b-button
+                                        class="flex-fill darker m-1"
+                                        @click="rejectPhoto"
+                                    >
+                                        Rifiuta
+                                    </b-button>
+                                    <b-button
+                                        class="flex-fill darker m-1"
+                                        @click="confirmPhoto"
+                                    >
+                                        Accetta
+                                    </b-button>
+                                </div>
+                            </template>
                         </b-modal>
-                        <b-modal
-                            v-if="selected_player"
-                            id="photo-modal"
-                            size="lg"
-                            :title="selected_player.name"
-                            cancel-title="Rifiuta"
-                            ok-title="Accetta"
-                            @ok="acceptPhoto()"
-                            @cancel="declinePhoto()"
+                        <b-container
+                            v-if="selected_section == sections[2]"
+                            style="height: 100%; width: 100vw"
+                            
                         >
-                            <h3>Foto</h3>
-                        </b-modal>
+                        <div style="height: 90%; width: 100%;" class=" esp d-flex align-items-center justify-content-center">
+                            <b-button
+                                class="esporta ml-2 mr-2"
+                                style="height: 25vh; width: 70%"
+                            >
+                                <h3>Scarica file JSon</h3>
+                            </b-button>
+                        </div>
+                        <div style="height: 10%;" class="d-flex  justify-content-center">
+                            <h3>Chiave d'accesso alla partita: {{ game_key }}</h3>
+                        </div>
                     </b-container>
+                    </div>
                 </div>
-
-                <div
-                    class="align-self-end d-flex"
-                    style="width: 100%; height: 10%"
-                >
-                    <b-button autofocus class="flex-fill m-2 darker">
+                <div class="d-flex py-1 px-1" style="height: 10%">
+                    <b-button
+                        class="flex-fill m-1"
+                        @click="selected_section = sections[0]"
+                    >
                         <b-icon icon="person-fill"></b-icon>
                     </b-button>
-                    <b-button class="flex-fill m-2 darker">
+                    <b-button
+                        class="flex-fill m-1"
+                        @click="selected_section = sections[1]"
+                    >
                         <b-icon icon="bar-chart-fill"></b-icon>
                     </b-button>
-                    <b-button class="flex-fill m-2 darker">
+                    <b-button
+                        class="flex-fill m-1"
+                        @click="selected_section = sections[2]"
+                    >
                         <b-icon icon="gear-fill"></b-icon>
                     </b-button>
                 </div>
             </div>
         </div>
-        <!--
-                            http://192.168.178.21:8000/play?key=1601127169561
-                            http://192.168.178.21:8000/tutor?game_key=124&story_key=1601127169561
-                            -->
-
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- CUSTOM -->
         <script src="/public/javascripts/tutor.js"></script>

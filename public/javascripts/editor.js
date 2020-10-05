@@ -60,6 +60,13 @@ Vue.component("add-new-element", {
                             class: this.classe,
                         },
                         first_activity: null,
+                        results: [
+                            {
+                                key: null,
+                                range_min: 0,
+                                range_max: null,
+                            }
+                        ]
                     };
                 case "Attività":
                     return {
@@ -87,6 +94,7 @@ Vue.component("add-new-element", {
                             key: null,
                             points: null,
                         },
+                        time: null,
                     };
             }
         },
@@ -234,8 +242,25 @@ Vue.component("modal-edit-story", {
                 return a;
             } else return this.missions;
         },
+        resultsSelect: function(){
+            let a = JSON.parse(JSON.stringify(this.selected_path.missions));
+            a.push({
+                key: "-1",
+                title: "Fine missione"
+            })
+            return a;
+        }
     },
     methods: {
+        removePath(path){
+            for (let i = 0; i < this.story.paths.length; i++) {
+                if (this.story.paths[i].key === path.key) {
+                    this.story.paths.splice(i, 1);
+                    this.selected_path = null;
+                    i--;
+                }
+            }
+        },
         selectMission(data) {
             let a = [];
             this.selected_path.missions.forEach((mission) => {
@@ -250,10 +275,43 @@ Vue.component("modal-edit-story", {
         addPath() {
             this.story.paths.push({
                 name: "Senza nome",
-                entry_point: null,
                 missions: [],
+                first_mission: null,
                 key: String(Date.now()),
             });
+        },
+        maxResult(){
+            let a = 0;
+            this.selected_mission.activities.forEach(activity => {
+                a = a + parseInt(activity.correct.points)
+            });
+            return a;
+        },
+        addResult(){
+            if (this.selected_mission.results.length < 5){
+                this.selected_mission.results.push({
+                    id: String(Date.now()),
+                    key: null,
+                    range_min: null,
+                    range_max: null,
+                })
+            }
+        },
+        removeResult(result){
+            for (let i = 0; i < this.selected_mission.results.length; i++) {
+                if (this.selected_mission.results[i].id === result.id) {
+                    this.selected_mission.results.splice(i, 1);
+                    i--;
+                }
+            }
+        },
+        rangeMin(index){
+            let unit = this.maxResult() / this.selected_mission.results.length;
+            return Math.round(unit * (index) + 1);
+        },
+        rangeMax(index){
+            let unit = this.maxResult() / this.selected_mission.results.length;
+            return Math.round(unit * (index + 1));
         },
         onPathClick(path) {
             this.selected_path = path;
@@ -266,24 +324,18 @@ Vue.component("modal-edit-story", {
         showMissionInfos(mission) {
             this.selected_mission = mission;
         },
-        checkMission(mission) {
-            let available = true;
-            if (this.selected_path.missions.indexOf(mission) != -1)
-                available = false;
-            return {
-                unavailable: !available,
-            };
-        },
         onAvailableMissionClick(mission) {
-            if (this.selected_path.missions.indexOf(mission) == -1) {
-                this.selected_path.missions.push(mission);
-            } else
-                for (let i = 0; i < this.selected_path.missions.length; i++) {
-                    if (this.selected_path.missions[i] === mission) {
-                        this.selected_path.missions.splice(i, 1);
-                        i--;
-                    }
+            let a = JSON.parse(JSON.stringify(mission));
+            a.key = String(Date.now());
+            this.selected_path.missions.push(a);
+        },
+        removeMission(mission){
+            for (let i = 0; i < this.selected_path.missions.length; i++) {
+                if (this.selected_path.missions[i].key === mission.key) {
+                    this.selected_path.missions.splice(i, 1);
+                    i--;
                 }
+            }
         },
         addSuccessiveMission() {
             this.selected_mission.successive.push({
@@ -471,6 +523,7 @@ Vue.component("modal-edit-mission", {
     },
     methods: {
         showActivityInfos(activity){
+            console.log(activity)
             this.selected_activity = activity;
         },
         onEditMenuClick(item) {
@@ -479,30 +532,10 @@ Vue.component("modal-edit-mission", {
             );
             item.isActive = true;
         },
-        checkActivity(activity) {
-            let available = true;
-            if (this.mission.activities.indexOf(activity) != -1)
-                available = false;
-            return {
-                //unavailable: !available,
-            };
-        },
         onAvailableActivityClick(activity) {
             let a = JSON.parse(JSON.stringify(activity));
             a.key = String(Date.now());
-            console.log(a)
             this.mission.activities.push(a);
-            /*
-            if (this.mission.activities.indexOf(activity) == -1) {
-                this.mission.activities.push(activity);
-            } else
-                for (let i = 0; i < this.mission.activities.length; i++) {
-                    if (this.mission.activities[i] === activity) {
-                        this.mission.activities.splice(i, 1);
-                        i--;
-                    }
-                }
-            */
         },
         removeActivity(activity){
             for (let i = 0; i < this.mission.activities.length; i++) {
@@ -1170,6 +1203,14 @@ var vm = new Vue({
                         title: data.item.title,
                         activities: data.item.activities,
                         player: data.item.player,
+                        first_activity: data.item.first_activity,
+                        results: [
+                            {
+                                key: null,
+                                range_min: 0,
+                                range_max: null,
+                            }
+                        ]
                     };
                     break;
                 }

@@ -41,17 +41,29 @@
                 class="d-flex flex-column"
             >
                 <div style="height: 80%; width: 100%">
-                    <div style="height: 100%; width: 100; background-color: grey;" class="d-flex align-items-center justify-content-center">
-                        <p style="font-size: 10vw; text-align: center;">STORY<br>CONTENT</p>
+                    <div
+                        style="
+                            height: 100%;
+                            width: 100%;
+                            overflow-y: auto;
+                            overflow-x: hidden;
+                        "
+                        class="d-flex flex-column"
+                    >
+                        <component
+                            v-for="(element,index) in current_activity.elements"
+                            :is="element.type"
+                            :element="element"
+                        >
+                        </component>
+                        <div class="d-flex mx-2 mt-5 mb-2">
+                            <b-button class="flex-grow-1"> Prosegui </b-button>
+                        </div>
                     </div>
                 </div>
                 <div
                     class="d-flex flex-column"
-                    style="
-                        width: 100%;
-                        height: 20%;
-                        overflow-y: auto;
-                    "
+                    style="width: 100%; height: 20%; overflow-y: auto"
                 >
                     <div
                         v-for="message in messages"
@@ -62,11 +74,37 @@
                     </div>
                 </div>
                 <div class="d-flex flex-row m-2">
-                    <b-button class="mr-2" style="height: 100%;" @click="sendMessage">Invia</b-button>
-                    <b-form-input style="height: 100%;" v-model="message_input"></b-form-input>
+                    <b-button
+                        class="mr-2"
+                        style="height: 100%"
+                        @click="sendMessage"
+                        >Invia</b-button
+                    >
+                    <b-form-input
+                        style="height: 100%"
+                        v-model="message_input"
+                    ></b-form-input>
                 </div>
             </div>
+            <div
+                v-else
+                style="height: 100vh; width: 100vw"
+                class="d-flex flex-column justify-content-center align-items-center"
+            >
+                <b-spinner label="caricamento"></b-spinner>
+                <strong class="mt-2">Caricamento della storia in corso</strong>
+            </div>
         </div>
+
+        <template id="Collega">
+            <div class="d-flex flex-column m-3">
+                <h3 class="my-2">Riunisci le frasi</h3>
+                <div v-for="answer in element.answers" class="d-flex flex-row justify-content-between my-2">
+                    <b-button>{{ answer.first }}</b-button>
+                    <b-button>{{ answer.second }}</b-button>
+                </div>
+            </div>
+        </template>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- CUSTOM -->

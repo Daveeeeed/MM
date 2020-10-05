@@ -250,7 +250,13 @@
         </template>
 
         <template id="modal-edit-story">
-            <b-modal @ok="onSave()" @hide="onHide()" :id="story_to_edit.key" size="xl" :title="story_to_edit.title">
+            <b-modal
+                @ok="onSave()"
+                @hide="onHide()"
+                :id="story_to_edit.key"
+                size="xl"
+                :title="story_to_edit.title"
+            >
                 <template #modal-header>
                     <b-container
                         fluid
@@ -272,7 +278,19 @@
                                     fluid
                                     class="d-flex justify-content-center"
                                 >
-                                    <span class="py-3" id="qrcode"></span>
+                                    <a
+                                        >http://192.168.178.21:8000/play?key={{story.key}}</a
+                                    >
+                                    <span
+                                        v-if="story_to_edit.settings.published"
+                                        class="py-3"
+                                        id="qrcode"
+                                    ></span>
+
+                                    <p class="my-3" v-else>
+                                        Pubblica la storia per visualizzare il
+                                        QR code
+                                    </p>
                                 </b-container>
                             </template>
                             <template #modal-footer="{ close }">
@@ -289,8 +307,8 @@
                     </b-container>
                 </template>
                 <template #default>
-                    <b-container fluid class="p-0 m-0">
-                        <b-row class="p-0 m-0">
+                    <b-container fluid class="p-0 m-0" style="height: 100%">
+                        <b-row class="p-0 m-0" style="height: 100%">
                             <b-col class="p-0 m-0 menu-column" cols="2">
                                 <b-list-group>
                                     <b-list-group-item
@@ -329,32 +347,33 @@
                                             <b-list-group-item
                                                 v-for="(path,index) in story.paths"
                                                 :key="index"
-                                                class="px-0 py-2 my-1"
+                                                class="my-2 d-flex align-items-center justify-content-between"
                                                 :class="pathClass(path)"
                                                 button
                                                 @click="onPathClick(path)"
                                             >
-                                                <b-row
-                                                    align-v="center"
-                                                    class="p-0 m-0"
-                                                >
-                                                    <b-col
-                                                        cols="auto"
-                                                        class="mr-auto ml-2"
+                                                <div class="ml-2">
+                                                    {{path.name}}
+                                                </div>
+                                                <div class="mr-2">
+                                                    <b-button
+                                                        @click="$bvModal.show(path.key)"
                                                     >
-                                                        {{path.name}}
-                                                    </b-col>
-                                                    <b-col>
-                                                        <b-button
-                                                            @click="$bvModal.show(path.key)"
-                                                        >
-                                                            <b-icon-pencil></b-icon-pencil>
-                                                        </b-button>
-                                                        <modal-edit-path-name
-                                                            :path="path"
-                                                        ></modal-edit-path-name>
-                                                    </b-col>
-                                                </b-row>
+                                                        <b-icon
+                                                            icon="pencil"
+                                                        ></b-icon>
+                                                    </b-button>
+                                                    <b-button
+                                                        @click="removePath(path)"
+                                                    >
+                                                        <b-icon
+                                                            icon="x"
+                                                        ></b-icon>
+                                                    </b-button>
+                                                    <modal-edit-path-name
+                                                        :path="path"
+                                                    ></modal-edit-path-name>
+                                                </div>
                                             </b-list-group-item>
                                         </b-list-group>
                                     </b-col>
@@ -390,7 +409,6 @@
                                                 class="px-0 py-2 my-1"
                                                 button
                                                 @click="onAvailableMissionClick(mission)"
-                                                :class="checkMission(mission)"
                                             >
                                                 {{ mission.title }}
                                             </b-list-group-item>
@@ -420,9 +438,14 @@
                                             <b-list-group-item
                                                 v-for="(mission,index) in selected_path.missions"
                                                 :key="index"
-                                                class="px-0 py-2 my-1"
+                                                class="py-2 px-3 my-1 d-flex justify-content-between align-items-center"
                                             >
-                                                {{ mission.title }}
+                                                <div>{{ mission.title }}</div>
+                                                <b-button
+                                                    @click="removeMission(mission)"
+                                                >
+                                                    <b-icon icon="x"></b-icon>
+                                                </b-button>
                                             </b-list-group-item>
                                         </b-list-group>
                                     </b-col>
@@ -463,78 +486,72 @@
                             <b-col
                                 v-if="list_item_edit_story[2].isActive"
                                 cols="7"
+                                style="overflow-y: auto; height: 100%"
                             >
                                 <h6 v-if="!selected_mission">
                                     Nessuna missione selezionata
                                 </h6>
-                                <b-container
-                                    fluid
-                                    class="m-0 p-0"
-                                    v-if="selected_mission"
+                                <div
+                                    v-else
+                                    class="d-flex flex-column"
+                                    style="width: 100%; height: 100%"
                                 >
-                                    <b-row
-                                        class="m-0 p-0"
-                                        style="
-                                            height: calc(100vh - 75vh);
-                                            overflow-y: auto;
-                                        "
+                                    <h3 class="my-3">
+                                        {{ selected_mission.title }}
+                                    </h3>
+                                    <h5 class="my-3">
+                                        Numero di attività: {{
+                                        selected_mission.activities.length }}
+                                    </h5>
+                                    <div
+                                        class="d-flex justify-content-between align-items-center my-3"
                                     >
-                                        <b-col class="p-0 m-0">
-                                            <h4 class="mt-2 mb-0">
-                                                {{selected_mission.title}}
-                                            </h4>
-                                            <p class="mt-2 mb-0">
-                                                {{selected_mission.description}}
-                                            </p>
-                                        </b-col>
-                                    </b-row>
-                                </b-container>
-                                <b-container
-                                    fluid
-                                    class="m-0 p-0"
-                                    v-if="selected_mission"
-                                >
-                                    <b-row class="p-0 m-0">
-                                        <b-col
-                                            cols="auto"
-                                            class="mr-auto p-0 mt-2"
+                                        <h5>Esiti</h5>
+                                        <b-button @click="addResult()"
+                                            >+ Aggiungi esito</b-button
                                         >
-                                            <h3>Esiti</h3>
-                                        </b-col>
-                                        <b-col cols="auto" class="my-2 px-0">
-                                            <b-button
-                                                @click="addSuccessiveMission"
-                                            >
-                                                Aggiungi
-                                            </b-button>
-                                        </b-col>
-                                    </b-row>
-                                    <b-row
-                                        class="p-0 m-0"
-                                        style="
-                                            height: calc(100vh - 51, 4vh);
-                                            overflow-y: auto;
-                                        "
-                                    >
-                                        <b-table
-                                            borderless
-                                            :fields="successive_fields"
-                                            tbody-tr-class="table-row"
-                                            thead-class="cell-default"
-                                            :items="selected_mission.successive"
+                                    </div>
+                                    <b-list-group class="mission-group-item">
+                                        <b-list-group-item
+                                            class="my-2 py-2"
+                                            v-for="(result,index) in selected_mission.results"
+                                            :key="index"
                                         >
-                                            <template
-                                                v-slot:cell(selectableMissions)="data"
+                                            <b-row
+                                                style="width: 100%"
+                                                class="m-0"
                                             >
-                                                <b-form-select
-                                                    :options="selectMission(data)"
-                                                    class="mb-3"
+                                                <b-col
+                                                    cols="6"
+                                                    class="p-0 d-flex align-items-center mr-auto"
                                                 >
-                                                </b-form-select>
-                                            </template>
-                                        </b-table>
-                                    </b-row>
-                                </b-container>
+                                                    da {{ rangeMin(index) }}
+                                                    punti a {{ rangeMax(index)
+                                                    }} punti
+                                                </b-col>
+                                                <b-col
+                                                    cols="6"
+                                                    class="p-0 d-flex"
+                                                >
+                                                    <b-form-select
+                                                        text-field="title"
+                                                        value-field="key"
+                                                        v-model="selected_mission.results[index].key"
+                                                        :options="resultsSelect"
+                                                    >
+                                                    </b-form-select>
+                                                    <b-button
+                                                        @click="removeResult(result)"
+                                                        class="ml-2"
+                                                        ><b-icon
+                                                            icon="x"
+                                                        ></b-icon
+                                                    ></b-button>
+                                                </b-col>
+                                            </b-row>
+                                        </b-list-group-item>
+                                    </b-list-group>
+                                </div>
                             </b-col>
                             <b-col
                                 class="m-0 p-0 scrollable-full-body-height"
@@ -551,9 +568,17 @@
                                             class="m-2"
                                             type="text"
                                             v-model="selected_path.name"
-                                            required
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
+                                        <h5>Missione d'inizio</h5>
+                                        <b-form-select
+                                            style="width: 50%"
+                                            text-field="title"
+                                            value-field="key"
+                                            v-model="selected_path.first_mission"
+                                            :options="selected_path.missions"
+                                        >
+                                        </b-form-select>
                                     </div>
                                 </b-container>
                             </b-col>
@@ -629,23 +654,12 @@
                         </b-row>
                     </b-container>
                 </template>
-                <template
-                    #modal-footer="{ hide, ok }"
-                >
-                    <b-row
-                        d-flex
-                        justify-content-end
-                    >
-                        <b-button
-                            class="darker mx-1"
-                            @click="hide()"
-                        >
+                <template #modal-footer="{ hide, ok }">
+                    <b-row d-flex justify-content-end>
+                        <b-button class="darker mx-1" @click="hide()">
                             Indietro
                         </b-button>
-                        <b-button
-                            class="darker mx-1"
-                            @click="ok()"
-                        >
+                        <b-button class="darker mx-1" @click="ok()">
                             Salva
                         </b-button>
                     </b-row>
@@ -693,7 +707,8 @@
                                 <b-list-group>
                                     <b-list-group-item
                                         button
-                                        v-for="item in list_item_edit_mission"
+                                        v-for="(item,index) in list_item_edit_mission"
+                                        :key="index"
                                         :class="{ active : item.isActive }"
                                         @click="onEditMenuClick(item)"
                                     >
@@ -731,11 +746,11 @@
                                         </h6>
                                         <b-list-group>
                                             <b-list-group-item
-                                                v-for="activity in filteredActivities"
+                                                v-for="(activity,index) in filteredActivities"
+                                                :key="index"
                                                 class="py-2 my-1"
                                                 button
                                                 @click="onAvailableActivityClick(activity)"
-                                                :class="checkActivity(activity)"
                                                 style="height: 53px"
                                             >
                                                 {{ activity.title }}
@@ -764,7 +779,8 @@
                                         </h6>
                                         <b-list-group v-else>
                                             <b-list-group-item
-                                                v-for="activity in mission.activities"
+                                                v-for="(activity,index) in mission.activities"
+                                                :key="index"
                                                 class="py-2 px-3 my-1 d-flex justify-content-between align-items-center"
                                             >
                                                 <div>{{ activity.title }}</div>
@@ -816,7 +832,9 @@
                             >
                                 <b-row v-if="!selected_activity" class="m-0">
                                     <b-col class="p-0 mt-2 mb-1">
-                                        <h3 style="height: 34px">Nessuna attività selezionata</h3>
+                                        <h3 style="height: 34px">
+                                            Nessuna attività selezionata
+                                        </h3>
                                     </b-col>
                                 </b-row>
                                 <b-row
@@ -829,8 +847,10 @@
                                         <h3 class="p-0 mt-2 mb-1">
                                             {{ selected_activity.title }}
                                         </h3>
-                                        <h5 class="pt-3">Collegamenti con le altre attività</h5>
-                                        <b-row class="m-0" style="width: 100%;">
+                                        <h5 class="pt-3">
+                                            Collegamenti con le altre attività
+                                        </h5>
+                                        <b-row class="m-0" style="width: 100%">
                                             <b-col
                                                 cols="4"
                                                 offset="1"
@@ -856,11 +876,13 @@
                                                 ></b-form-select>
                                                 <h3 class="mt-3">Ottieni</h3>
                                                 <b-form-input
-                                                    class="mb-3"
+                                                    style="text-align: center"
+                                                    class="my-3"
                                                     type="text"
-                                                    placeholder="Inserisci i punti..."
+                                                    placeholder="100"
                                                     v-model="selected_activity.correct.points"
                                                 ></b-form-input>
+                                                <h3 class="mb-3">punti</h3>
                                             </b-col>
                                             <b-col
                                                 cols="4"
@@ -876,30 +898,34 @@
                                                 <b-icon
                                                     icon="x"
                                                     class="h1 mt-2"
-                                                    style="color: #FF3D4A"
+                                                    style="color: #ff3d4a"
                                                 ></b-icon>
                                                 <h3>Vai a</h3>
                                                 <b-form-select
-                                                text-field="title"
-                                                value-field="key"
-                                                :options="mission.activities"
-                                                v-model="selected_activity.wrong.key"
+                                                    text-field="title"
+                                                    value-field="key"
+                                                    :options="mission.activities"
+                                                    v-model="selected_activity.wrong.key"
                                                 ></b-form-select>
                                                 <h3 class="mt-3">Ottieni</h3>
                                                 <b-form-input
-                                                class="mb-3"
-                                                type="text"
-                                                placeholder="Inserisci i punti..."
-                                                v-model="selected_activity.wrong.points"
+                                                    style="text-align: center"
+                                                    class="my-3"
+                                                    type="text"
+                                                    placeholder="100"
+                                                    v-model="selected_activity.wrong.points"
                                                 ></b-form-input>
+                                                <h3 class="mb-3">punti</h3>
                                             </b-col>
                                         </b-row>
-                                        <h5 class="pt-3">Elementi dell'attività</h5>
+                                        <h5 class="pt-3">
+                                            Elementi dell'attività
+                                        </h5>
                                         <b-list-group-item
                                             v-for="(element,index) in selected_activity.elements"
                                             :key="index"
                                             class="px-0 py-2 my-1"
-                                            style="width: 70%;"
+                                            style="width: 70%"
                                         >
                                             {{ element.type }}
                                         </b-list-group-item>
@@ -1084,17 +1110,28 @@
                                 v-if="list_item_edit_activity[0].isActive"
                             >
                                 <b-row class="m-0 p-0">
-                                    <b-col cols="auto" class="p-0 mr-auto mt-2 mb-1">
+                                    <b-col
+                                        cols="auto"
+                                        class="p-0 mr-auto mt-2 mb-1"
+                                    >
                                         <h3 style="height: 34px">Struttura</h3>
                                     </b-col>
                                     <b-col cols="auto" class="my-2 px-0">
-                                        <b-button @click="$bvModal.show('activity-preview')">
+                                        <b-button
+                                            @click="$bvModal.show('activity-preview')"
+                                        >
                                             Anteprima
                                         </b-button>
                                     </b-col>
-                                    <b-modal id="activity-preview" size="md" scrollable>
+                                    <b-modal
+                                        id="activity-preview"
+                                        size="md"
+                                        scrollable
+                                    >
                                         <b-container fluid>
-                                            <b-row v-for="element in activity.elements">
+                                            <b-row
+                                                v-for="element in activity.elements"
+                                            >
                                                 ANTEPRIMA DA FARE
                                             </b-row>
                                         </b-container>
@@ -1161,7 +1198,6 @@
                                                             class="mb-2"
                                                             type="text"
                                                             v-model="component_selected.question"
-                                                            required
                                                             placeholder="Inserisci la domanda..."
                                                         ></b-form-input>
                                                         <h5>Risposte</h5>
@@ -1187,7 +1223,6 @@
                                                             class="mb-2"
                                                             type="text"
                                                             v-model="component_selected.question"
-                                                            required
                                                             placeholder="Inserisci la domanda..."
                                                         ></b-form-input>
                                                         <h5>Risposte</h5>
@@ -1200,7 +1235,6 @@
                                                             <b-form-input
                                                                 type="text"
                                                                 v-model="component_selected.answers[0]"
-                                                                required
                                                                 placeholder="Risposta..."
                                                             ></b-form-input>
                                                         </b-form-radio>
@@ -1213,7 +1247,6 @@
                                                             <b-form-input
                                                                 type="text"
                                                                 v-model="component_selected.answers[1]"
-                                                                required
                                                                 placeholder="Risposta..."
                                                             ></b-form-input>
                                                         </b-form-radio>
@@ -1226,7 +1259,6 @@
                                                             <b-form-input
                                                                 type="text"
                                                                 v-model="component_selected.answers[2]"
-                                                                required
                                                                 placeholder="Risposta..."
                                                             ></b-form-input>
                                                         </b-form-radio>
@@ -1239,7 +1271,6 @@
                                                             <b-form-input
                                                                 type="text"
                                                                 v-model="component_selected.answers[3]"
-                                                                required
                                                                 placeholder="Risposta..."
                                                             ></b-form-input>
                                                         </b-form-radio>
@@ -1260,7 +1291,6 @@
                                                             class="mb-2"
                                                             type="text"
                                                             v-model="component_selected.question"
-                                                            required
                                                             placeholder="Inserisci la domanda..."
                                                         ></b-form-input>
                                                     </div>
@@ -1305,14 +1335,12 @@
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[0].first"
-                                                                required
                                                                 placeholder="Prima parte..."
                                                             ></b-form-input>
                                                             <b-form-input
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[0].second"
-                                                                required
                                                                 placeholder="Seconda parte..."
                                                             ></b-form-input>
                                                         </div>
@@ -1323,14 +1351,12 @@
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[1].first"
-                                                                required
                                                                 placeholder="Prima parte..."
                                                             ></b-form-input>
                                                             <b-form-input
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[1].second"
-                                                                required
                                                                 placeholder="Seconda parte..."
                                                             ></b-form-input>
                                                         </div>
@@ -1341,14 +1367,12 @@
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[2].first"
-                                                                required
                                                                 placeholder="Prima parte..."
                                                             ></b-form-input>
                                                             <b-form-input
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[2].second"
-                                                                required
                                                                 placeholder="Seconda parte..."
                                                             ></b-form-input>
                                                         </div>
@@ -1359,14 +1383,12 @@
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[3].first"
-                                                                required
                                                                 placeholder="Prima parte..."
                                                             ></b-form-input>
                                                             <b-form-input
                                                                 class="m-1"
                                                                 type="text"
                                                                 v-model="component_selected.answers[3].second"
-                                                                required
                                                                 placeholder="Seconda parte..."
                                                             ></b-form-input>
                                                         </div>
@@ -1429,18 +1451,7 @@
                                                             class="mb-2"
                                                             type="text"
                                                             v-model="component_selected.text"
-                                                            required
                                                             placeholder="Inserisci il titolo..."
-                                                        ></b-form-input>
-                                                    </div>
-                                                    <div>
-                                                        <h5>Tempo stimato</h5>
-                                                        <p>in minuti</p>
-                                                        <b-form-input
-                                                            class="mb-2"
-                                                            type="number"
-                                                            required
-                                                            placeholder="Inserisci un valore..."
                                                         ></b-form-input>
                                                     </div>
                                                 </b-container>
@@ -1486,7 +1497,6 @@
                                             class="m-2"
                                             type="text"
                                             v-model="activity.title"
-                                            required
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
                                     </div>
@@ -1537,6 +1547,19 @@
                                                 >15-18</b-form-checkbox
                                             >
                                         </div>
+                                    </div>
+                                    <div
+                                        class="m-4 d-flex flex-column align-items-center"
+                                    >
+                                        <h5>Tempo stimato</h5>
+                                        <p>in minuti</p>
+                                        <b-form-input
+                                            style="width: 50%"
+                                            class="m-2"
+                                            v-model="activity.time"
+                                            type="number"
+                                            placeholder="Inserisci un valore..."
+                                        ></b-form-input>
                                     </div>
                                 </b-container>
                             </b-col>

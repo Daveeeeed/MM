@@ -87,6 +87,20 @@ wsc.onmessage = function (data, flags, number) {
     }
 };
 
+Vue.component("Collega", {
+    data(){
+        return {
+
+        }
+    },
+    props: {
+        element: {
+            type: Object
+        }
+    },
+    template: "#Collega",
+})
+
 var vm = new Vue({
     el: "#app",
     data: {
@@ -96,9 +110,16 @@ var vm = new Vue({
         player: null,
         message_input: "",
         messages: [],
+        story: null,
+        current_activity: null,
+        current_path: null,
+        current_mission: null,
     },
     computed: {},
     methods: {
+        renderElement(element){
+            return JSON.stringify(element)
+        },
         sendMessage() {
             wsc.send(
                 JSON.stringify({
@@ -124,20 +145,36 @@ $(document).ready(() => {
     vm.$data.game_key = urlParams.get("game_key");
     vm.$data.story_key = urlParams.get("story_key");
     vm.$data.player_id = urlParams.get("player_id");
-    fetchPlayer();
+    initPlayer();
 });
 
-function fetchPlayer() {
-    fetch(
-        "/api/player?game_key=" +
-            vm.$data.game_key +
-            "&player_id=" +
-            vm.$data.player_id
-    )
+function findObject(array, key){
+    for (let i = 0; i < array.length; i++){
+        if (array[i].key = key) return array[i]
+    }
+}
+
+function initPlayer() {
+    fetch("/api/stories?key=" + vm.$data.story_key)
         .then((response) => response.json())
         .then((data) => {
-            vm.$data.player = data;
-            setInterval(updateStatus, 2000);
+            if ((data.length == 1)) {
+                vm.$data.story = data[0];
+                vm.$data.current_path = vm.$data.story.paths[Math.round(Math.random() * (vm.$data.story.paths.length - 1))]
+                vm.$data.current_mission = findObject(vm.$data.current_path.missions, vm.$data.current_path.first_mission)
+                vm.$data.current_activity = findObject(vm.$data.current_mission.activities,vm.$data.current_mission.first_activity)
+                fetch(
+                    "/api/player?game_key=" +
+                        vm.$data.game_key +
+                        "&player_id=" +
+                        vm.$data.player_id
+                )
+                    .then((response) => response.json())
+                    .then((data) => {
+                        vm.$data.player = data;
+                        setInterval(updateStatus, 2000);
+                    });
+            }
         });
 }
 
