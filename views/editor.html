@@ -668,6 +668,11 @@
                         <unvalid-alert
                             :empty_title="story.title == ''"
                             :empty_paths="!validatePath()"
+                            :empty_path_name="!validatePathsNames()"
+                            :invalid_story_type="!validateStoryType()"
+                            :empty_story_missions="!validateStoryMissions()"
+                            :empty_first_mission="!validateStoryFirstMission()"
+                            :empty_story_results="!validateStoryResults()"
                         >
                         </unvalid-alert>
                     </b-row>
@@ -1634,6 +1639,21 @@
                         </li>
                         <li v-if="empty_connection">
                             Inserisci gli esiti delle attività
+                        </li>
+                        <li v-if="empty_path_name">
+                            Inserisci un titolo ad ogni percorso
+                        </li>
+                        <li v-if="invalid_story_type">
+                            Specifica il tipo di storia in Impostazioni Storia
+                        </li>
+                        <li v-if="empty_story_missions">
+                            Inserisci almeno una missione in tutti i percorsi
+                        </li>
+                        <li v-if="empty_first_mission">
+                            Specifica la missione iniziale in ogni percorso
+                        </li>
+                        <li v-if="empty_story_results">
+                            Specifica un esito per ogni missione di ogni percorso
                         </li>
                     </ul>
                 </b-container>

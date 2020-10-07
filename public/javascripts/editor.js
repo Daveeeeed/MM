@@ -212,6 +212,26 @@ Vue.component("unvalid-alert", {
         empty_connection:{
             type: Boolean,
             default: false,
+        },
+        empty_path_name:{
+            type: Boolean,
+            defaul: false,
+        },
+        invalid_story_type:{
+            type: Boolean,
+            defaul: false,
+        },
+        empty_story_missions:{
+            type: Boolean,
+            defaul: false,
+        },
+        empty_first_mission:{
+            type: Boolean,
+            defaul: false,
+        },
+        empty_story_results:{
+            type: Boolean,
+            defaul: false,
         }
     },
     template: "#unvalid-alert",
@@ -295,8 +315,9 @@ Vue.component("modal-edit-story", {
     },
     methods: {
         validateStory() {
-            console.log(this.validatePath())
-            if ((this.story.title != "") && this.validatePath()) {
+            //console.log(this.validatePath())
+            if ((this.story.title != "") && this.validatePath() && this.validatePathsNames() && this.validateStoryType()
+            && this.validateStoryMissions() && this.validateStoryFirstMission() && this.validateStoryResults()) {
                 return true;
             } else {
                 return false;
@@ -305,6 +326,44 @@ Vue.component("modal-edit-story", {
         validatePath() {
             if (this.story.paths.length != 0) return true;
             else false;
+        },
+        validatePathsNames() {
+            for (let i=0; i < this.story.paths.length; i++) {
+                if (this.story.paths[i].name == "")
+                return false;
+            }
+            return true;
+        },
+        validateStoryType() {
+            if ((this.story.settings.player.sette || this.story.settings.player.undici || this.story.settings.player.quindici) &&
+            (this.story.settings.player.single || this.story.settings.player.group || this.story.settings.player.class))
+            return true;
+            else false;
+        },
+        validateStoryMissions() {
+            for (let i=0; i < this.story.paths.length; i++) {
+                if (this.story.paths[i].missions.length == 0)
+                return false;
+            }
+            return true;
+        },
+        validateStoryFirstMission() {  //Non crea comunque il modal anche se non è selezionata alcuna first mission
+            for (let i=0; i < this.story.paths.length; i++) {
+                if (this.story.paths[i].first_mission == null)
+                return false;
+            }
+            return true;
+        },
+        validateStoryResults() {
+            for (let i=0; i < this.story.paths.length; i++) {
+                for (let j=0; j < this.story.paths[i].missions.length; j++) {
+                    for (let k=0; k < this.story.paths[i].missions[j].results.length; k++) {
+                        if (this.story.paths[i].missions[j].results[k].key == null)
+                        return false;
+                    }
+                }
+            }
+            return true;
         },
         showAlertModal() {
             this.$bvModal.show("non-valid");
