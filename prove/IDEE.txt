@@ -1,0 +1,5 @@
+LOADING BAR DURANTE IL GIOCO, CHE SI INCREMENTA PER OGNI LIVELLO COMPLETATO
+
+https://bootsnipp.com/snippets/2eEjz  --> TEMPLATE ICONE SUCCESS/FAIL
+
+https://bootsnipp.com/snippets/VgBP3	--> TEMPLATE PAGINE 404

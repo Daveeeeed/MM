@@ -1,0 +1,42 @@
+@import url(https://cdn.bootcss.com/magic/1.1.0/magic.min.css);
+
+.body-preview {
+  border: solid 1px pink;
+}
+body {
+  background: #ddd;
+}
+.game-top {
+  top: 5vh;
+  height: 90vh;
+  background: #000;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+  color: #ccff00;
+}
+.game-top .monster-col {
+  padding: 3px;
+}
+.game-top .monster-col .monster {
+  background: #000;
+  position: relative;
+  border: solid 1px #fdee00;
+  padding: 3px;
+  border-radius: 5px;
+}
+.game-top .bullet {
+  color: red;
+  margin-left: 2%;
+  position: absolute;
+  top: 79vh;
+  z-index: 99999;
+}
+.game-bottom {
+  border: solid 1px #f0f590;
+  position: relative;
+}
+.game-bottom .game-me {
+  background: #ccff00;
+  height: 5px;
+}
