@@ -25,4 +25,8 @@ router.get("/story", (req, res) => {
     res.sendFile(path.resolve("views/story.html"));
 });
 
+router.get("/gioco", (req, res) => {
+    res.sendFile(path.resolve("views/word.html"));
+});
+
 module.exports = router;
