@@ -1600,7 +1600,7 @@
                         <unvalid-alert
                             v-if="!component_selected"
                             :empty_title="activity.title == ''"
-                            :empty_time="activity.time == ''"
+                            :empty_time="activity.time == null" 
                             :empty_element="!validateStructure()"
                             :missing_special="!disableSpecial"
                         >
