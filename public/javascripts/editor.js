@@ -931,13 +931,14 @@ Vue.component("modal-edit-activity", {
                 type: "",
             });
         },
-        removeElement(element) {
+        removeElement(evt,element) {
             for (let i = 0; i < this.activity.elements.length; i++) {
                 if (this.activity.elements[i] === element) {
                     this.activity.elements.splice(i, 1);
                     i--;
                 }
             }
+            evt.stopPropagation();
         },
         openComponentModal(element) {
             if (this.component_selected) {
