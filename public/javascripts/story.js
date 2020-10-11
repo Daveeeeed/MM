@@ -70,7 +70,7 @@ WebSocketClient.prototype.onclose = function (e) {
 
 var wsc = new WebSocketClient();
 
-wsc.open("ws://192.168.178.21:8080");
+wsc.open("ws://frank.cs.unibo.it:8080");
 
 wsc.onmessage = function (data, flags, number) {
     let message = JSON.parse(data.data);
