@@ -6,7 +6,9 @@ var ws = require("ws");
 var webSocketServer = new ws.Server({ port: 8080 });
 
 webSocketServer.on("connection", (webSocket) => {
+    console.log("connection successfull")
     webSocket.on("message", (data) => {
+        console.log("message emitted...")
         webSocketServer.clients.forEach((client) => {
             if (client.readyState === ws.OPEN) {
                 client.send(data);
