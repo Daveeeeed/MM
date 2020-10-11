@@ -286,6 +286,7 @@ Vue.component("modal-edit-story", {
             selected_mission: null,
             story: null,
             isSaved: false,
+            removePathActive: false,
         };
     },
     props: {
@@ -369,6 +370,7 @@ Vue.component("modal-edit-story", {
             this.$bvModal.show("non-valid");
         },
         removePath(path) {
+            this.removePathActive = true;
             for (let i = 0; i < this.story.paths.length; i++) {
                 if (this.story.paths[i].key === path.key) {
                     this.story.paths.splice(i, 1);
@@ -430,7 +432,8 @@ Vue.component("modal-edit-story", {
             return Math.round(unit * (index + 1));
         },
         onPathClick(path) {
-            this.selected_path = path;
+            if (!this.removePathActive) this.selected_path = path;
+            this.removePathActive = false;
         },
         pathClass(path) {
             return {
@@ -461,10 +464,11 @@ Vue.component("modal-edit-story", {
             });
         },
         onEditStoryMenuClick(item) {
+            //console.log(this.selected_path);
             if (
-                (item.name == "Missioni" && this.selected_path) ||
-                (item.name == "Esiti" && this.selected_path) ||
-                (item.name == "Impostazioni percorso" && this.selected_path) ||
+                (item.name == "Missioni" && this.selected_path != null) ||  //item.name è quello che clicchi -- quando elimino il percorso selected_path rimane non null
+                (item.name == "Esiti" && this.selected_path != null) ||
+                (item.name == "Impostazioni percorso" && this.selected_path != null) ||
                 (item.name != "Missioni" &&
                     item.name != "Esiti" &&
                     item.name != "Impostazioni percorso")
