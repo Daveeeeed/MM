@@ -184,20 +184,22 @@ var vm = new Vue({
             this.$bvModal.show("info-modal");
         },
         sendMessage() {
-            wsc.send(
-                JSON.stringify({
-                    message: this.message,
-                    player_id: this.selected_player.id,
-                    game_key: this.game_key,
-                    story_key: this.story_key,
+            if (this.message){
+                wsc.send(
+                    JSON.stringify({
+                        message: this.message,
+                        player_id: this.selected_player.id,
+                        game_key: this.game_key,
+                        story_key: this.story_key,
+                        sender: true,
+                    })
+                );
+                this.messages[this.selected_player.id].push({
+                    text: this.message,
                     sender: true,
-                })
-            );
-            this.messages[this.selected_player.id].push({
-                text: this.message,
-                sender: true,
-            });
-            this.message = "";
+                });
+                this.message = "";
+            }
         },
         setPlayerClass1(item) {
             return {

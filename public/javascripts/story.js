@@ -72,7 +72,7 @@ var wsc = new WebSocketClient();
 
 wsc.open("ws://frank.cs.unibo.it:8080");
 
-wsc.onmessage = function (data, flags, number) {
+wsc.onmessage = function (data) {
     let message = JSON.parse(data.data);
     if (
         message.player_id == vm.$data.player_id &&
@@ -121,21 +121,23 @@ var vm = new Vue({
             return JSON.stringify(element)
         },
         sendMessage() {
-            wsc.send(
-                JSON.stringify({
-                    message: this.message_input,
-                    player_id: this.player_id,
-                    game_key: this.game_key,
-                    story_key: this.story_key,
-                    sender: false,
-                })
-            );
-            this.messages.push({
-                text: this.message_input,
-                sender: true,
-            });
-            this.message_input = "";
-            updateStatus();
+            if (this.message_input){
+                wsc.send(
+                    JSON.stringify({
+                        message: this.message_input,
+                        player_id: this.player_id,
+                        game_key: this.game_key,
+                        story_key: this.story_key,
+                        sender: false,
+                    })
+                );
+                this.messages.push({
+                    text: this.message_input,
+                    sender: true,
+                });
+                this.message_input = "";
+                updateStatus();
+            }
         },
     },
 });

@@ -35,7 +35,6 @@
     </head>
     <body>
         <div id="app">
-            <!-- NAVBAR CON LOGO E TABS (STORIE, MISSIONI, ATTIVITà) -->
             <b-navbar sticky id="topbar" type="dark" class="py-0 px-0">
                 <b-navbar-brand href="/" class="py-0 mx-5">
                     <img
@@ -57,10 +56,6 @@
                 </b-navbar-nav>
             </b-navbar>
 
-            <!-- 
-                CONTENUTO DELLA PAGINA
-                varia a seconda della tab selezionata (active_section)
-            -->
             <b-container fluid v-if="active_section">
                 <b-row>
                     <b-col cols="auto" class="mr-auto ml-4">
@@ -114,53 +109,6 @@
                             tbody-tr-class="table-row"
                             thead-class="cell-default"
                         >
-                            <template v-slot:cell(storyForHandicapped)="data">
-                                <div
-                                    v-if="storyForHandicappedContent(data)"
-                                    class="cell-true"
-                                >
-                                    ✓
-                                </div>
-                                <div v-else class="cell-false">✗</div>
-                            </template>
-                            <template v-slot:cell(missionCompleted)="data">
-                                <div
-                                    v-if="missionCompletedContent(data)"
-                                    class="cell-true"
-                                >
-                                    ✓
-                                </div>
-                                <div v-else class="cell-false">✗</div>
-                            </template>
-                            <template v-slot:cell(missionForHandicapped)="data">
-                                <div
-                                    v-if="missionForHandicappedContent(data)"
-                                    class="cell-true"
-                                >
-                                    ✓
-                                </div>
-                                <div v-else class="cell-false">✗</div>
-                            </template>
-                            <template v-slot:cell(activityCompleted)="data">
-                                <div
-                                    v-if="activityCompletedContent(data)"
-                                    class="cell-true"
-                                >
-                                    ✓
-                                </div>
-                                <div v-else class="cell-false">✗</div>
-                            </template>
-                            <template
-                                v-slot:cell(activityForHandicapped)="data"
-                            >
-                                <div
-                                    v-if="activityForHandicappedContent(data)"
-                                    class="cell-true"
-                                >
-                                    ✓
-                                </div>
-                                <div v-else class="cell-false">✗</div>
-                            </template>
                             <template v-slot:cell(actions)="data">
                                 <b-button
                                     v-if="active_section == sections[0]"
@@ -201,12 +149,10 @@
                                         :mission_to_edit="data.item"
                                         :activities="activities"
                                     ></modal-edit-mission>
-
                                     <modal-edit-activity
                                         v-if="active_section.navbar_name == 'Attività'"
                                         :activity_prop="data.item"
                                     ></modal-edit-activity>
-
                                     <b-icon-pencil-square></b-icon-pencil-square>
                                 </b-button>
                                 <b-button
@@ -243,12 +189,12 @@
                             class="mb-3"
                             type="text"
                             v-model="title"
+                            maxlength=25
                             required
                             placeholder="Inserisci il titolo..."
                         ></b-form-input>
                         <div
                             class="d-flex flex-row justify-content-around my-2"
-                            v-if="category == 'Storie'"
                         >
                             <div class="d-flex flex-column align-items-center">
                                 <h5>Giocatore</h5>
@@ -296,9 +242,19 @@
                         <b-button class="darker mx-1" @click="onCancel()">
                             Cancella
                         </b-button>
-                        <b-button class="darker mx-1" @click="onSave()">
+                        <b-button 
+                        class="darker mx-1" 
+                        v-on="validateCreateStory() ? { click: () => onSave() } : { click: () => showAlertModal() }"
+                        >
                             Salva
                         </b-button>
+                        <unvalid-alert
+                            :empty_title="title == ''"
+                            :invalid_story_type="!validateCreateStoryType()"
+
+
+                        >
+                        </unvalid-alert>
                     </b-row>
                 </template>
             </b-modal>
@@ -459,7 +415,7 @@
                                     >
                                         <b-list-group>
                                             <b-list-group-item
-                                                v-for="(mission,index) in availableFilteredMissions"
+                                                v-for="(mission,index) in filteredMissions"
                                                 :key="index"
                                                 class="px-0 py-2 my-1"
                                                 button
@@ -624,6 +580,7 @@
                                             type="text"
                                             v-model="selected_path.name"
                                             placeholder="Inserisci il titolo..."
+                                            maxlength=25
                                         ></b-form-input>
                                         <h5>Missione d'inizio</h5>
                                         <b-form-select
@@ -654,6 +611,7 @@
                                             v-model="story.title"
                                             required
                                             placeholder="Inserisci il titolo..."
+                                            maxlength=25
                                         ></b-form-input>
                                     </div>
                                     <div
@@ -749,6 +707,7 @@
                             <b-form-input
                                 v-model="pathName"
                                 placeholder="Nome del percorso"
+                                maxlength=25
                             ></b-form-input>
                         </b-col>
                     </b-row>
@@ -808,13 +767,13 @@
                                         class="mission-group-item scrollable py-3"
                                     >
                                         <h6
-                                            v-if="availableFilteredActivities.length == 0"
+                                            v-if="filteredActivities.length == 0"
                                         >
                                             Nessuna attività disponibile...
                                         </h6>
                                         <b-list-group>
                                             <b-list-group-item
-                                                v-for="(activity,index) in availableFilteredActivities"
+                                                v-for="(activity,index) in filteredActivities"
                                                 :key="index"
                                                 class="py-2 my-1"
                                                 button
@@ -1017,7 +976,56 @@
                                             v-model="mission.title"
                                             required
                                             placeholder="Inserisci il titolo..."
+                                            maxlength=25
                                         ></b-form-input>
+                                    </div>
+                                    <div
+                                        class="m-3 d-flex flex-column align-items-center"
+                                    >
+                                        <h5>Giocatore</h5>
+                                        <div
+                                            class="d-flex justify-content-center"
+                                        >
+                                            <b-form-checkbox
+                                                class="m-2"
+                                                v-model="mission.player.single"
+                                                >Singolo</b-form-checkbox
+                                            >
+                                            <b-form-checkbox
+                                                class="m-2"
+                                                v-model="mission.player.group"
+                                                >Gruppo</b-form-checkbox
+                                            >
+                                            <b-form-checkbox
+                                                class="m-2"
+                                                v-model="mission.player.class"
+                                                >Classe</b-form-checkbox
+                                            >
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="m-3 d-flex flex-column align-items-center"
+                                    >
+                                        <h5>Età</h5>
+                                        <div
+                                            class="d-flex justify-content-center"
+                                        >
+                                            <b-form-checkbox
+                                                class="m-2"
+                                                v-model="mission.player.sette"
+                                                >7-10</b-form-checkbox
+                                            >
+                                            <b-form-checkbox
+                                                class="m-2"
+                                                v-model="mission.player.undici"
+                                                >11-14</b-form-checkbox
+                                            >
+                                            <b-form-checkbox
+                                                class="m-2"
+                                                v-model="mission.player.quindici"
+                                                >15-18</b-form-checkbox
+                                            >
+                                        </div>
                                     </div>
                                     <div
                                         class="m-3 d-flex flex-column align-items-center"
@@ -1041,10 +1049,7 @@
                         <b-button class="darker mx-1" @click="hide()">
                             Indietro
                         </b-button>
-                        <b-button
-                            class="darker mx-1"
-                            v-on="validatemission() ? { click: () => ok() } : { click: () => showAlertModal() }"
-                        >
+                        <b-button class="darker mx-1" v-on="validatemission() ? { click: () => ok() } : { click: () => showAlertModal() }">
                             Salva
                         </b-button>
                         <unvalid-alert
@@ -1052,12 +1057,13 @@
                             :empty_start_activity="mission.first_activity == null"
                             :empty_activity="mission.activities.length == 0"
                             :empty_connection="!connectionActivities()"
-                        >
-                        </unvalid-alert>
+                        >                            
+                        </unvalid-alert>    
                     </b-row>
                 </template>
             </b-modal>
         </template>
+
 
         <template id="modal-edit-activity">
             <b-modal
@@ -1104,16 +1110,19 @@
                                         (obbligatorio uno e uno solo per
                                         attività)
                                     </p>
+
                                     <div
-                                        class="d-flex flex-wrap mission-group-item"
+                                        class="d-flex flex-wrap mission-group-item pad"
                                     >
                                         <b-button
                                             v-for="(component,index) in components_special"
                                             :key="index"
-                                            class="m-2 list-group-item"
+                                            class="m-2 list-group-item" 
                                             @click="onComponentClick(component)"
+                                            :class="{ sele : ( checkSelected(component) )}"
                                             :disabled="disableSpecial"
-                                            style="height: 75px; width: 130px"
+                                           
+                                            style="height: 75px; width: 130px"    
                                         >
                                             {{ component.type }}
                                         </b-button>
@@ -1127,23 +1136,6 @@
                                             :key="index"
                                             class="m-2 list-group-item"
                                             @click="onComponentClick(component)"
-                                            :disabled="disableDefault"
-                                            style="height: 75px; width: 130px"
-                                        >
-                                            {{ component.type }}
-                                        </b-button>
-                                    </div>
-                                    <h5 class="my-2">Minigiochi</h5>
-                                    <p>(per attività mono-componente)</p>
-                                    <div
-                                        class="d-flex flex-wrap mission-group-item"
-                                    >
-                                        <b-button
-                                            v-for="(component,index) in minigames"
-                                            :key="index"
-                                            class="m-2 list-group-item"
-                                            @click="onComponentClick(component)"
-                                            :disabled="disableMinigames"
                                             style="height: 75px; width: 130px"
                                         >
                                             {{ component.type }}
@@ -1238,7 +1230,7 @@
                                                     <!-- DOMANDA -->
                                                     <div
                                                         v-if=" component_selected.type == 'Domanda' "
-                                                    >
+                                                    > 
                                                         <h5>Domanda</h5>
                                                         <b-form-input
                                                             class="mb-2"
@@ -1256,7 +1248,8 @@
                                                     <!-- SCELTA MULTIPLA -->
                                                     <div
                                                         v-if=" component_selected.type == 'Scelta Multipla' "
-                                                    >
+                                                    >  
+
                                                         <h5>Domanda</h5>
                                                         <p>
                                                             Per superare
@@ -1440,6 +1433,13 @@
                                                         </div>
                                                     </div>
 
+                                                    <!-- RIEMPI -->
+                                                    <div
+                                                        v-if=" component_selected.type == 'Riempi' "
+                                                    >
+                                                        <h5>Qui bestemmio</h5>
+                                                    </div>
+
                                                     <!-- DESCRIZIONE -->
                                                     <div
                                                         v-if=" component_selected.type == 'Descrizione' "
@@ -1491,12 +1491,13 @@
                                                             type="text"
                                                             v-model="component_selected.text"
                                                             placeholder="Inserisci il titolo..."
+                                                            maxlength=25
                                                         ></b-form-input>
                                                     </div>
-
+                                                    
                                                     <!-- BOTTONI -->
                                                     <div
-                                                        class="d-flex justify-content-end mt-3"
+                                                    class="d-flex justify-content-end mt-3"                                                       
                                                     >
                                                         <b-button
                                                             class="darker mx-1"
@@ -1511,10 +1512,7 @@
                                                             Salva
                                                         </b-button>
                                                     </div>
-                                                    <unvalid-alert
-                                                        v-if="component_selected"
-                                                        :unvalid_component="!validateComponent()"
-                                                    ></unvalid-alert>
+                                                    <unvalid-alert v-if="component_selected" :unvalid_component="!validateComponent()"></unvalid-alert>
                                                 </b-container>
                                             </template>
                                         </b-modal>
@@ -1538,7 +1536,20 @@
                                             type="text"
                                             v-model="activity.title"
                                             placeholder="Inserisci il titolo..."
+                                            maxlength=25
                                         ></b-form-input>
+                                    </div>
+                                    <div
+                                        class="m-4 d-flex flex-column align-items-center"
+                                    >
+                                        <h5>Giocatore</h5>
+                
+                                    </div>
+                                    <div
+                                        class="m-4 d-flex flex-column align-items-center"
+                                    >
+                                        <h5>Età</h5>
+                                    
                                     </div>
                                     <div
                                         class="m-4 d-flex flex-column align-items-center"
@@ -1551,6 +1562,7 @@
                                             v-model="activity.time"
                                             type="number"
                                             placeholder="Inserisci un valore..."
+                                            
                                         ></b-form-input>
                                     </div>
                                 </b-container>
@@ -1573,7 +1585,8 @@
                         <unvalid-alert
                             v-if="!component_selected"
                             :empty_title="activity.title == ''"
-                            :empty_time="activity.time == null"
+                            :empty_time="activity.time == null" 
+                            :empty_time="activity.time == ''"
                             :empty_element="!validateStructure()"
                             :missing_special="!disableSpecial"
                         >
@@ -1601,12 +1614,15 @@
                         <li v-if="empty_start_activity">
                             Manca l'attività iniziale
                         </li>
-                        <li v-if="empty_activity">Nessuna attività aggiunta</li>
-                        <li v-if="unvalid_component">
-                            Controlla di aver riempito correttamente tutti i
-                            campi
+                        <li v-if="empty_activity">
+                            Nessuna attività aggiunta
                         </li>
-                        <li v-if="empty_paths">Inserisci almeno un percorso</li>
+                        <li v-if="unvalid_component">
+                            Controlla di aver riempito correttamente tutti i campi
+                        </li>
+                        <li v-if="empty_paths">
+                            Inserisci almeno un percorso
+                        </li>
                         <li v-if="empty_connection">
                             Inserisci gli esiti delle attività
                         </li>
@@ -1614,7 +1630,7 @@
                             Inserisci un titolo ad ogni percorso
                         </li>
                         <li v-if="invalid_story_type">
-                            Specifica il tipo di storia in Impostazioni Storia
+                            Specifica il tipo di storia
                         </li>
                         <li v-if="empty_story_missions">
                             Inserisci almeno una missione in tutti i percorsi
@@ -1623,8 +1639,7 @@
                             Specifica la missione iniziale in ogni percorso
                         </li>
                         <li v-if="empty_story_results">
-                            Specifica un esito per ogni missione di ogni
-                            percorso
+                            Specifica un esito per ogni missione di ogni percorso
                         </li>
                     </ul>
                 </b-container>
