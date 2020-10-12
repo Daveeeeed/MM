@@ -143,6 +143,19 @@ Vue.component("add-new-element", {
             this.gruppo = false;
             this.classe = false;
         },
+        validateCreateStory(){
+            if (this.title != "" && this.validateCreateStoryType()) {
+                
+                return true;
+            }else false;
+        },
+        validateCreateStoryType() {
+            return (this.sette || this.undici || this.quindici) &&
+            (this.singolo || this.gruppo || this.classe)
+        },
+        showAlertModal() {
+            this.$bvModal.show("non-valid");
+        },
     },
     template: "#add-new-element",
 });
@@ -205,6 +218,10 @@ Vue.component("unvalid-alert", {
             type: Boolean,
             defaul: false,
         },
+        empty_path_title:{
+            type: Boolean,
+            defaul: false, 
+         },
     },
     template: "#unvalid-alert",
 });
@@ -765,7 +782,6 @@ Vue.component("modal-edit-activity", {
                 {
                     type: "Foto",
                     question: "",
-                    no_handicap: true,
                 },
                 {
                     type: "Testo",
@@ -801,24 +817,20 @@ Vue.component("modal-edit-activity", {
                 {
                     type: "Immagine",
                     text: "",
-                    no_handicap: true,
                 },
                 {
                     type: "Video",
                     text: "",
-                    no_handicap: true,
                 },
             ],
             minigames: [
                 {
                     type: "Word Invaders",
                     words: [],
-                    no_handicap: true,
                 },
                 {
                     type: "Memory",
                     images: [],
-                    no_handicap: true,
                 },
             ],
             activity: null,
@@ -877,6 +889,12 @@ Vue.component("modal-edit-activity", {
         },
     },
     methods: {
+        checkSelected(component){
+            if(this.component_selected) {
+                if(this.component_selected==component) return true;
+                else false;
+            }
+        },
         validateStructure() {
             for (let i = 0; i < this.activity.elements.length; i++) {
                 if (this.activity.elements[i].type == "") return false;
@@ -906,43 +924,34 @@ Vue.component("modal-edit-activity", {
                         return true;
                     else return false;
                 }
-                case "Scelta multipla": {
-                    console.log(function () {
-                        for (
-                            let i = 0;
-                            i < this.component_selected.answers.length;
-                            i++
-                        ) {
-                            if (this.component_selected.answers[i] == "")
-                                return false;
+                case "Scelta Multipla": {
+                    if(this.component_selected.question == "" || this.component_selected.correct_answer == null){
+                        return false;
+                    }else{
+                        for(let i=0; i<this.component_selected.answers.length; i++){
+                            if(this.component_selected.answers[i]=="")return false;
                         }
                         return true;
-                    });
-                    if (
-                        this.component_selected.question != "" &&
-                        this.component_selected.correct_answer != null &&
-                        function () {
-                            for (
-                                let i = 0;
-                                i < this.component_selected.answers.length;
-                                i++
-                            ) {
-                                if (this.component_selected.answers[i] == "")
-                                    return false;
-                            }
-                            return true;
-                        }
-                    ) {
-                        return true;
-                    } else return false;
+                    }
                 }
                 case "Foto": {
                 }
                 case "Testo": {
+                    if(this.component_selected.text == "")return false;
+                    else return true;
                 }
                 case "Collega": {
+                    for(let i = 0; i<this.component_selected.answers.length; i++){
+                        if(this.component_selected.answers[i].first == "" || this.component_selected.answers[i].second == "")
+                        return false;
+                        }
+                        return true;
+                }
+                case "Riempi": {
                 }
                 case "Descrizione": {
+                    if (this.component_selected.text!= "")return true;
+                    else false;
                 }
                 case "Immagine": {
                 }

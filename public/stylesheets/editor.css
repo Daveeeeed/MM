@@ -301,18 +301,10 @@ body {
     margin-top: 15px;
 }
 
-
 .tutst-group-item:focus {
     outline: 0;
 }
 
-
-
-
-
-
-
-
-
-
-
+.pad .sele{	
+    background-color:yellow;	
+}

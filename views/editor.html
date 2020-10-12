@@ -243,6 +243,7 @@
                             class="mb-3"
                             type="text"
                             v-model="title"
+                            maxlength=25
                             required
                             placeholder="Inserisci il titolo..."
                         ></b-form-input>
@@ -296,9 +297,17 @@
                         <b-button class="darker mx-1" @click="onCancel()">
                             Cancella
                         </b-button>
-                        <b-button class="darker mx-1" @click="onSave()">
-                            Salva
-                        </b-button>
+                        <b-button 	
+                        class="darker mx-1" 	
+                        v-on="validateCreateStory() ? { click: () => onSave() } : { click: () => showAlertModal() }"	
+                        >	
+                            Salva	
+                        </b-button>	
+                        <unvalid-alert	
+                            :empty_title="title == ''"	
+                            :invalid_story_type="!validateCreateStoryType()"	
+                        >	
+                        </unvalid-alert>
                     </b-row>
                 </template>
             </b-modal>
@@ -622,6 +631,7 @@
                                             style="width: 50%"
                                             class="m-2"
                                             type="text"
+                                            maxlength=25
                                             v-model="selected_path.name"
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
@@ -652,6 +662,7 @@
                                             class="m-2"
                                             type="text"
                                             v-model="story.title"
+                                            maxlength=25
                                             required
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
@@ -748,6 +759,7 @@
                         <b-col class="py-3">
                             <b-form-input
                                 v-model="pathName"
+                                maxlength=25
                                 placeholder="Nome del percorso"
                             ></b-form-input>
                         </b-col>
@@ -1016,6 +1028,7 @@
                                             type="text"
                                             v-model="mission.title"
                                             required
+                                            maxlength=25
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
                                     </div>
@@ -1105,7 +1118,7 @@
                                         attività)
                                     </p>
                                     <div
-                                        class="d-flex flex-wrap mission-group-item"
+                                        class="d-flex flex-wrap mission-group-item pad"
                                     >
                                         <b-button
                                             v-for="(component,index) in components_special"
@@ -1113,6 +1126,7 @@
                                             class="m-2 list-group-item"
                                             @click="onComponentClick(component)"
                                             :disabled="disableSpecial"
+                                            :class="{ sele : ( checkSelected(component) )}"
                                             style="height: 75px; width: 130px"
                                         >
                                             {{ component.type }}
@@ -1537,6 +1551,7 @@
                                             class="m-2"
                                             type="text"
                                             v-model="activity.title"
+                                            maxlength=25
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
                                     </div>
