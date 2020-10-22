@@ -243,7 +243,7 @@
                             class="mb-3"
                             type="text"
                             v-model="title"
-                            maxlength=25
+                            maxlength="25"
                             required
                             placeholder="Inserisci il titolo..."
                         ></b-form-input>
@@ -297,16 +297,16 @@
                         <b-button class="darker mx-1" @click="onCancel()">
                             Cancella
                         </b-button>
-                        <b-button 	
-                        class="darker mx-1" 	
-                        v-on="validateCreateStory() ? { click: () => onSave() } : { click: () => showAlertModal() }"	
-                        >	
-                            Salva	
-                        </b-button>	
-                        <unvalid-alert	
-                            :empty_title="title == ''"	
-                            :invalid_story_type="!validateCreateStoryType()"	
-                        >	
+                        <b-button
+                            class="darker mx-1"
+                            v-on="validateCreateStory() ? { click: () => onSave() } : { click: () => showAlertModal() }"
+                        >
+                            Salva
+                        </b-button>
+                        <unvalid-alert
+                            :empty_title="title == ''"
+                            :invalid_story_type="category == 'Storie' ? !validateCreateStoryType() : false"
+                        >
                         </unvalid-alert>
                     </b-row>
                 </template>
@@ -342,15 +342,11 @@
                                     fluid
                                     class="d-flex justify-content-center"
                                 >
-                                    <a
-                                        >http://192.168.178.21:8000/play?key={{story.key}}</a
-                                    >
                                     <span
                                         v-if="story_to_edit.settings.published"
                                         class="py-3"
                                         id="qrcode"
                                     ></span>
-
                                     <p class="my-3" v-else>
                                         Pubblica la storia per visualizzare il
                                         QR code
@@ -631,7 +627,7 @@
                                             style="width: 50%"
                                             class="m-2"
                                             type="text"
-                                            maxlength=25
+                                            maxlength="25"
                                             v-model="selected_path.name"
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
@@ -662,7 +658,7 @@
                                             class="m-2"
                                             type="text"
                                             v-model="story.title"
-                                            maxlength=25
+                                            maxlength="25"
                                             required
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
@@ -759,7 +755,7 @@
                         <b-col class="py-3">
                             <b-form-input
                                 v-model="pathName"
-                                maxlength=25
+                                maxlength="25"
                                 placeholder="Nome del percorso"
                             ></b-form-input>
                         </b-col>
@@ -959,7 +955,7 @@
                                                     style="text-align: center"
                                                     class="my-3"
                                                     type="text"
-                                                    placeholder="100"
+                                                    placeholder="Punti..."
                                                     v-model="selected_activity.correct.points"
                                                 ></b-form-input>
                                                 <h3 class="mb-3">punti</h3>
@@ -992,7 +988,7 @@
                                                     style="text-align: center"
                                                     class="my-3"
                                                     type="text"
-                                                    placeholder="100"
+                                                    placeholder="Punti..."
                                                     v-model="selected_activity.wrong.points"
                                                 ></b-form-input>
                                                 <h3 class="mb-3">punti</h3>
@@ -1028,7 +1024,7 @@
                                             type="text"
                                             v-model="mission.title"
                                             required
-                                            maxlength=25
+                                            maxlength="25"
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
                                     </div>
@@ -1111,14 +1107,14 @@
                                 >
                                     Componenti
                                 </h3>
-                                <div class="scrollable p-0 m-0">
+                                <div class="scrollable p-0 m-0 pad">
                                     <h5 class="my-2">Necessari</h5>
                                     <p>
                                         (obbligatorio uno e uno solo per
                                         attività)
                                     </p>
                                     <div
-                                        class="d-flex flex-wrap mission-group-item pad"
+                                        class="d-flex flex-wrap mission-group-item"
                                     >
                                         <b-button
                                             v-for="(component,index) in components_special"
@@ -1126,7 +1122,7 @@
                                             class="m-2 list-group-item"
                                             @click="onComponentClick(component)"
                                             :disabled="disableSpecial"
-                                            :class="{ sele : ( checkSelected(component) )}"
+                                            :class="checkSelected(component)"
                                             style="height: 75px; width: 130px"
                                         >
                                             {{ component.type }}
@@ -1142,6 +1138,7 @@
                                             class="m-2 list-group-item"
                                             @click="onComponentClick(component)"
                                             :disabled="disableDefault"
+                                            :class="checkSelected(component)"
                                             style="height: 75px; width: 130px"
                                         >
                                             {{ component.type }}
@@ -1158,6 +1155,7 @@
                                             class="m-2 list-group-item"
                                             @click="onComponentClick(component)"
                                             :disabled="disableMinigames"
+                                            :class="checkSelected(component)"
                                             style="height: 75px; width: 130px"
                                         >
                                             {{ component.type }}
@@ -1240,296 +1238,302 @@
                                             id="edit-component-modal"
                                             size="lg"
                                             :title="component_selected.type"
-                                            @ok="onSaveComponentModal()"
                                             @hide="onHideComponentModal()"
                                             @hidden="component_selected = null; disableSpecial"
                                             hide-footer
                                         >
-                                            <template #default="{ hide, ok }">
-                                                <b-container
-                                                    class="my-3 d-flex flex-column justify-content-around"
-                                                >
-                                                    <!-- DOMANDA -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Domanda' "
+                                            <template #default="{ hide }">
+                                                <b-overlay :show="overlay_edit_component">
+                                                    <b-container
+                                                        class="my-3 d-flex flex-column justify-content-around"
                                                     >
-                                                        <h5>Domanda</h5>
-                                                        <b-form-input
-                                                            class="mb-2"
-                                                            type="text"
-                                                            v-model="component_selected.question"
-                                                            placeholder="Inserisci la domanda..."
-                                                        ></b-form-input>
-                                                        <h5>Risposte</h5>
-                                                        <b-form-tags
-                                                            placeholder="Risposte..."
-                                                            v-model="component_selected.answers"
-                                                        ></b-form-tags>
-                                                    </div>
-
-                                                    <!-- SCELTA MULTIPLA -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Scelta Multipla' "
-                                                    >
-                                                        <h5>Domanda</h5>
-                                                        <p>
-                                                            Per superare
-                                                            l'attività sarà
-                                                            richiesto di
-                                                            selezionare una
-                                                            delle 4 risposte
-                                                        </p>
-                                                        <b-form-input
-                                                            class="mb-2"
-                                                            type="text"
-                                                            v-model="component_selected.question"
-                                                            placeholder="Inserisci la domanda..."
-                                                        ></b-form-input>
-                                                        <h5>Risposte</h5>
-                                                        <b-form-radio
-                                                            class="my-1"
-                                                            v-model="component_selected.correct_answer"
-                                                            name="answers"
-                                                            :value="component_selected.answers[0]"
-                                                        >
-                                                            <b-form-input
-                                                                type="text"
-                                                                v-model="component_selected.answers[0]"
-                                                                placeholder="Risposta..."
-                                                            ></b-form-input>
-                                                        </b-form-radio>
-                                                        <b-form-radio
-                                                            class="my-1"
-                                                            v-model="component_selected.correct_answer"
-                                                            name="answers"
-                                                            :value="component_selected.answers[1]"
-                                                        >
-                                                            <b-form-input
-                                                                type="text"
-                                                                v-model="component_selected.answers[1]"
-                                                                placeholder="Risposta..."
-                                                            ></b-form-input>
-                                                        </b-form-radio>
-                                                        <b-form-radio
-                                                            class="my-1"
-                                                            v-model="component_selected.correct_answer"
-                                                            name="answers"
-                                                            :value="component_selected.answers[2]"
-                                                        >
-                                                            <b-form-input
-                                                                type="text"
-                                                                v-model="component_selected.answers[2]"
-                                                                placeholder="Risposta..."
-                                                            ></b-form-input>
-                                                        </b-form-radio>
-                                                        <b-form-radio
-                                                            class="my-1"
-                                                            v-model="component_selected.correct_answer"
-                                                            name="answers"
-                                                            :value="component_selected.answers[3]"
-                                                        >
-                                                            <b-form-input
-                                                                type="text"
-                                                                v-model="component_selected.answers[3]"
-                                                                placeholder="Risposta..."
-                                                            ></b-form-input>
-                                                        </b-form-radio>
-                                                    </div>
-
-                                                    <!-- FOTO -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Foto' "
-                                                    >
-                                                        <h5>Domanda</h5>
-                                                        <p>
-                                                            Sarà richiesto lo
-                                                            scatto di una foto
-                                                            come risposta alla
-                                                            seguente domanda
-                                                        </p>
-                                                        <b-form-input
-                                                            class="mb-2"
-                                                            type="text"
-                                                            v-model="component_selected.question"
-                                                            placeholder="Inserisci la domanda..."
-                                                        ></b-form-input>
-                                                    </div>
-
-                                                    <!-- TESTO -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Testo' "
-                                                    >
-                                                        <h5>Descrizione</h5>
-                                                        <p>
-                                                            Per superare questa
-                                                            attività non sarà
-                                                            richiesta nessuna
-                                                            azione
-                                                        </p>
-                                                        <b-form-textarea
-                                                            class="my-2"
-                                                            v-model="component_selected.text"
-                                                            placeholder="Inserisci il testo..."
-                                                            no-resize
-                                                            rows="5"
-                                                        ></b-form-textarea>
-                                                    </div>
-
-                                                    <!-- COLLEGA -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Collega' "
-                                                    >
-                                                        <h5>Risposte</h5>
-                                                        <p>
-                                                            L'utente dovrà
-                                                            ricollegare
-                                                            correttamente tutte
-                                                            le frasi, proposte
-                                                            spezzate in ordine
-                                                            casuale
-                                                        </p>
+                                                        <!-- DOMANDA -->
                                                         <div
-                                                            class="d-flex flex-row justify-content-around"
+                                                            v-if=" component_selected.type == 'Domanda' "
                                                         >
+                                                            <h5>Domanda</h5>
                                                             <b-form-input
-                                                                class="m-1"
+                                                                class="mb-2"
                                                                 type="text"
-                                                                v-model="component_selected.answers[0].first"
-                                                                placeholder="Prima parte..."
+                                                                v-model="component_selected.question"
+                                                                placeholder="Inserisci la domanda..."
                                                             ></b-form-input>
+                                                            <h5>Risposte</h5>
+                                                            <b-form-tags
+                                                                placeholder="Risposte..."
+                                                                v-model="component_selected.answers"
+                                                            ></b-form-tags>
+                                                        </div>
+
+                                                        <!-- SCELTA MULTIPLA -->
+                                                        <div
+                                                            v-if=" component_selected.type == 'Scelta Multipla' "
+                                                        >
+                                                            <h5>Domanda</h5>
+                                                            <p>
+                                                                Per superare
+                                                                l'attività sarà
+                                                                richiesto di
+                                                                selezionare una
+                                                                delle 4 risposte
+                                                            </p>
                                                             <b-form-input
-                                                                class="m-1"
+                                                                class="mb-2"
                                                                 type="text"
-                                                                v-model="component_selected.answers[0].second"
-                                                                placeholder="Seconda parte..."
+                                                                v-model="component_selected.question"
+                                                                placeholder="Inserisci la domanda..."
+                                                            ></b-form-input>
+                                                            <h5>Risposte</h5>
+                                                            <b-form-radio
+                                                                class="my-1"
+                                                                v-model="component_selected.correct_answer"
+                                                                name="answers"
+                                                                :value="component_selected.answers[0]"
+                                                            >
+                                                                <b-form-input
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[0]"
+                                                                    placeholder="Risposta..."
+                                                                ></b-form-input>
+                                                            </b-form-radio>
+                                                            <b-form-radio
+                                                                class="my-1"
+                                                                v-model="component_selected.correct_answer"
+                                                                name="answers"
+                                                                :value="component_selected.answers[1]"
+                                                            >
+                                                                <b-form-input
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[1]"
+                                                                    placeholder="Risposta..."
+                                                                ></b-form-input>
+                                                            </b-form-radio>
+                                                            <b-form-radio
+                                                                class="my-1"
+                                                                v-model="component_selected.correct_answer"
+                                                                name="answers"
+                                                                :value="component_selected.answers[2]"
+                                                            >
+                                                                <b-form-input
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[2]"
+                                                                    placeholder="Risposta..."
+                                                                ></b-form-input>
+                                                            </b-form-radio>
+                                                            <b-form-radio
+                                                                class="my-1"
+                                                                v-model="component_selected.correct_answer"
+                                                                name="answers"
+                                                                :value="component_selected.answers[3]"
+                                                            >
+                                                                <b-form-input
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[3]"
+                                                                    placeholder="Risposta..."
+                                                                ></b-form-input>
+                                                            </b-form-radio>
+                                                        </div>
+
+                                                        <!-- FOTO -->
+                                                        <div
+                                                            v-if=" component_selected.type == 'Foto' "
+                                                        >
+                                                            <h5>Domanda</h5>
+                                                            <p>
+                                                                Sarà richiesto
+                                                                lo scatto di una
+                                                                foto come
+                                                                risposta alla
+                                                                seguente domanda
+                                                            </p>
+                                                            <b-form-input
+                                                                class="mb-2"
+                                                                type="text"
+                                                                v-model="component_selected.question"
+                                                                placeholder="Inserisci la domanda..."
                                                             ></b-form-input>
                                                         </div>
+
+                                                        <!-- TESTO -->
                                                         <div
-                                                            class="d-flex flex-row justify-content-around"
+                                                            v-if=" component_selected.type == 'Testo' "
                                                         >
+                                                            <h5>Descrizione</h5>
+                                                            <p>
+                                                                Per superare
+                                                                questa attività
+                                                                non sarà
+                                                                richiesta
+                                                                nessuna azione
+                                                            </p>
+                                                            <b-form-textarea
+                                                                class="my-2"
+                                                                v-model="component_selected.text"
+                                                                placeholder="Inserisci il testo..."
+                                                                no-resize
+                                                                rows="5"
+                                                            ></b-form-textarea>
+                                                        </div>
+
+                                                        <!-- COLLEGA -->
+                                                        <div
+                                                            v-if=" component_selected.type == 'Collega' "
+                                                        >
+                                                            <h5>Risposte</h5>
+                                                            <p>
+                                                                L'utente dovrà
+                                                                ricollegare
+                                                                correttamente
+                                                                tutte le frasi,
+                                                                proposte
+                                                                spezzate in
+                                                                ordine casuale
+                                                            </p>
+                                                            <div
+                                                                class="d-flex flex-row justify-content-around"
+                                                            >
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[0].first"
+                                                                    placeholder="Prima parte..."
+                                                                ></b-form-input>
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[0].second"
+                                                                    placeholder="Seconda parte..."
+                                                                ></b-form-input>
+                                                            </div>
+                                                            <div
+                                                                class="d-flex flex-row justify-content-around"
+                                                            >
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[1].first"
+                                                                    placeholder="Prima parte..."
+                                                                ></b-form-input>
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[1].second"
+                                                                    placeholder="Seconda parte..."
+                                                                ></b-form-input>
+                                                            </div>
+                                                            <div
+                                                                class="d-flex flex-row justify-content-around"
+                                                            >
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[2].first"
+                                                                    placeholder="Prima parte..."
+                                                                ></b-form-input>
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[2].second"
+                                                                    placeholder="Seconda parte..."
+                                                                ></b-form-input>
+                                                            </div>
+                                                            <div
+                                                                class="d-flex flex-row justify-content-around"
+                                                            >
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[3].first"
+                                                                    placeholder="Prima parte..."
+                                                                ></b-form-input>
+                                                                <b-form-input
+                                                                    class="m-1"
+                                                                    type="text"
+                                                                    v-model="component_selected.answers[3].second"
+                                                                    placeholder="Seconda parte..."
+                                                                ></b-form-input>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- DESCRIZIONE -->
+                                                        <div
+                                                            v-if=" component_selected.type == 'Descrizione' "
+                                                        >
+                                                            <h5>Descrizione</h5>
+                                                            <b-form-textarea
+                                                                class="my-2"
+                                                                v-model="component_selected.text"
+                                                                placeholder="Inserisci il testo..."
+                                                                no-resize
+                                                                rows="5"
+                                                            ></b-form-textarea>
+                                                        </div>
+
+                                                        <!-- IMMAGINE -->
+                                                        <div
+                                                            v-if=" component_selected.type == 'Immagine' "
+                                                        >
+                                                            <h5>Immagine</h5>
+                                                            <p>
+                                                                La seguente
+                                                                immagine sarà
+                                                                mostrata nella
+                                                                schermata
+                                                            </p>
+                                                            <b-form-file
+                                                                accept="image/*"
+                                                                placeholder="Seleziona foto..."
+                                                                v-model="component_selected.name"
+                                                                @input="uploadFile"
+                                                            ></b-form-file>
+                                                        </div>
+
+                                                        <!-- VIDEO -->
+                                                        <div
+                                                            v-if=" component_selected.type == 'Video' "
+                                                        >
+                                                            <h5>Video</h5>
+                                                            <p>
+                                                                Il seguente
+                                                                video sarà
+                                                                mostrato nella
+                                                                schermata
+                                                            </p>
+                                                            <p>
+                                                                E' richiesto
+                                                                l'URL embedded
+                                                            </p>
                                                             <b-form-input
-                                                                class="m-1"
+                                                                class="mb-2"
                                                                 type="text"
-                                                                v-model="component_selected.answers[1].first"
-                                                                placeholder="Prima parte..."
-                                                            ></b-form-input>
-                                                            <b-form-input
-                                                                class="m-1"
-                                                                type="text"
-                                                                v-model="component_selected.answers[1].second"
-                                                                placeholder="Seconda parte..."
+                                                                v-model="component_selected.text"
+                                                                placeholder="Inserisci il link qui..."
                                                             ></b-form-input>
                                                         </div>
+
+                                                        <!-- BOTTONI -->
                                                         <div
-                                                            class="d-flex flex-row justify-content-around"
+                                                            class="d-flex justify-content-end mt-3"
                                                         >
-                                                            <b-form-input
-                                                                class="m-1"
-                                                                type="text"
-                                                                v-model="component_selected.answers[2].first"
-                                                                placeholder="Prima parte..."
-                                                            ></b-form-input>
-                                                            <b-form-input
-                                                                class="m-1"
-                                                                type="text"
-                                                                v-model="component_selected.answers[2].second"
-                                                                placeholder="Seconda parte..."
-                                                            ></b-form-input>
+                                                            <b-button
+                                                                class="darker mx-1"
+                                                                @click="hide()"
+                                                            >
+                                                                Indietro
+                                                            </b-button>
+                                                            <b-button
+                                                                class="darker mx-1"
+                                                                v-on="validateComponent() ? { click: () => onSaveComponentModal() } : { click: () => showAlertModal() }"
+                                                            >
+                                                                Salva
+                                                            </b-button>
                                                         </div>
-                                                        <div
-                                                            class="d-flex flex-row justify-content-around"
-                                                        >
-                                                            <b-form-input
-                                                                class="m-1"
-                                                                type="text"
-                                                                v-model="component_selected.answers[3].first"
-                                                                placeholder="Prima parte..."
-                                                            ></b-form-input>
-                                                            <b-form-input
-                                                                class="m-1"
-                                                                type="text"
-                                                                v-model="component_selected.answers[3].second"
-                                                                placeholder="Seconda parte..."
-                                                            ></b-form-input>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- DESCRIZIONE -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Descrizione' "
-                                                    >
-                                                        <h5>Descrizione</h5>
-                                                        <b-form-textarea
-                                                            class="my-2"
-                                                            v-model="component_selected.text"
-                                                            placeholder="Inserisci il testo..."
-                                                            no-resize
-                                                            rows="5"
-                                                        ></b-form-textarea>
-                                                    </div>
-
-                                                    <!-- IMMAGINE -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Immagine' "
-                                                    >
-                                                        <h5>Immagine</h5>
-                                                        <p>
-                                                            La seguente immagine
-                                                            sarà mostrata nella
-                                                            schermata
-                                                        </p>
-                                                        <b-form-file
-                                                            accept="image/*"
-                                                            v-model="component_selected.text"
-                                                            :state="Boolean(component_selected.text)"
-                                                            placeholder="Seleziona foto..."
-                                                        ></b-form-file>
-                                                    </div>
-
-                                                    <!-- VIDEO -->
-                                                    <div
-                                                        v-if=" component_selected.type == 'Video' "
-                                                    >
-                                                        <h5>Video</h5>
-                                                        <p>
-                                                            Il seguente video
-                                                            sarà mostrato nella
-                                                            schermata
-                                                        </p>
-                                                        <p>
-                                                            E' richiesto l'URL
-                                                            embedded
-                                                        </p>
-                                                        <b-form-input
-                                                            class="mb-2"
-                                                            type="text"
-                                                            v-model="component_selected.text"
-                                                            placeholder="Inserisci il titolo..."
-                                                        ></b-form-input>
-                                                    </div>
-
-                                                    <!-- BOTTONI -->
-                                                    <div
-                                                        class="d-flex justify-content-end mt-3"
-                                                    >
-                                                        <b-button
-                                                            class="darker mx-1"
-                                                            @click="hide()"
-                                                        >
-                                                            Indietro
-                                                        </b-button>
-                                                        <b-button
-                                                            class="darker mx-1"
-                                                            v-on="validateComponent() ? { click: () => ok() } : { click: () => showAlertModal() }"
-                                                        >
-                                                            Salva
-                                                        </b-button>
-                                                    </div>
-                                                    <unvalid-alert
-                                                        v-if="component_selected"
-                                                        :unvalid_component="!validateComponent()"
-                                                    ></unvalid-alert>
-                                                </b-container>
+                                                        <unvalid-alert
+                                                            v-if="component_selected"
+                                                            :unvalid_component="!validateComponent()"
+                                                        ></unvalid-alert>
+                                                    </b-container>
+                                                </b-overlay>
                                             </template>
                                         </b-modal>
                                     </b-container>
@@ -1551,7 +1555,7 @@
                                             class="m-2"
                                             type="text"
                                             v-model="activity.title"
-                                            maxlength=25
+                                            maxlength="25"
                                             placeholder="Inserisci il titolo..."
                                         ></b-form-input>
                                     </div>

@@ -4,7 +4,7 @@ body {
 
 /* NAVBAR E SUOI ELEMENTI */
 .navbar {
-    background-color: #1C1E2B;
+    background-color: #1c1e2b;
 }
 
 .navbar .nav-item {
@@ -14,12 +14,12 @@ body {
 }
 
 .navbar .nav-item.active {
-    box-shadow: 0 2px 0 #00BD58;
-    color: #FFFFFF;
+    box-shadow: 0 2px 0 #00bd58;
+    color: #ffffff;
 }
 
 .navbar .nav-item:hover {
-    background-color: #28293D;
+    background-color: #28293d;
 }
 
 /* TAB DELLE SCHERMATE (es. Storie e Archiviate) */
@@ -27,7 +27,7 @@ body {
     background-color: transparent;
     border: 0px;
     color: #848689;
-    white-space:nowrap;
+    white-space: nowrap;
 }
 
 .tabs .list-group-item:focus {
@@ -40,18 +40,18 @@ body {
 
 /* BOTTONE */
 .btn {
-    background-color: #1A1C2C;
+    background-color: #1a1c2c;
     border: none;
     border-radius: 10px;
 }
 
 .btn.darker {
-    background-color: #090A11;
+    background-color: #090a11;
 }
 
 /* LENTE INGRANDIMENTO INPUT */
 .input-group-text {
-    background-color: #1A1C2C;
+    background-color: #1a1c2c;
     color: #848689;
     border: none;
     border-radius: 10px;
@@ -59,15 +59,15 @@ body {
 
 /* TEXT BOX INPUT */
 .form-control {
-    background-color: #1A1C2C;
-    color: #FFFFFF;
+    background-color: #1a1c2c;
+    color: #ffffff;
     border: none;
     border-radius: 10px;
 }
 
 .form-control:focus {
-    background-color: #1A1C2C;
-    color: #FFFFFF;
+    background-color: #1a1c2c;
+    color: #ffffff;
     border: none;
     box-shadow: none;
 }
@@ -80,44 +80,45 @@ body {
 
 .table-row {
     background-color: #171926;
-    color: #FFFFFF;
+    color: #ffffff;
 }
 
 .cell-default {
-    color: #FFFFFF;
+    color: #ffffff;
 }
 
 .cell-true {
-    color: #00CA5B;
+    color: #00ca5b;
     font-size: 14px;
     text-align: center;
 }
 
 .cell-false {
-    color: #FF3D4A;
+    color: #ff3d4a;
     font-size: 14px;
     text-align: center;
 }
 
-.table td, .table th {
+.table td,
+.table th {
     vertical-align: middle;
 }
 
 /* MODAL */
 
 .modal-header {
-    background-color: #1C1E2B;
+    background-color: #1c1e2b;
     border: 0px;
 }
 
 .modal-footer {
-    background-color: #1C1E2B;
+    background-color: #1c1e2b;
     border: 0px;
 }
 
-.modal-content{
+.modal-content {
     background-color: #121421;
-    color: #FFFFFF;
+    color: #ffffff;
 }
 
 .modal-body {
@@ -125,21 +126,21 @@ body {
 }
 
 .modal-xl .modal-header {
-    padding:  0px;
-    background-color: #1C1E2B;
+    padding: 0px;
+    background-color: #1c1e2b;
     border: 0px;
     height: 60px;
 }
 
 .modal-xl .modal-footer {
-    background-color: #1C1E2B;
+    background-color: #1c1e2b;
     border: 0px;
     height: 68px;
 }
 
-.modal-xl .modal-content{
+.modal-xl .modal-content {
     background-color: #121421;
-    color: #FFFFFF;
+    color: #ffffff;
     height: calc(100vh - 56px);
 }
 
@@ -154,17 +155,17 @@ body {
     color: #ffffff;
     text-align: center;
     border-radius: 10px;
-    box-shadow: 0 2px 0 #00BD58;
+    box-shadow: 0 2px 0 #00bd58;
     overflow-y: auto;
     outline: 0;
 }
 
 .mission-group-item .list-group-item:hover {
-    background-color:#1C1E2B;
+    background-color: #1c1e2b;
 }
 
 .mission-group-item .list-group-item:focus {
-    background-color:#1C1E2B;
+    background-color: #1c1e2b;
 }
 
 /* ELEMENTO INATTIVO MISSIONE NEL MODAL */
@@ -178,7 +179,7 @@ body {
     height: calc(100vh - 60px - 68px - 28px - 28px);
     overflow-y: auto;
     overflow-x: hidden;
-    background-color: #090A11;
+    background-color: #090a11;
 }
 
 .menu-column .list-group-item {
@@ -192,16 +193,16 @@ body {
 }
 
 .menu-column .list-group-item:hover {
-    background-color: #28293D; 
+    background-color: #28293d;
 }
 
 .menu-column .list-group-item:focus {
-    background-color: #28293D;
+    background-color: #28293d;
 }
 
-.menu-column .list-group-item.active{
-   color: white;
-   box-shadow: 0px 3px 0px  #00BD58;
+.menu-column .list-group-item.active {
+    color: white;
+    box-shadow: 0px 3px 0px #00bd58;
 }
 
 .activity-button {
@@ -223,10 +224,10 @@ body {
 }
 
 .mission-group-item .list-group-item.selected_path {
-    background-color: #00BD58;
+    background-color: #00bd58;
 }
 
-.selezionate{
+.selezionate {
     border-right-color: white;
     border-right-width: 1px;
     border-right-style: solid;
@@ -235,19 +236,18 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     height: calc(100vh - 64px - 68px - 56px);
-    
 }
 
-.edit-title{
-    display: inline-block
+.edit-title {
+    display: inline-block;
 }
 
-.bv-no-focus-ring{
+.bv-no-focus-ring {
     text-align: center;
 }
 
 .path-label {
-    color: #FFFFFF;
+    color: #ffffff;
     background-color: transparent;
 }
 
@@ -268,43 +268,29 @@ body {
 }
 
 .red:hover {
-    background-color: #FF3D4A;
+    background-color: #ff3d4a;
 }
 
 ::-webkit-scrollbar {
     width: 5px;
-    
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: transparent; 
-  }
-   
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: #28293D; 
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #28293d;
     border-radius: 3px;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555; 
-  }
-
-  .tut .list-group-item {
-    background-color: #28293D;
-    border: 0px;
-    color:white;
-    white-space:nowrap;
-    text-align: left;
-    margin-top: 15px;
 }
 
-.tutst-group-item:focus {
-    outline: 0;
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
-.pad .sele{	
-    background-color:yellow;	
+.pad .mission-group-item .selected-component {
+    background-color: #00bd58;
 }
