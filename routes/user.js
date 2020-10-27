@@ -12,6 +12,12 @@ router.get("/play", (req, res) => {
     res.sendFile(path.resolve("views/access.html"));
 });
 
+/* GET editorS */
+router.get("/editorS", (req, res) => {
+    res.sendFile(path.resolve("views/editorS.html"));
+});
+
+
 /* GET editor */
 router.get("/editor", (req, res) => {
     res.sendFile(path.resolve("views/editor.html"));
