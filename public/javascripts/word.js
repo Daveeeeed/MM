@@ -175,8 +175,34 @@ var global_words = [
 	// "start",
 	// "hand",
 	// "might"
+"Rivoluzione",
+"monarchia",
+"assoluta",
+"abolizione",
+"Repubblica",
+//"AncienRégime",
+"disuguaglianza",
+"povertà",
+"emanazione",
+"aristocrazia",
+"moti", 
+"rivoluzionari",
+"borghesia",
+"re",
+"nobiltà",
+"clero",
+//"terzo stato",
+"malcontento",
+"Presa",
+"Bastiglia",
+//"prima Repubblica",
+"Regina",
+"MariaAntonietta",
+"uguaglianza",
+"democrazia",
+"Stato",
+"moderno"
 
-"1792","1787","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792","1792"
 ];
 
 var intervals = {};
@@ -219,10 +245,10 @@ function monsterDown(word) {	//layout pagina
 			tmpObj.css('top', top+'px');
 			var gameHeight = parseInt($('.game-top').css('height'));
 			var selfHeight = parseInt(tmpObj.css('height'));
-			if (top > gameHeight-selfHeight) { // 碰到了底部
+			if (top > gameHeight-selfHeight) { //Hit the bottom
 				hideMonster(tmpWord);
 				if (tmpObj.hasClass('monster-living')) {
-					throw new ExceptionFail(); // 游戏失败
+					throw new ExceptionFail(); //game over
 				}
 			}
 		} catch (e) {
@@ -267,7 +293,7 @@ function getRandomWord() {
 		}
 		var index = getRandInt(0, wordsSort[letter].length - 1);
 		var res = wordsSort[letter][index];
-		wordsSort[letter].splice(index, 1); // 保证单词只出现一次!
+		wordsSort[letter].splice(index, 1); //Make sure that the word only appears once!
 		return res;
 	}
 }
@@ -300,7 +326,7 @@ function genMonster(monsterNum) {
 
 function hideMonster(word) {
 	var tmpObj = $('.monster-col[data-word='+word+']');
-	// 加入消失效果
+	//Add disappearance effect
 	var magics = ['magic', 'puffOut', 'puffOut', 'vanishOut', 'openDownLeftOut', 'openDownRightOut', 'openUpLeftOut', 'openUpRightOut', 'rotateDown', 'rotateUp', 'rotateLeft', 'rotateRight', 'swashOut', 'foolishOut', 'holeOut', 'tinRightOut', 'tinLeftOut', 'tinUpOut', 'tinDownOut', 'bombRightOut', 'bombLeftOut', 'boingOutDown', 'spaceOutUp', 'spaceOutRight', 'spaceOutDown', 'spaceOutLeft'];
 	var magic = magics[getRandInt(0, magics.length - 1)];
 	tmpObj.addClass('magictime ' + magic);
@@ -311,10 +337,10 @@ function searchTarget(key) {
 		return target;
 	}
 	var monsters;
-	if (!key) { // 按的是功能键之类的非打印字符键
+	if (!key) { //Pressing a non-printing character key such as a function key
 		throw new ExceptionNoTarget();
 	}
-	monsters = $('.monster-living[data-word^='+key+']'); // 寻找首字母为key的monster
+	monsters = $('.monster-living[data-word^='+key+']'); // Find monsters with the first letter as key
 	if (!monsters.length) {
 		throw new ExceptionNoTarget();
 	}
@@ -355,14 +381,14 @@ function shoot(targetKey) {
       		var obj = $('#' + $(this).data('target-id'));
       		obj.css('color', '#ec3b83').addClass('colored');
       		var tmpTarget = obj.closest('.monster-col');
-      		// 所有字母都消灭后, 停止循环器, 并隐藏单词
+      		// After all the letters are eliminated, stop the circulator and hide the word
       		if (!tmpTarget.find('.monster-letter.undone').length && tmpTarget.find('.monster-letter.done').length == tmpTarget.find('.monster-letter.colored').length) {
       			$('.bullet[data-word=' + tmpTarget.data('word') + ']').hide();
       			hideMonster(tmpTarget.data('word'))
       			clearInterval(intervals[word]);
       		}
 	    },
-	    step: function(now, fx) { // 让子弹临近目标时隐藏
+	    step: function(now, fx) { // Hide the bullet when it is near the target
 	    	var obj = $('#' + fx.elem.id);
 	    	var tmpTarget = $('#' + obj.data('target-id')).closest('.monster-col');
 			if (tmpTarget.position().top >= obj.position().top) {
@@ -377,7 +403,7 @@ function attackMonster(key) {
 	if (!target) {
 		throw new ExceptionNoTarget();
 	}
-	targetKey = target.find('.monster-letter.undone:first'); // 按键和选定monster的下一个字母不一样
+	targetKey = target.find('.monster-letter.undone:first'); // Il pulsante è diverso dalla lettera successiva del mostro selezionato
 	if (key != targetKey.text()) {
 		throw new ExceptionNotMatch();
 	}
@@ -405,12 +431,12 @@ function handleException(e) {
 		clearAllInterval();
 	}
 }
-
-$(document).ready(function(){
+//diminuire intervallo per evitare che il browser crashi
+$(document).ready(function(){ 	//funzione che genera nuove parole ogni 3sec
 	genMonster();
 	intervals['___init___'] = setInterval(function() {
 		genMonster(1);
-	}, 30000);
+	}, 30000);	//modificato da 3000 a 30000
 	$(document).on('keypress', function(e) {
 		try {
 			var key = String.fromCharCode(e.which);
