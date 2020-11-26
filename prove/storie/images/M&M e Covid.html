@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>M&amp;M e Covid</title>
+
+    <link rel="stylesheet" href="M&amp;M%20e%20Covid_files/bootstrap.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="M&amp;M%20e%20Covid_files/jquery-3.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="M&amp;M%20e%20Covid_files/popper.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="M&amp;M%20e%20Covid_files/bootstrap.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="M&amp;M%20e%20Covid_files/jquery_002.js"> </script>
+    <script src="M&amp;M%20e%20Covid_files/jquery.js" type="text/javascript"></script>
+    <link href="M&amp;M%20e%20Covid_files/css_002.css" rel="stylesheet" type="text/css">
+    <link href="M&amp;M%20e%20Covid_files/css_003.css" rel="stylesheet">
+    <link href="M&amp;M%20e%20Covid_files/css.css" rel="stylesheet">
+    <script type="text/javascript" src="M&amp;M%20e%20Covid_files/myPlayer.js"></script>
+    <script type="text/javascript">
+
+      var myVAL = new URLSearchParams(location.search).get("file");
+      console.log(myVAL);
+
+      starter(myVAL);
+
+      var myCounter = 0;
+
+      loadIntro();
+
+    </script><link rel="stylesheet" type="text/css" href="M&amp;M%20e%20Covid_files/italia.css"><script type="text/javascript" src="M&amp;M%20e%20Covid_files/italia.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid" id="funCheck"><div class="row" id="riga1"><div class="col-md-1"></div><div class="col-md-10 col-xs-12" id="middle"><div class="row" id="riga2"><span></span><div class="container-fluid" id="myConteiner"><div class="row"><div class="col-sm-6"></div><div class="col-sm-6" id="myPoints"><br><h2>Points</h2> <div class="progress"><div class="progress-bar bg-success" id="myProgress" style="width:0%"></div></div><br></div></div><br><div class="row"><div class="col-sm"></div><div class="col-sm-6"><div class="myDivStyle" id="initialDiv"><h4> Per iniziare a scappare devi saper contare quante sono le regioni italiane?</h4></div></div><div class="col-sm"></div></div><br><div class="row"><div class="col-sm"></div><div class="col-sm-6"><img src="M&amp;M%20e%20Covid_files/italia_cartina.png"></div><div class="col-sm"></div></div><br><div class="row"><div class="col-sm"></div><div class="col-sm-6"><input type="number" class="form-control" id="regIt"></div><div class="col-sm"></div></div><br><div class="row"><div class="col-sm"></div><div class="col-sm-6"><button onclick="checkInputType();" id="bottone" type="button" class="btn btn-warning"><h2>Conferma</h2></button></div><div class="col-sm"></div></div></div></div><br><br></div></div></div>
+  
+
+</body></html>

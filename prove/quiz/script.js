@@ -94,7 +94,7 @@ submitBtn.addEventListener("click", () => {
             quiz.innerHTML = `
                 <h2>Hai risposto correttamente a ${score} su ${quizData.length} domande.</h2>
                 
-                <button onclick="location.reload()">Reload</button>
+                <button onclick="location.reload()">Ritenta</button>
             `; //bottone che ricarica la pagina
         }
     }

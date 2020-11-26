@@ -1,0 +1,43 @@
+body {
+  background-image: url('mappa_sfondo.jpg');
+  background-position: cover;
+}
+
+#riga1{
+  margin-top: 5%;
+}
+
+div.myDivStyle{
+  background-color: #E8B092;
+  vertical-align:middle;
+  padding: 10px;
+  opacity: 0.9;
+}
+div#myPoints{
+  background-color:orange; opacity: 0.7;
+}
+
+h2{
+	color: #363027;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#middle{
+  padding: 1%;
+  text-align: center;
+  background-image: url('pesa2.jpg');
+}
+
+img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+input#regIt, select {
+  background-color: orange;
+  width: 100%;
+  border-color:  orange;
+  color: #363027;
+  opacity: 0.9;
+}
