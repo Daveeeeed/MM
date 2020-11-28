@@ -51,14 +51,6 @@ Vue.component("add-new-element", {
                         key: String(Date.now()),
                         title: this.title,
                         activities: [],
-                        player: {
-                            sette: this.sette,
-                            undici: this.undici,
-                            quindici: this.quindici,
-                            single: this.singolo,
-                            group: this.gruppo,
-                            class: this.classe,
-                        },
                         first_activity: null,
                         results: [
                             {
@@ -72,27 +64,14 @@ Vue.component("add-new-element", {
                     return {
                         key: String(Date.now()),
                         title: this.title,
-                        elements: [
-                            {
-                                key: String(Date.now()),
-                                type: "",
-                            },
-                        ],
-                        player: {
-                            sette: this.sette,
-                            undici: this.undici,
-                            quindici: this.quindici,
-                            single: this.singolo,
-                            group: this.gruppo,
-                            class: this.classe,
-                        },
+                        elements: [],
                         correct: {
                             key: null,
-                            points: null,
+                            points: "100",
                         },
                         wrong: {
                             key: null,
-                            points: null,
+                            points: "50",
                         },
                         time: null,
                     };
@@ -152,14 +131,7 @@ Vue.component("add-new-element", {
                         }
                     }
                 });
-            this.$bvModal.hide("modal-add-new-element");
-            this.title = "";
-            this.sette = false;
-            this.undici = false;
-            this.quindici = false;
-            this.singolo = false;
-            this.gruppo = false;
-            this.classe = false;
+            this.onCancel();
         },
         onCancel() {
             this.$bvModal.hide("modal-add-new-element");
@@ -170,6 +142,20 @@ Vue.component("add-new-element", {
             this.singolo = false;
             this.gruppo = false;
             this.classe = false;
+        },
+        validateCreateStory() {
+            if (this.category == "Storie")
+                return this.title != "" && this.validateCreateStoryType();
+            else return this.title != "";
+        },
+        validateCreateStoryType() {
+            return (
+                (this.sette || this.undici || this.quindici) &&
+                (this.singolo || this.gruppo || this.classe)
+            );
+        },
+        showAlertModal() {
+            this.$bvModal.show("non-valid");
         },
     },
     template: "#add-new-element",
@@ -209,10 +195,34 @@ Vue.component("unvalid-alert", {
             type: Boolean,
             default: false,
         },
-        empty_connection:{
+        empty_connection: {
             type: Boolean,
             default: false,
-        }
+        },
+        empty_path_name: {
+            type: Boolean,
+            defaul: false,
+        },
+        invalid_story_type: {
+            type: Boolean,
+            defaul: false,
+        },
+        empty_story_missions: {
+            type: Boolean,
+            defaul: false,
+        },
+        empty_first_mission: {
+            type: Boolean,
+            defaul: false,
+        },
+        empty_story_results: {
+            type: Boolean,
+            defaul: false,
+        },
+        empty_path_title: {
+            type: Boolean,
+            defaul: false,
+        },
     },
     template: "#unvalid-alert",
 });
@@ -266,6 +276,7 @@ Vue.component("modal-edit-story", {
             selected_mission: null,
             story: null,
             isSaved: false,
+            removePathActive: false,
         };
     },
     props: {
@@ -274,15 +285,19 @@ Vue.component("modal-edit-story", {
         activities: null,
     },
     computed: {
-        filteredMissions() {
-            if (this.mission_filter) {
-                let a = [];
-                this.missions.forEach((element) => {
-                    if (element.title.includes(this.mission_filter))
-                        a.push(element);
-                });
-                return a;
-            } else return this.missions;
+        availableFilteredMissions() {
+            let a = [];
+            this.missions.forEach((mission) => {
+                if (mission.activities.length > 0) {
+                    if (this.mission_filter) {
+                        if (mission.title.includes(this.mission_filter))
+                            a.push(mission);
+                    } else {
+                        a.push(mission);
+                    }
+                }
+            });
+            return a;
         },
         resultsSelect: function () {
             let a = JSON.parse(JSON.stringify(this.selected_path.missions));
@@ -295,8 +310,15 @@ Vue.component("modal-edit-story", {
     },
     methods: {
         validateStory() {
-            console.log(this.validatePath())
-            if ((this.story.title != "") && this.validatePath()) {
+            if (
+                this.story.title != "" &&
+                this.validatePath() &&
+                this.validatePathsNames() &&
+                this.validateStoryType() &&
+                this.validateStoryMissions() &&
+                this.validateStoryFirstMission() &&
+                this.validateStoryResults()
+            ) {
                 return true;
             } else {
                 return false;
@@ -306,10 +328,59 @@ Vue.component("modal-edit-story", {
             if (this.story.paths.length != 0) return true;
             else false;
         },
+        validatePathsNames() {
+            for (let i = 0; i < this.story.paths.length; i++) {
+                if (this.story.paths[i].name == "") return false;
+            }
+            return true;
+        },
+        validateStoryType() {
+            if (
+                (this.story.settings.player.sette ||
+                    this.story.settings.player.undici ||
+                    this.story.settings.player.quindici) &&
+                (this.story.settings.player.single ||
+                    this.story.settings.player.group ||
+                    this.story.settings.player.class)
+            )
+                return true;
+            else false;
+        },
+        validateStoryMissions() {
+            for (let i = 0; i < this.story.paths.length; i++) {
+                if (this.story.paths[i].missions.length == 0) return false;
+            }
+            return true;
+        },
+        validateStoryFirstMission() {
+            for (let i = 0; i < this.story.paths.length; i++) {
+                if (this.story.paths[i].first_mission == null) return false;
+            }
+            return true;
+        },
+        validateStoryResults() {
+            for (let i = 0; i < this.story.paths.length; i++) {
+                for (let j = 0; j < this.story.paths[i].missions.length; j++) {
+                    for (
+                        let k = 0;
+                        k < this.story.paths[i].missions[j].results.length;
+                        k++
+                    ) {
+                        if (
+                            this.story.paths[i].missions[j].results[k].key ==
+                            null
+                        )
+                            return false;
+                    }
+                }
+            }
+            return true;
+        },
         showAlertModal() {
             this.$bvModal.show("non-valid");
         },
         removePath(path) {
+            this.removePathActive = true;
             for (let i = 0; i < this.story.paths.length; i++) {
                 if (this.story.paths[i].key === path.key) {
                     this.story.paths.splice(i, 1);
@@ -371,7 +442,8 @@ Vue.component("modal-edit-story", {
             return Math.round(unit * (index + 1));
         },
         onPathClick(path) {
-            this.selected_path = path;
+            if (!this.removePathActive) this.selected_path = path;
+            this.removePathActive = false;
         },
         pathClass(path) {
             return {
@@ -403,9 +475,10 @@ Vue.component("modal-edit-story", {
         },
         onEditStoryMenuClick(item) {
             if (
-                (item.name == "Missioni" && this.selected_path) ||
-                (item.name == "Esiti" && this.selected_path) ||
-                (item.name == "Impostazioni percorso" && this.selected_path) ||
+                (item.name == "Missioni" && this.selected_path != null) || //item.name è quello che clicchi -- quando elimino il percorso selected_path rimane non null
+                (item.name == "Esiti" && this.selected_path != null) ||
+                (item.name == "Impostazioni percorso" &&
+                    this.selected_path != null) ||
                 (item.name != "Missioni" &&
                     item.name != "Esiti" &&
                     item.name != "Impostazioni percorso")
@@ -429,7 +502,8 @@ Vue.component("modal-edit-story", {
                     fill: "#000",
                     back: "#fff",
                     text:
-                        "http://192.168.1.2:8000/play?key=" + this.story.key,
+                        "http://frank.cs.unibo.it:8000/play?key=" +
+                        this.story.key,
                     rounded: 0,
                     quiet: 0,
                     // label/image size and pos in pc: 0..100
@@ -566,33 +640,39 @@ Vue.component("modal-edit-mission", {
         },
     },
     computed: {
-        filteredActivities: function () {
-            if (this.activity_filter) {
-                let a = [];
-                this.activities.forEach((element) => {
-                    if (element.title.includes(this.activity_filter))
-                        a.push(element);
-                });
-                return a;
-            } else return this.activities;
+        availableFilteredActivities: function () {
+            let a = [];
+            this.activities.forEach((activity) => {
+                if (activity.elements.length > 0) {
+                    if (this.activity_filter) {
+                        if (activity.title.includes(this.activity_filter))
+                            a.push(activity);
+                    } else {
+                        a.push(activity);
+                    }
+                }
+            });
+            return a;
         },
     },
     methods: {
         connectionActivities() {
             for (let i = 0; i < this.mission.activities.length; i++) {
-                if (this.mission.activities[i].correct.key == null || this.mission.activities[i].wrong.key == null)
+                if (
+                    this.mission.activities[i].correct.key == null ||
+                    this.mission.activities[i].wrong.key == null
+                )
                     return false;
             }
             return true;
         },
         validatemission() {
-            console.log(this.connectionActivities())
+            console.log(this.connectionActivities());
             if (
                 this.mission.title != "" &&
                 this.mission.first_activity != null &&
                 this.connectionActivities() &&
-                this.mission.activities.length > 0 
-                
+                this.mission.activities.length > 0
             ) {
                 return true;
             } else {
@@ -728,32 +808,39 @@ Vue.component("modal-edit-activity", {
                         },
                     ],
                 },
-                {
-                    type: "Riempi",
-                    text: "",
-                },
             ],
             components: [
                 {
                     type: "Descrizione",
-                    text: "",
+                    description: "",
                 },
                 {
                     type: "Immagine",
-                    text: "",
+                    photo_key: "",
+                    name: null,
                 },
                 {
                     type: "Video",
                     text: "",
                 },
+            ],
+            minigames: [
                 {
-                    type: "Custom",
+                    type: "Word Invaders",
+                    words: [],
+                },
+                {
+                    type: "Memory",
+                    images: [],
                 },
             ],
             activity: null,
             isSaved: false,
             component_selected: null,
             element_selected: null,
+            is_element_removed: false,
+            to_upload: [],
+            overlay_edit_component: false,
         };
     },
     props: {
@@ -762,12 +849,43 @@ Vue.component("modal-edit-activity", {
         },
     },
     computed: {
+        disableDefault: function () {
+            // La riga successiva serve per "forzare" l'update della computed
+            if (this.element_selected);
+            let a = false;
+            this.activity.elements.forEach((element) => {
+                this.minigames.forEach((component) => {
+                    if (element.type == component.type) a = true;
+                });
+            });
+            return a;
+        },
         disableSpecial: function () {
-            // Serve per "forzare" l'update della computed
+            // La riga successiva serve per "forzare" l'update della computed
             if (this.element_selected);
             let a = false;
             this.activity.elements.forEach((element) => {
                 this.components_special.forEach((component) => {
+                    if (element.type == component.type) a = true;
+                });
+                this.minigames.forEach((component) => {
+                    if (element.type == component.type) a = true;
+                });
+            });
+            return a;
+        },
+        disableMinigames: function () {
+            // La riga successiva serve per "forzare" l'update della computed
+            if (this.element_selected);
+            let a = false;
+            this.activity.elements.forEach((element) => {
+                this.components.forEach((component) => {
+                    if (element.type == component.type) a = true;
+                });
+                this.components_special.forEach((component) => {
+                    if (element.type == component.type) a = true;
+                });
+                this.minigames.forEach((component) => {
                     if (element.type == component.type) a = true;
                 });
             });
@@ -775,12 +893,30 @@ Vue.component("modal-edit-activity", {
         },
     },
     methods: {
+        // Quando nel componente foto un file è caricato dal file input si aggiunge alla coda degli upload
+        uploadFile(file) {
+            let key = String(Date.now());
+            this.to_upload = [{
+                key: key,
+                data: file,
+            }];
+            this.component_selected.photo_key = key;
+        },
+        // Controlla se il componente è selezionato
+        checkSelected(component) {
+            if (this.component_selected) {
+                if (this.component_selected.type == component.type)
+                    return "selected-component";
+            }
+        },
+        // Verifica che tutti gli elementi non siano vuoti
         validateStructure() {
             for (let i = 0; i < this.activity.elements.length; i++) {
                 if (this.activity.elements[i].type == "") return false;
             }
             return true;
         },
+        // Verifica tutti i requisiti prima del salvataggio
         validate() {
             if (
                 this.activity.title != "" &&
@@ -793,9 +929,7 @@ Vue.component("modal-edit-activity", {
                 return false;
             }
         },
-        checkMultiple(){
-
-        },
+        // Verifica la completezza del modal di un componente
         validateComponent() {
             switch (this.component_selected.type) {
                 case "Domanda": {
@@ -806,53 +940,69 @@ Vue.component("modal-edit-activity", {
                         return true;
                     else return false;
                 }
-                case "Scelta multipla": {
-                    console.log(function () {
-                        for(let i = 0; i < this.component_selected.answers.length; i++){
-                            if (this.component_selected.answers[i] == "") return false;
-                        }
-                        return true;
-                    })
+                case "Scelta Multipla": {
                     if (
-                        this.component_selected.question != "" &&
-                        this.component_selected.correct_answer != null &&
-                        function () {
-                            for(let i = 0; i < this.component_selected.answers.length; i++){
-                                if (this.component_selected.answers[i] == "") return false;
-                            }
-                            return true;
-                        }
+                        this.component_selected.question == "" ||
+                        this.component_selected.correct_answer == null
                     ) {
+                        return false;
+                    } else {
+                        for (
+                            let i = 0;
+                            i < this.component_selected.answers.length;
+                            i++
+                        ) {
+                            if (this.component_selected.answers[i] == "")
+                                return false;
+                        }
                         return true;
-                    } else return false;
+                    }
                 }
                 case "Foto": {
+                    return this.component_selected.question;
                 }
                 case "Testo": {
+                    return this.component_selected.text;
                 }
                 case "Collega": {
+                    for (
+                        let i = 0;
+                        i < this.component_selected.answers.length;
+                        i++
+                    ) {
+                        if (
+                            this.component_selected.answers[i].first == "" ||
+                            this.component_selected.answers[i].second == ""
+                        )
+                            return false;
+                    }
+                    return true;
                 }
                 case "Riempi": {
                 }
                 case "Descrizione": {
+                    return this.component_selected.description;
                 }
                 case "Immagine": {
+                    return this.component_selected.photo_key;
                 }
                 case "Video": {
-                }
-                case "Custom": {
+                    return this.component_selected.text;
                 }
             }
         },
+        // Mostra un modal d'avviso se ci sono campi incompleti prima di un salvataggio
         showAlertModal() {
             this.$bvModal.show("non-valid");
         },
+        // Cambia sezione nel menù laterale
         onEditMenuClick(item) {
             this.list_item_edit_activity.forEach(
                 (element) => (element.isActive = false)
             );
             item.isActive = true;
         },
+        // Imposta il componente selezionato quando ne viene cliccato uno
         onComponentClick(component) {
             if (this.component_selected) {
                 if (this.component_selected.type == component.type) {
@@ -866,13 +1016,16 @@ Vue.component("modal-edit-activity", {
                 this.component_selected = JSON.parse(JSON.stringify(component));
             }
         },
+        // Aggiunge un elemento dall'attività
         addElement() {
             this.activity.elements.push({
                 key: String(Date.now()),
                 type: "",
             });
         },
+        // Rimuove un elemento dall'attività
         removeElement(element) {
+            this.is_element_removed = true;
             for (let i = 0; i < this.activity.elements.length; i++) {
                 if (this.activity.elements[i] === element) {
                     this.activity.elements.splice(i, 1);
@@ -880,32 +1033,59 @@ Vue.component("modal-edit-activity", {
                 }
             }
         },
+        // Apre il modal di modifica di un componente quando ne è selezionato uno e si clicca un elemento
         openComponentModal(element) {
-            if (this.component_selected) {
+            if (this.component_selected && !this.is_element_removed) {
                 this.element_selected = element;
                 this.$bvModal.show("edit-component-modal");
-            }
+            } else this.is_element_removed = false;
         },
+        // Apre il modal di modifica di un componente quando si clicca sul suo bottone di modifica nell'elemento
         editComponent(element) {
             this.element_selected = element;
             this.component_selected = element;
             this.$bvModal.show("edit-component-modal");
         },
-        onHideComponentModal(evt) {
+        // Il modal di modifica di un componenete viene nascosto
+        onHideComponentModal() {
             this.element_selected = null;
+            this.to_upload = [];
             this.$bvModal.hide("edit-component-modal");
         },
-        onSaveComponentModal(evt) {
+        // Il modal di modifica di un componenete viene salvato
+        onSaveComponentModal() {
+            this.overlay_edit_component = true;
             for (let i = 0; i < this.activity.elements.length; i++) {
                 if (
                     this.activity.elements[i].key === this.element_selected.key
                 ) {
-                    let key = this.element_selected.key;
                     this.activity.elements[i] = this.component_selected;
-                    this.activity.elements[i].key = key;
+                    this.activity.elements[i].key = this.element_selected.key;
+                    this.to_upload.forEach((upload) => {
+                        let formData = new FormData();
+                        formData.append("photo", upload.data);
+                        fetch("/api/images/" + upload.key, {
+                            method: "POST",
+                            body: formData,
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.ok) {
+                                for (let i = 0; i < this.to_upload.length; i++) {
+                                    if (this.to_upload[i].key == upload.key) {
+                                        this.to_upload.splice(i, 1);
+                                        i--;
+                                    }
+                                }
+                            } else console.error("File not uploaded! Unknown error.")
+                            this.overlay_edit_component = false;
+                            this.onHideComponentModal();
+                        })
+                    });
                 }
             }
         },
+        // Il modal di modifica di un'attività viene nascosto
         onHide() {
             this.$bvModal.hide(this.modalId);
             this.component_selected = null;
@@ -915,6 +1095,7 @@ Vue.component("modal-edit-activity", {
             }
             this.isSaved = false;
         },
+        // Il modal di modifica di un'attività viene salvato
         onSave() {
             this.isSaved = true;
             fetch("/api/activities/edit", {
@@ -971,14 +1152,14 @@ var vm = new Vue({
                         key: "title",
                         label: "Titolo",
                         tdClass: "titleFormatter",
-                        thStyle: "width: 32%;",
+                        thStyle: "width: 30%;",
                     },
                     {
                         key: "settings.published",
                         label: "Pubblicata",
                         formatter: "tableFormatter",
                         tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 14%;",
+                        thStyle: "text-align:center; width: 6%;",
                     },
                     {
                         key: "settings.player.single",
@@ -1023,6 +1204,11 @@ var vm = new Vue({
                         thStyle: "text-align:center;  width: 6%;",
                     },
                     {
+                        key: "storyForHandicapped",
+                        label: "Per disabili",
+                        thStyle: "text-align:center;  width: 6%;",
+                    },
+                    {
                         key: "actions",
                         label: "Azioni",
                         thStyle: "width: 17%;",
@@ -1044,51 +1230,19 @@ var vm = new Vue({
                         thStyle: "width: 34%;",
                     },
                     {
-                        key: "player.single",
-                        label: "Singolo",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
+                        key: "missionCompleted",
+                        label: "Utilizzabile",
+                        thStyle: "text-align:center;  width: 7%;",
                     },
                     {
-                        key: "player.group",
-                        label: "Gruppo",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.class",
-                        label: "Classe",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.sette",
-                        label: "7-10",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.undici",
-                        label: "11-14",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.quindici",
-                        label: "15-18",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center;  width: 9%;",
+                        key: "missionForHandicapped",
+                        label: "Per disabili",
+                        thStyle: "text-align:center;  width: 7%;",
                     },
                     {
                         key: "actions",
                         label: "Azioni",
-                        thStyle: "width: 12%;",
+                        thStyle: "width: 7%;",
                     },
                 ],
                 table_filter: null,
@@ -1107,51 +1261,19 @@ var vm = new Vue({
                         thStyle: "width: 34%;",
                     },
                     {
-                        key: "player.single",
-                        label: "Singolo",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
+                        key: "activityCompleted",
+                        label: "Utilizzabile",
+                        thStyle: "text-align:center;  width: 7%;",
                     },
                     {
-                        key: "player.group",
-                        label: "Gruppo",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.class",
-                        label: "Classe",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.sette",
-                        label: "7-10",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.undici",
-                        label: "11-14",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center; width: 9%;",
-                    },
-                    {
-                        key: "player.quindici",
-                        label: "15-18",
-                        formatter: "tableFormatter",
-                        tdClass: "cellFormatter",
-                        thStyle: "text-align:center;  width: 9%;",
+                        key: "activityForHandicapped",
+                        label: "Per disabili",
+                        thStyle: "text-align:center;  width: 7%;",
                     },
                     {
                         key: "actions",
                         label: "Azioni",
-                        thStyle: "width: 12%;",
+                        thStyle: "width: 7%;",
                     },
                 ],
                 table_filter: null,
@@ -1195,6 +1317,62 @@ var vm = new Vue({
         },
     },
     methods: {
+        storyForHandicappedContent(data) {
+            let a = true;
+            data.item.paths.forEach((path) => {
+                path.missions.forEach((mission) => {
+                    mission.activities.forEach((activity) => {
+                        activity.elements.forEach((element) => {
+                            if (
+                                element.type == "Foto" ||
+                                element.type == "Immagine" ||
+                                element.type == "Video" ||
+                                element.type == "Word Invaders" ||
+                                element.type == "Memory"
+                            )
+                                a = false;
+                        });
+                    });
+                });
+            });
+            return a;
+        },
+        missionCompletedContent(data) {
+            return data.item.activities.length > 0 ? true : false;
+        },
+        missionForHandicappedContent(data) {
+            let a = true;
+            data.item.activities.forEach((activity) => {
+                activity.elements.forEach((element) => {
+                    if (
+                        element.type == "Foto" ||
+                        element.type == "Immagine" ||
+                        element.type == "Video" ||
+                        element.type == "Word Invaders" ||
+                        element.type == "Memory"
+                    )
+                        a = false;
+                });
+            });
+            return a;
+        },
+        activityCompletedContent(data) {
+            return data.item.elements.length > 0 ? true : false;
+        },
+        activityForHandicappedContent(data) {
+            let a = true;
+            data.item.elements.forEach((element) => {
+                if (
+                    element.type == "Foto" ||
+                    element.type == "Immagine" ||
+                    element.type == "Video" ||
+                    element.type == "Word Invaders" ||
+                    element.type == "Memory"
+                )
+                    a = false;
+            });
+            return a;
+        },
         tableFormatter(value) {
             return value ? "✓" : "✗";
         },
@@ -1353,7 +1531,6 @@ var vm = new Vue({
                         key: String(Date.now()),
                         title: data.item.title,
                         activities: data.item.activities,
-                        player: data.item.player,
                         first_activity: data.item.first_activity,
                         results: [
                             {
@@ -1369,8 +1546,10 @@ var vm = new Vue({
                     cloned = {
                         key: String(Date.now()),
                         title: data.item.title,
-                        player: data.item.player,
                         elements: data.item.elements,
+                        correct: data.item.correct,
+                        wrong: data.item.wrong,
+                        time: data.item.time,
                     };
                     break;
                 }

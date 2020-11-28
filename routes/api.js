@@ -1,5 +1,9 @@
 var express = require("express");
 var router = express.Router();
+var path = require("path");
+var fs = require("fs");
+const multer = require("multer");
+var upload = multer({ dest: '.' });
 
 // WEB SOCKET
 var ws = require("ws");
@@ -18,6 +22,7 @@ webSocketServer.on("connection", (webSocket) => {
 // MONK
 var monk = require("monk");
 const { response } = require("express");
+const { data } = require("jquery");
 var user = "davide";
 var passw = "zJRJBT3skYKKVWaw";
 var dbName = "techweb";
@@ -150,12 +155,10 @@ router.get("/activities", (req, res) => {
 
 router.get("/tutor", (req, res) => {
     db.get("games")
-    .find({
-        game_key: req.query.game_key,
-    })
-    .then((response) =>
-        res.send(response[0])
-    );
+        .find({
+            game_key: req.query.game_key,
+        })
+        .then((response) => res.send(response[0]));
 });
 
 router.post("/tutor", (req, res) => {
@@ -294,6 +297,33 @@ router.post("/tutor/update", (req, res) => {
                     res.send(player_on_db);
                 });
         });
+});
+
+router.get("/images/:key", (req, res) => {
+    db.get("images").findOne({ key: req.params.key }, (err, result) => {
+        if (err) return console.log(err);
+        res.contentType("image/jpeg");
+        res.send(result.image.buffer);
+    });
+});
+
+router.post("/images/:key", upload.single("photo"), (req, res) => {
+    var img = fs.readFileSync(req.file.path);
+    var encode_image = img.toString("base64");
+    var finalImg = {
+        key: req.params.key,
+        contentType: req.file.mimetype,
+        image: new Buffer.from(encode_image, "base64"),
+    };
+    db.get("images").insert(finalImg, (err, result) => {
+        console.log(result);
+        if (err) return console.log(err);
+
+        console.log("saved to database");
+        res.send({
+            ok: !err,
+        });
+    });
 });
 
 module.exports = router;
