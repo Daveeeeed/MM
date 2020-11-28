@@ -896,10 +896,12 @@ Vue.component("modal-edit-activity", {
         // Quando nel componente foto un file è caricato dal file input si aggiunge alla coda degli upload
         uploadFile(file) {
             let key = String(Date.now());
-            this.to_upload = [{
-                key: key,
-                data: file,
-            }];
+            this.to_upload = [
+                {
+                    key: key,
+                    data: file,
+                },
+            ];
             this.component_selected.photo_key = key;
         },
         // Controlla se il componente è selezionato
@@ -1061,27 +1063,8 @@ Vue.component("modal-edit-activity", {
                 ) {
                     this.activity.elements[i] = this.component_selected;
                     this.activity.elements[i].key = this.element_selected.key;
-                    this.to_upload.forEach((upload) => {
-                        let formData = new FormData();
-                        formData.append("photo", upload.data);
-                        fetch("/api/images/" + upload.key, {
-                            method: "POST",
-                            body: formData,
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.ok) {
-                                for (let i = 0; i < this.to_upload.length; i++) {
-                                    if (this.to_upload[i].key == upload.key) {
-                                        this.to_upload.splice(i, 1);
-                                        i--;
-                                    }
-                                }
-                            } else console.error("File not uploaded! Unknown error.")
-                            this.overlay_edit_component = false;
-                            this.onHideComponentModal();
-                        })
-                    });
+                    this.overlay_edit_component = false;
+                    this.onHideComponentModal();
                 }
             }
         },
