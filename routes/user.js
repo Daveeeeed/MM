@@ -12,12 +12,6 @@ router.get("/play", (req, res) => {
     res.sendFile(path.resolve("views/access.html"));
 });
 
-/* GET editorS */
-router.get("/editorS", (req, res) => {
-    res.sendFile(path.resolve("views/editorS.html"));
-});
-
-
 /* GET editor */
 router.get("/editor", (req, res) => {
     res.sendFile(path.resolve("views/editor.html"));
@@ -33,6 +27,12 @@ router.get("/story", (req, res) => {
 
 router.get("/gioco", (req, res) => {
     res.sendFile(path.resolve("views/word.html"));
+});
+
+router.get("/comp/:app/:name", (req, res) => {
+    let app = req.params.app
+    let component_name = req.params.name;
+    res.sendFile(path.resolve("components/" + app + "/" + component_name));
 });
 
 module.exports = router;
