@@ -1,11 +1,5 @@
 <template>
-  <b-modal
-    @ok="onSave()"
-    @hide="onHide()"
-    :id="story_to_edit.key"
-    size="xl"
-    :title="story_to_edit.title"
-  >
+  <b-modal @hide="onHide" @ok="onSave" size="xl" id="modal-edit-story">
     <template #modal-header>
       <b-container
         fluid
@@ -679,8 +673,10 @@ module.exports = {
     unvalidAlert: httpVueLoader("comp/editor/unvalid_alert.vue"),
     editPathName: httpVueLoader("comp/editor/edit_path_name.vue"),
   },
-  mounted() {
-    this.story = JSON.parse(JSON.stringify(this.story_to_edit));
+  watch: {
+    story_to_edit(new_value) {
+      this.story = new_value;
+    },
   },
 };
 </script>

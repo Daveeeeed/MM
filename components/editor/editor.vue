@@ -10,7 +10,7 @@
           v-for="(item, index) in sections"
           :key="index"
           :class="{ active: item === active_section }"
-          @click="active_section = item"
+          @click="setActiveSection(index)"
           class="py-2 px-4"
         >
           {{ item.navbar_name }}
@@ -59,6 +59,7 @@
       <b-row>
         <b-col>
           <b-table
+            responsive
             borderless
             hover
             :busy="isBusy"
@@ -69,10 +70,8 @@
             tbody-tr-class="table-row"
             thead-class="cell-default"
           >
-            <template v-slot:cell(storyForHandicapped)="data">
-              <div v-if="storyForHandicappedContent(data)" class="cell-true">
-                ✓
-              </div>
+            <template v-slot:cell(storyAccessibility)="data">
+              <div v-if="storyAccessibleContent(data)" class="cell-true">✓</div>
               <div v-else class="cell-false">✗</div>
             </template>
             <template v-slot:cell(missionCompleted)="data">
@@ -81,8 +80,8 @@
               </div>
               <div v-else class="cell-false">✗</div>
             </template>
-            <template v-slot:cell(missionForHandicapped)="data">
-              <div v-if="missionForHandicappedContent(data)" class="cell-true">
+            <template v-slot:cell(missionAccessibility)="data">
+              <div v-if="missionAccessibleContent(data)" class="cell-true">
                 ✓
               </div>
               <div v-else class="cell-false">✗</div>
@@ -93,8 +92,8 @@
               </div>
               <div v-else class="cell-false">✗</div>
             </template>
-            <template v-slot:cell(activityForHandicapped)="data">
-              <div v-if="activityForHandicappedContent(data)" class="cell-true">
+            <template v-slot:cell(activityAccessibility)="data">
+              <div v-if="activityAccessibleContent(data)" class="cell-true">
                 ✓
               </div>
               <div v-else class="cell-false">✗</div>
@@ -128,30 +127,12 @@
                 style="background-color: #00bec8"
                 @click="onEdit(data)"
               >
-                <modal-edit-story
-                  v-if="active_section.navbar_name == 'Storie'"
-                  :story_to_edit="data.item"
-                  :missions="missions"
-                  :activities="activities"
-                ></modal-edit-story>
-
-                <modal-edit-mission
-                  v-if="active_section.navbar_name == 'Missioni'"
-                  :mission_to_edit="data.item"
-                  :activities="activities"
-                ></modal-edit-mission>
-
-                <modal-edit-activity
-                  v-if="active_section.navbar_name == 'Attività'"
-                  :activity_prop="data.item"
-                ></modal-edit-activity>
-
                 <b-icon-pencil-square></b-icon-pencil-square>
               </b-button>
               <b-button
                 size="sm"
                 style="background-color: #ffa300"
-                @click="onClone(data, active_section.navbar_name)"
+                @click="onClone(data)"
               >
                 <b-icon-back></b-icon-back>
               </b-button>
@@ -168,9 +149,32 @@
     </b-container>
 
     <!-- Modals -->
-    <modal-new-element
+    <new-element
       :category="active_section.navbar_name"
-    ></modal-new-element>
+      @add-element="onAddElement"
+      @found-errors="onShowErrorAlert"
+    ></new-element>
+
+    <modal-edit-story
+      :story_to_edit="active_element"
+      :missions="missions"
+      :activities="activities"
+      @show-error-alert="onShowErrorAlert"
+    ></modal-edit-story>
+
+    <modal-edit-mission
+      :mission_to_edit="active_element"
+      :activities="activities"
+      @show-error-alert="onShowErrorAlert"
+    ></modal-edit-mission>
+
+    <modal-edit-activity
+      :activity_prop="active_element"
+      @found-errors="onShowErrorAlert"
+      @activity-updated="onElementUpdated($event, 'activities')"
+    ></modal-edit-activity>
+
+    <error-alert :errors="errors"></error-alert>
   </div>
 </template>
 
@@ -194,7 +198,8 @@ module.exports = {
               key: "title",
               label: "Titolo",
               tdClass: "titleFormatter",
-              thStyle: "width: 30%;",
+              thStyle: "width: 27%;",
+              stickyColumn: true,
             },
             {
               key: "settings.published",
@@ -246,14 +251,15 @@ module.exports = {
               thStyle: "text-align:center;  width: 6%;",
             },
             {
-              key: "storyForHandicapped",
-              label: "Accessibile",
-              thStyle: "text-align:center;  width: 6%;",
+              key: "storyAccessibility",
+              label: "Accessibilità",
+              thStyle: "text-align:center;  width: 9%;",
             },
             {
               key: "actions",
               label: "Azioni",
               thStyle: "width: 17%;",
+              tdClass: "cell-default",
             },
           ],
           table_filter: null,
@@ -277,8 +283,8 @@ module.exports = {
               thStyle: "text-align:center;  width: 7%;",
             },
             {
-              key: "missionForHandicapped",
-              label: "Accessibile",
+              key: "missionAccessibility",
+              label: "Accessibilità",
               thStyle: "text-align:center;  width: 7%;",
             },
             {
@@ -308,8 +314,8 @@ module.exports = {
               thStyle: "text-align:center;  width: 7%;",
             },
             {
-              key: "activityForHandicapped",
-              label: "Accessibile",
+              key: "activityAccessibility",
+              label: "Accessibilità",
               thStyle: "text-align:center;  width: 7%;",
             },
             {
@@ -328,6 +334,10 @@ module.exports = {
       // Tables
       filter_field: ["title"],
       isBusy: false,
+
+      // Utility data
+      active_element: null,
+      errors: [],
     };
   },
   props: {},
@@ -361,10 +371,75 @@ module.exports = {
     },
   },
   methods: {
+    onElementUpdated(element, category) {
+      fetch("/api/" + category + "/edit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(element),
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          else return fetch("/api/" + category);
+        })
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          else return response.json();
+        })
+        .then((data) => {
+          this.setCollectionByName(category, data);
+        })
+        .catch((error) => {
+          console.error(
+            "There has been a problem with your fetch operation",
+            error
+          );
+          this.setCollectionByName(category, null);
+        });
+    },
+    onAddElement(element) {
+      let collection_name = this.collectionName(
+        this.active_section.navbar_name
+      );
+      let section_name = this.active_section.navbar_name;
+      fetch("/api/" + collection_name + "/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(element),
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          else return fetch("/api/" + collection_name);
+        })
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          else return response.json();
+        })
+        .then((data) => {
+          this.setCollectionByName(collection_name, data);
+        })
+        .catch((error) => {
+          console.error(
+            "There has been a problem with your fetch operation",
+            error
+          );
+          this.setCollectionByName(collection_name, null);
+        });
+    },
+    setActiveSection(index) {
+      this.active_section = this.sections[index];
+    },
     addNewElement() {
       this.$bvModal.show("modal-add-new-element");
     },
-    storyForHandicappedContent(data) {
+    onShowErrorAlert(errors_from_component) {
+      this.errors = errors_from_component;
+      this.$bvModal.show("non-valid");
+    },
+    storyAccessibleContent(data) {
       let a = true;
       data.item.paths.forEach((path) => {
         path.missions.forEach((mission) => {
@@ -387,7 +462,7 @@ module.exports = {
     missionCompletedContent(data) {
       return data.item.activities.length > 0 ? true : false;
     },
-    missionForHandicappedContent(data) {
+    missionAccessibleContent(data) {
       let a = true;
       data.item.activities.forEach((activity) => {
         activity.elements.forEach((element) => {
@@ -406,7 +481,7 @@ module.exports = {
     activityCompletedContent(data) {
       return data.item.elements.length > 0 ? true : false;
     },
-    activityForHandicappedContent(data) {
+    activityAccessibleContent(data) {
       let a = true;
       data.item.elements.forEach((element) => {
         if (
@@ -435,6 +510,21 @@ module.exports = {
         : name == "Missioni"
         ? "missions"
         : "activities";
+    },
+    setCollectionByName(name, value) {
+      switch (name) {
+        case "stories":
+          this.stories = value;
+          break;
+        case "missions":
+          this.missions = value;
+          break;
+        case "activities":
+          this.activities = value;
+          break;
+        default:
+          break;
+      }
     },
     onPublish(data) {
       data.item.settings.published = !data.item.settings.published;
@@ -498,7 +588,9 @@ module.exports = {
     },
     onDelete(data, name) {
       this.isBusy = true;
-      fetch("/api/" + this.collectionName(name) + "/delete", {
+      let section_name = this.active_section.navbar_name;
+      let collection_name = this.collectionName(section_name);
+      fetch("/api/" + collection_name + "/delete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -507,27 +599,14 @@ module.exports = {
       })
         .then((response) => {
           if (!response.ok) throw new Error("Network response was not ok");
-          else return fetch("/api/" + this.collectionName(name));
+          else return fetch("/api/" + collection_name);
         })
         .then((response) => {
           if (!response.ok) throw new Error("Network response was not ok");
           else return response.json();
         })
         .then((data) => {
-          switch (name) {
-            case "Storie": {
-              this.stories = data;
-              break;
-            }
-            case "Missioni": {
-              this.missions = data;
-              break;
-            }
-            case "Attività": {
-              this.activities = data;
-              break;
-            }
-          }
+          this.setCollectionByName(collection_name, data);
           this.isBusy = false;
         })
         .catch((error) => {
@@ -535,29 +614,31 @@ module.exports = {
             "There has been a problem with your fetch operation",
             error
           );
-          switch (name) {
-            case "Storie": {
-              this.stories = null;
-              break;
-            }
-            case "Missioni": {
-              this.missions = null;
-              break;
-            }
-            case "Attività": {
-              this.activities = null;
-              break;
-            }
-          }
+          this.setCollectionByName(collection_name, null);
         });
     },
     onEdit(data) {
-      this.$bvModal.show(data.item.key);
+      this.active_element = data.item;
+      switch (this.active_section.navbar_name) {
+        case "Storie":
+          this.$bvModal.show("modal-edit-story");
+          break;
+        case "Missioni":
+          this.$bvModal.show("modal-edit-mission");
+          break;
+        case "Attività":
+          this.$bvModal.show("modal-edit-activity");
+          break;
+        default:
+          break;
+      }
     },
-    onClone(data, name) {
+    onClone(data) {
       this.isBusy = true;
+      let section_name = this.active_section.navbar_name;
+      let collection_name = this.collectionName(section_name);
       let cloned = {};
-      switch (name) {
+      switch (section_name) {
         case "Storie": {
           cloned = {
             key: String(Date.now()),
@@ -595,7 +676,7 @@ module.exports = {
           break;
         }
       }
-      fetch("/api/" + this.collectionName(name) + "/new", {
+      fetch("/api/" + collection_name + "/new", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -604,27 +685,14 @@ module.exports = {
       })
         .then((response) => {
           if (!response.ok) throw new Error("Network response was not ok");
-          else return fetch("/api/" + this.collectionName(name));
+          else return fetch("/api/" + collection_name);
         })
         .then((response) => {
           if (!response.ok) throw new Error("Network response was not ok");
           else return response.json();
         })
         .then((data) => {
-          switch (name) {
-            case "Storie": {
-              this.stories = data;
-              break;
-            }
-            case "Missioni": {
-              this.missions = data;
-              break;
-            }
-            case "Attività": {
-              this.activities = data;
-              break;
-            }
-          }
+          this.setCollectionByName(collection_name, data);
           this.isBusy = false;
         })
         .catch((error) => {
@@ -632,33 +700,29 @@ module.exports = {
             "There has been a problem with your fetch operation",
             error
           );
-          switch (name) {
-            case "Storie": {
-              this.stories = null;
-              break;
-            }
-            case "Missioni": {
-              this.missions = null;
-              break;
-            }
-            case "Attività": {
-              this.activities = null;
-              break;
-            }
-          }
+          this.setCollectionByName(collection_name, null);
         });
     },
+    onUpdateStories(updated_data) {
+      this.stories = updated_data;
+    },
+    onUpdateMissions(updated_data) {
+      this.missions = updated_data;
+    },
+    onUpdateActivities(updated_data) {
+      this.activities = updated_data;
+    },
   },
-  watch: {},
   components: {
-    modalNewElement: httpVueLoader("comp/editor/modal_new_element.vue"),
+    newElement: httpVueLoader("comp/editor/new_element.vue"),
     modalEditStory: httpVueLoader("comp/editor/modal_edit_story.vue"),
     modalEditMission: httpVueLoader("comp/editor/modal_edit_mission.vue"),
     modalEditActivity: httpVueLoader("comp/editor/modal_edit_activity.vue"),
+    errorAlert: httpVueLoader("comp/editor/error_alert.vue"),
   },
   created: function () {
     fetchData(this);
-    this.active_section = this.sections[0];
+    this.setActiveSection(0);
   },
 };
 
@@ -783,6 +847,9 @@ function fetchActivities(vue) {
 
 .cell-default {
   color: #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .cell-true {
@@ -800,6 +867,7 @@ function fetchActivities(vue) {
 .table td,
 .table th {
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 /* MODAL */
@@ -991,5 +1059,26 @@ function fetchActivities(vue) {
 
 .pad .mission-group-item .selected-component {
   background-color: #00bd58;
+}
+
+.table.b-table > thead > tr > .table-b-table-default {
+  background-color: #121421;
+  color: white;
+}
+
+.table.b-table > tbody > tr > .table-b-table-default {
+  background-color: rgb(23, 25, 38);
+}
+
+.table.b-table > tbody > tr > .table-b-table-default {
+  color: white;
+}
+
+.table.b-table.table-hover > tbody > tr:hover > .table-b-table-default {
+  color: white;
+}
+
+.table.b-table.table-hover > tbody > tr:hover > .table-b-table-default {
+  background-color: rgb(18 20 33);
 }
 </style>

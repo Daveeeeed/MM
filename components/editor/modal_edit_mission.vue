@@ -1,5 +1,5 @@
 <template>
-  <b-modal @hide="onHide" @ok="onSave" size="xl" :id="mission_to_edit.key">
+  <b-modal @hide="onHide" @ok="onSave" size="xl" id="modal-edit-mission">
     <template #modal-header>
       <b-container fluid>
         <h4 class="py-3">{{ mission_to_edit.title }}</h4>
@@ -248,6 +248,7 @@
         >
           Salva
         </b-button>
+        <!--
         <unvalid-alert
           :empty_title="mission.title == ''"
           :empty_start_activity="mission.first_activity == null"
@@ -255,6 +256,7 @@
           :empty_connection="!connectionActivities()"
         >
         </unvalid-alert>
+        -->
       </b-row>
     </template>
   </b-modal>
@@ -420,8 +422,10 @@ module.exports = {
   components: {
     unvalidAlert: httpVueLoader("comp/editor/unvalid_alert.vue"),
   },
-  mounted() {
-    this.mission = JSON.parse(JSON.stringify(this.mission_to_edit));
+  watch: {
+    mission_to_edit(new_value) {
+      this.mission = new_value;
+    },
   },
 };
 </script>
