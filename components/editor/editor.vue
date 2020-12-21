@@ -156,16 +156,18 @@
     ></new-element>
 
     <modal-edit-story
-      :story_to_edit="active_element"
+      :story_prop="active_element"
       :missions="missions"
       :activities="activities"
-      @show-error-alert="onShowErrorAlert"
+      @found-errors="onShowErrorAlert"
+      @story-updated="onElementUpdated($event, 'stories')"
     ></modal-edit-story>
 
     <modal-edit-mission
-      :mission_to_edit="active_element"
+      :mission_prop="active_element"
       :activities="activities"
-      @show-error-alert="onShowErrorAlert"
+      @found-errors="onShowErrorAlert"
+      @mission-updated="onElementUpdated($event, 'missions')"
     ></modal-edit-mission>
 
     <modal-edit-activity
@@ -174,7 +176,16 @@
       @activity-updated="onElementUpdated($event, 'activities')"
     ></modal-edit-activity>
 
-    <error-alert :errors="errors"></error-alert>
+    <b-modal id="error-alert" title="Attenzione">
+      <b-container class="mt-2" fluid>
+        <h5>Sono stati trovati i seguenti errori:</h5>
+        <ul>
+          <li v-for="(error, index) in errors" :key="index">
+            {{ error }}
+          </li>
+        </ul>
+      </b-container>
+    </b-modal>
   </div>
 </template>
 
@@ -340,7 +351,6 @@ module.exports = {
       errors: [],
     };
   },
-  props: {},
   computed: {
     archivedStories() {
       if (this.stories) {
@@ -437,63 +447,7 @@ module.exports = {
     },
     onShowErrorAlert(errors_from_component) {
       this.errors = errors_from_component;
-      this.$bvModal.show("non-valid");
-    },
-    storyAccessibleContent(data) {
-      let a = true;
-      data.item.paths.forEach((path) => {
-        path.missions.forEach((mission) => {
-          mission.activities.forEach((activity) => {
-            activity.elements.forEach((element) => {
-              if (
-                element.type == "Foto" ||
-                element.type == "Immagine" ||
-                element.type == "Video" ||
-                element.type == "Word Invaders" ||
-                element.type == "Memory"
-              )
-                a = false;
-            });
-          });
-        });
-      });
-      return a;
-    },
-    missionCompletedContent(data) {
-      return data.item.activities.length > 0 ? true : false;
-    },
-    missionAccessibleContent(data) {
-      let a = true;
-      data.item.activities.forEach((activity) => {
-        activity.elements.forEach((element) => {
-          if (
-            element.type == "Foto" ||
-            element.type == "Immagine" ||
-            element.type == "Video" ||
-            element.type == "Word Invaders" ||
-            element.type == "Memory"
-          )
-            a = false;
-        });
-      });
-      return a;
-    },
-    activityCompletedContent(data) {
-      return data.item.elements.length > 0 ? true : false;
-    },
-    activityAccessibleContent(data) {
-      let a = true;
-      data.item.elements.forEach((element) => {
-        if (
-          element.type == "Foto" ||
-          element.type == "Immagine" ||
-          element.type == "Video" ||
-          element.type == "Word Invaders" ||
-          element.type == "Memory"
-        )
-          a = false;
-      });
-      return a;
+      this.$bvModal.show("error-alert");
     },
     tableFormatter(value) {
       return value ? "✓" : "✗";
@@ -505,11 +459,19 @@ module.exports = {
       return value ? "cell-true" : "cell-false";
     },
     collectionName(name) {
-      return name == "Storie"
-        ? "stories"
-        : name == "Missioni"
-        ? "missions"
-        : "activities";
+      switch (name) {
+        case "Storie":
+          return "stories";
+          break;
+        case "Missioni":
+          return "missions";
+          break;
+        case "Attività":
+          return "activities";
+          break;
+        default:
+          break;
+      }
     },
     setCollectionByName(name, value) {
       switch (name) {
@@ -712,49 +674,101 @@ module.exports = {
     onUpdateActivities(updated_data) {
       this.activities = updated_data;
     },
+    fetchData() {
+      this.fetchStories();
+      this.fetchMissions();
+      this.fetchActivities();
+    },
+    fetchStories() {
+      fetch("/api/stories")
+        .then((response) => response.json())
+        .then((data) => {
+          this.stories = data;
+        });
+    },
+    fetchMissions() {
+      fetch("/api/missions")
+        .then((response) => response.json())
+        .then((data) => {
+          this.missions = data;
+        });
+    },
+    fetchActivities() {
+      fetch("/api/activities")
+        .then((response) => response.json())
+        .then((data) => {
+          this.activities = data;
+        });
+    },
+    /* DA CONTROLLARE */
+    storyAccessibleContent(data) {
+      let a = true;
+      data.item.paths.forEach((path) => {
+        path.missions.forEach((mission) => {
+          mission.activities.forEach((activity) => {
+            activity.elements.forEach((element) => {
+              if (
+                element.type == "Foto" ||
+                element.type == "Immagine" ||
+                element.type == "Video" ||
+                element.type == "Word Invaders" ||
+                element.type == "Memory"
+              )
+                a = false;
+            });
+          });
+        });
+      });
+      return a;
+    },
+    missionCompletedContent(data) {
+      return data.item.activities.length > 0 ? true : false;
+    },
+    missionAccessibleContent(data) {
+      let a = true;
+      data.item.activities.forEach((activity) => {
+        activity.elements.forEach((element) => {
+          if (
+            element.type == "Foto" ||
+            element.type == "Immagine" ||
+            element.type == "Video" ||
+            element.type == "Word Invaders" ||
+            element.type == "Memory"
+          )
+            a = false;
+        });
+      });
+      return a;
+    },
+    activityCompletedContent(data) {
+      return data.item.elements.length > 0 ? true : false;
+    },
+    activityAccessibleContent(data) {
+      let a = true;
+      data.item.elements.forEach((element) => {
+        if (
+          element.type == "Foto" ||
+          element.type == "Immagine" ||
+          element.type == "Video" ||
+          element.type == "Word Invaders" ||
+          element.type == "Memory"
+        )
+          a = false;
+      });
+      return a;
+    },
   },
   components: {
     newElement: httpVueLoader("comp/editor/new_element.vue"),
     modalEditStory: httpVueLoader("comp/editor/modal_edit_story.vue"),
     modalEditMission: httpVueLoader("comp/editor/modal_edit_mission.vue"),
     modalEditActivity: httpVueLoader("comp/editor/modal_edit_activity.vue"),
-    errorAlert: httpVueLoader("comp/editor/error_alert.vue"),
   },
   created: function () {
-    fetchData(this);
+    this.fetchData();
     this.setActiveSection(0);
   },
 };
-
-function fetchData(vue) {
-  fetchStories(vue);
-  fetchMissions(vue);
-  fetchActivities(vue);
-}
-
-function fetchStories(vue) {
-  fetch("/api/stories")
-    .then((response) => response.json())
-    .then((data) => {
-      vue.stories = data;
-    });
-}
-
-function fetchMissions(vue) {
-  fetch("/api/missions")
-    .then((response) => response.json())
-    .then((data) => {
-      vue.missions = data;
-    });
-}
-
-function fetchActivities(vue) {
-  fetch("/api/activities")
-    .then((response) => response.json())
-    .then((data) => {
-      vue.activities = data;
-    });
-}
 </script>
 
 <style>

@@ -21,12 +21,8 @@ router.get("/tutor", (req, res) => {
     res.sendFile(path.resolve("views/tutor.html"));
 });
 
-router.get("/story", (req, res) => {
-    res.sendFile(path.resolve("views/story.html"));
-});
-
-router.get("/gioco", (req, res) => {
-    res.sendFile(path.resolve("views/word.html"));
+router.get("/player", (req, res) => {
+    res.sendFile(path.resolve("views/player.html"));
 });
 
 router.get("/comp/:app/:name", (req, res) => {

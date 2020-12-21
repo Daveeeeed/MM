@@ -25,7 +25,7 @@
                 </b-list-group-item>
               </b-list-group>
             </b-col>
-            <!-- Components  -->
+            <!-- Components -->
             <b-col cols="5" v-if="active_section == sections[0]">
               <div class="scrollable-full-body-height p-0 m-0 pad">
                 <h5 class="mb-2 mt-3">
@@ -375,6 +375,7 @@ module.exports = {
     // Utilities
     init() {
       this.active_section = this.sections[0];
+      this.activity = JSON.parse(JSON.stringify(this.activity_prop));
     },
     reset() {
       this.$bvModal.hide("modal-edit-activity");

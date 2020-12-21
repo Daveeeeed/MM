@@ -34,14 +34,14 @@
 
     <body>
         <div id="app">
-            <editor></editor>
+            <player></player>
         </div>
 
         <script type="text/javascript">
             new Vue({
                 el: "#app",
                 components: {
-                    editor: httpVueLoader("comp/access/access.vue"),
+                    player: httpVueLoader("comp/player/player.vue"),
                 },
             });
         </script>

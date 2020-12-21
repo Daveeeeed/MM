@@ -103,7 +103,6 @@ router.post("/missions/edit", (req, res) => {
                 $set: {
                     title: req.body.title,
                     activities: req.body.activities,
-                    player: req.body.player,
                     first_activity: req.body.first_activity,
                 },
             }
@@ -119,9 +118,6 @@ router.post("/activities/edit", (req, res) => {
                 $set: {
                     title: req.body.title,
                     elements: req.body.elements,
-                    player: req.body.player,
-                    correct: req.body.correct,
-                    wrong: req.body.wrong,
                     time: req.body.time,
                 },
             }

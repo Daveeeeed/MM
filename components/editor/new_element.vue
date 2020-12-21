@@ -58,9 +58,7 @@
           <b-button
             class="darker mx-1"
             v-on="
-              valid
-                ? { click: () => save() }
-                : { click: () => notifyErrors() }
+              valid ? { click: () => save() } : { click: () => notifyErrors() }
             "
           >
             Salva
@@ -83,6 +81,11 @@ module.exports = {
       gruppo: false,
       classe: false,
     };
+  },
+  props: {
+    category: {
+      type: String,
+    },
   },
   computed: {
     valid: function () {
@@ -126,37 +129,17 @@ module.exports = {
             title: this.title,
             activities: [],
             first_activity: null,
-            results: [
-              {
-                key: null,
-                range_min: 0,
-                range_max: null,
-              },
-            ],
           };
         case "Attività":
           return {
             key: String(Date.now()),
             title: this.title,
             elements: [],
-            correct: {
-              key: null,
-              points: "100",
-            },
-            wrong: {
-              key: null,
-              points: "50",
-            },
             time: null,
           };
         default:
           return {};
       }
-    },
-  },
-  props: {
-    category: {
-      type: String,
     },
   },
   methods: {
