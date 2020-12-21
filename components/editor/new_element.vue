@@ -163,7 +163,7 @@ module.exports = {
     calculateErrors() {
       let a = [];
       if (!this.valid_title) a.push("Il titolo non può essere vuoto");
-      if (!this.valid_options)
+      if (this.category == "Storie" && !this.valid_options)
         a.push("Specifica una categoria per Età e Giocatore");
       return a;
     },
