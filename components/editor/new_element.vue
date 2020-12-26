@@ -54,9 +54,9 @@
       </template>
       <template #modal-footer>
         <b-row d-flex justify-content-end>
-          <b-button class="darker mx-1" @click="reset()"> Cancella </b-button>
+          <b-button class="mx-1" @click="reset()"> Cancella </b-button>
           <b-button
-            class="darker mx-1"
+            class="mx-1"
             v-on="
               valid ? { click: () => save() } : { click: () => notifyErrors() }
             "
@@ -121,6 +121,7 @@ module.exports = {
                 group: this.gruppo,
                 class: this.classe,
               },
+              background: null,
             },
           };
         case "Missioni":

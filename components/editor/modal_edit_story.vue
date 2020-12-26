@@ -9,9 +9,7 @@
           style="height: 100%"
         >
           <h4 class="py-3">{{ story_prop.title }}</h4>
-          <b-button class="px-4 my-auto darker" @click="showQrCode"
-            >QR CODE</b-button
-          >
+          <b-button class="px-4 my-auto" @click="showQrCode">QR CODE</b-button>
           <b-modal id="modal-qr-code" centered ok-only>
             <template #modal-header>
               <h4 class="mx-auto my-0">QR CODE</h4>
@@ -30,7 +28,7 @@
             </template>
             <template #modal-footer="{ close }">
               <b-container fluid class="d-flex justify-content-end">
-                <b-button class="darker" @click="close()"> OK </b-button>
+                <b-button @click="close()"> OK </b-button>
               </b-container>
             </template>
           </b-modal>
@@ -67,6 +65,13 @@
               </b-row>
               <b-row>
                 <b-col class="mission-group-item scrollable px-3 py-3 m-0">
+                  <div
+                    v-if="!story.paths.length"
+                    class="d-flex align-items-center justify-content-center"
+                    style="height: 100%"
+                  >
+                    <h6>Aggiungi almeno un percorso.</h6>
+                  </div>
                   <b-list-group>
                     <b-list-group-item
                       v-for="(path, index) in story.paths"
@@ -99,7 +104,7 @@
                     <b-form-input
                       spellcheck="false"
                       type="search"
-                      placeholder="Cerca"
+                      placeholder="Cerca..."
                       v-model="mission_filter"
                     ></b-form-input>
                   </b-input-group>
@@ -130,7 +135,7 @@
               <b-row>
                 <b-col class="mission-group-item scrollable px-3 py-3 m-0">
                   <h6 v-if="selected_path.missions.length == 0">
-                    Aggiungi qualche missione...
+                    Aggiungi almeno una missione.
                   </h6>
                   <b-list-group v-else>
                     <b-list-group-item
@@ -156,7 +161,7 @@
               <b-row>
                 <b-col class="mission-group-item scrollable px-3 py-3 m-0">
                   <h6 v-if="selected_path.missions.length == 0">
-                    Aggiungi qualche missione...
+                    Aggiungi almeno una missione.
                   </h6>
                   <b-list-group v-else>
                     <b-list-group-item
@@ -164,7 +169,12 @@
                       :key="index"
                       class="px-0 py-2 my-1"
                       button
-                      @click="showMissionInfos(mission)"
+                      :class="missionClass(mission)"
+                      @click="
+                        showMissionInfos(
+                          selected_mission == mission ? null : mission
+                        )
+                      "
                     >
                       {{ mission.title }}
                     </b-list-group-item>
@@ -177,7 +187,13 @@
               cols="7"
               style="overflow-y: auto; height: 100%"
             >
-              <h6 v-if="!selected_mission">Nessuna missione selezionata</h6>
+              <div
+                v-if="!selected_mission"
+                class="d-flex align-items-center justify-content-center"
+                style="height: 100%"
+              >
+                <h6>Nessuna missione selezionata.</h6>
+              </div>
               <div
                 v-else
                 class="d-flex flex-column"
@@ -259,7 +275,7 @@
               v-if="active_section == sections[4]"
               cols="10"
             >
-              <b-container class="d-flex flex-column" fluid>
+              <b-container class="d-flex flex-column" fluid id="stocazzo">
                 <div class="m-3 d-flex flex-column align-items-center">
                   <h5>Titolo</h5>
                   <b-form-input
@@ -313,10 +329,26 @@
                   </div>
                 </div>
                 <div class="m-3 d-flex flex-column align-items-center">
-                  <h5>Background</h5>
-                  <b-form-file
-                    placeholder="Seleziona l'immagine di background"
-                  ></b-form-file>
+                  <h5 class="mb-2">Background</h5>
+                  <div class="d-flex justify-content-center">
+                    <b-form-file
+                      v-model="background_selector"
+                      accept="image/*"
+                      id="background-selector"
+                      style="display: none"
+                      ref="backgroundFileInput"
+                    ></b-form-file>
+                    <b-button class="mt-2" @click="openSelector"
+                      >Cambia background</b-button
+                    >
+                  </div>
+                  <img
+                    class="mt-2 background-preview"
+                    v-if="story.settings.background"
+                    :src="story.settings.background"
+                    alt="background story image"
+                  />
+                  <h6 class="mt-2" v-else>Nessun background selezionato</h6>
                 </div>
               </b-container>
             </b-col>
@@ -325,9 +357,9 @@
       </template>
       <template #modal-footer>
         <b-row d-flex justify-content-end>
-          <b-button class="darker mx-1" @click="reset()"> Indietro </b-button>
+          <b-button class="mx-1" @click="reset()"> Indietro </b-button>
           <b-button
-            class="darker mx-1"
+            class="mx-1"
             v-on="
               valid_story
                 ? { click: () => save() }
@@ -358,6 +390,7 @@ module.exports = {
       selected_mission: null,
       story: null,
       selected_path: null,
+      background_selector: null,
       successive_fields: [
         {
           key: "min",
@@ -468,6 +501,10 @@ module.exports = {
     },
   },
   methods: {
+    openSelector() {
+      let el = $("#background-selector");
+      if (el) el.click();
+    },
     addPath() {
       this.story.paths.push({
         name: "Senza nome",
@@ -510,13 +547,15 @@ module.exports = {
       }
     },
     removeResult(result) {
-      for (let i = 0; i < this.selected_mission.results.length; i++) {
-        if (this.selected_mission.results[i].id === result.id) {
-          this.selected_mission.results.splice(i, 1);
-          i--;
+      if (this.selected_mission.results.length > 1) {
+        for (let i = 0; i < this.selected_mission.results.length; i++) {
+          if (this.selected_mission.results[i].id === result.id) {
+            this.selected_mission.results.splice(i, 1);
+            i--;
+          }
         }
+        this.calculateResultRange(this.selected_mission);
       }
-      this.calculateResultRange(this.selected_mission);
     },
     calculateResultRange(mission) {
       for (let i = 0; i < mission.results.length; i++) {
@@ -544,6 +583,11 @@ module.exports = {
         unavailable: path != this.selected_path,
       };
     },
+    missionClass(mission) {
+      return {
+        unavailable: mission != this.selected_mission,
+      };
+    },
     showMissionInfos(mission) {
       this.selected_mission = mission;
     },
@@ -564,6 +608,8 @@ module.exports = {
       for (let i = 0; i < this.selected_path.missions.length; i++) {
         if (this.selected_path.missions[i].key === mission.key) {
           this.selected_path.missions.splice(i, 1);
+          if (this.selected_mission.key == mission.key)
+            this.selected_mission = null;
           i--;
         }
       }
@@ -653,9 +699,27 @@ module.exports = {
     story_prop(new_value) {
       this.story = new_value;
     },
+    background_selector(file) {
+      if (file) {
+        let formData = new FormData();
+        formData.append("photo", file);
+
+        fetch("/api/uploadPhoto", {
+          method: "POST",
+          body: formData,
+        }).then((response) => {
+          if (response.ok) {
+            response.json().then((data) => {
+              this.story.settings.background = data.path;
+            });
+          }
+        });
+
+        this.$refs.backgroundFileInput.reset();
+      }
+    },
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

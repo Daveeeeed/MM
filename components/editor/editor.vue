@@ -210,7 +210,6 @@ module.exports = {
               label: "Titolo",
               tdClass: "titleFormatter",
               thStyle: "width: 27%;",
-              stickyColumn: true,
             },
             {
               key: "settings.published",
@@ -489,64 +488,82 @@ module.exports = {
       }
     },
     onPublish(data) {
-      data.item.settings.published = !data.item.settings.published;
-      this.isBusy = true;
-      fetch("/api/stories/edit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data.item),
-      })
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          else return fetch("/api/stories");
+      if (data.item.paths.length && !data.item.settings.archived) {
+        data.item.settings.published = !data.item.settings.published;
+        this.isBusy = true;
+        fetch("/api/stories/edit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data.item),
         })
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          else return response.json();
-        })
-        .then((data) => {
-          this.stories = data;
-          this.isBusy = false;
-        })
-        .catch((error) => {
-          console.error(
-            "There has been a problem with your fetch operation",
-            error
-          );
-          this.stories = null;
-        });
+          .then((response) => {
+            if (!response.ok) throw new Error("Network response was not ok");
+            else return fetch("/api/stories");
+          })
+          .then((response) => {
+            if (!response.ok) throw new Error("Network response was not ok");
+            else return response.json();
+          })
+          .then((stories) => {
+            this.stories = stories;
+            this.isBusy = false;
+          })
+          .catch((error) => {
+            console.error(
+              "There has been a problem with your fetch operation",
+              error
+            );
+            this.stories = null;
+          });
+      } else {
+        if (data.item.settings.archived) {
+          this.onShowErrorAlert([
+            "Una storia archiviata non può essere pubblicata",
+          ]);
+        } else {
+          this.onShowErrorAlert([
+            "Per pubblicare la storia è necessario almeno un perscorso",
+          ]);
+        }
+      }
     },
     onArchive(data) {
-      data.item.settings.archived = !data.item.settings.archived;
-      this.isBusy = true;
-      fetch("/api/stories/edit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data.item),
-      })
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          else return fetch("/api/stories");
+      if (!data.item.settings.published) {
+        data.item.settings.archived = !data.item.settings.archived;
+        this.isBusy = true;
+        fetch("/api/stories/edit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data.item),
         })
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          else return response.json();
-        })
-        .then((data) => {
-          this.stories = data;
-          this.isBusy = false;
-        })
-        .catch((error) => {
-          console.error(
-            "There has been a problem with your fetch operation",
-            error
-          );
-          this.stories = null;
-        });
+          .then((response) => {
+            if (!response.ok) throw new Error("Network response was not ok");
+            else return fetch("/api/stories");
+          })
+          .then((response) => {
+            if (!response.ok) throw new Error("Network response was not ok");
+            else return response.json();
+          })
+          .then((data) => {
+            this.stories = data;
+            this.isBusy = false;
+          })
+          .catch((error) => {
+            console.error(
+              "There has been a problem with your fetch operation",
+              error
+            );
+            this.stories = null;
+          });
+      } else {
+        this.onShowErrorAlert([
+          "Una storia pubblicata non può essere archiviata",
+        ]);
+      }
     },
     onDelete(data, name) {
       this.isBusy = true;
@@ -772,37 +789,86 @@ module.exports = {
 </script>
 
 <style>
+/* SCHEMA DI COLORI DAL PIù CHIARO AL PIù SCURO */
+:root {
+  --primary-color: #ffe0e9 !important; /* colore di fondo */
+  --object-color: #ffc2d4 !important; /* interactive elements */
+  --tertiary-color: #ff9ebb !important; /* colore dei menu */
+  --hover-color: #ff7aa2 !important; /* colore di hover */
+  --secondary-color: #e05780 !important; /* colore di header/footer */
+  --form-color: #b9375e !important; /* form elements (buttons and inputs) */
+  --disabled-color: #b9375e !important; /* colore degli oggetti disabilitati */
+  --selection-color: #8a2846 !important; /* colore di selezione */
+  --active-color: #602437 !important; /* colore dei bordi e degli oggetti attivi */
+  --text-color: #522e38 !important; /* colore del testo */
+}
+
+:root {
+  --primary-color: #121421 !important; /* colore di fondo */
+  --secondary-color: #1c1e2b !important; /* colore di header/footer */
+  --tertiary-color: #090a11 !important; /* colore dei menu */
+
+  --object-color: #171926 !important; /* interactive elements */
+  --form-color: #232538 !important; /* form elements (buttons and inputs) */
+
+  --active-color: #00bd58 !important; /* colore dei bordi e degli oggetti attivi */
+  --disabled-color: #848689 !important; /* colore degli oggetti disabilitati */
+  --hover-color: #28293d !important; /* colore di hover */
+
+  --selection-color: #00bd58 !important; /* colore di selezione */
+  --text-color: #ffffff !important; /* colore del testo */
+}
+
 /* NAVBAR */
+
+::-moz-selection {
+  color: var(--text-color);
+  background: var(--selection-color);
+}
+
+::selection {
+  color: var(--text-color);
+  background: var(--selection-color);
+}
+
 #editor {
-  background-color: #121421;
+  background-color: var(--primary-color);
   width: 100vw;
   height: 100vh;
+  color: var(--text-color);
 }
 
 .navbar {
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
 }
 
 .navbar .nav-item {
   box-sizing: border-box;
   transition: 0.5s;
-  color: #848689;
+  color: var(--disabled-color);
 }
 
 .navbar .nav-item.active {
-  box-shadow: 0 2px 0 #00bd58;
-  color: #ffffff;
+  box-shadow: 0 2px 0 var(--active-color);
+  color: var(--text-color);
+}
+
+.navbar-dark .navbar-nav .active > .nav-link,
+.navbar-dark .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .nav-link.show,
+.navbar-dark .navbar-nav .show > .nav-link {
+  color: var(--text-color);
 }
 
 .navbar .nav-item:hover {
-  background-color: #28293d;
+  background-color: var(--hover-color);
 }
 
 /* TAB DELLE SCHERMATE (es. Storie e Archiviate) */
 .tabs .list-group-item {
   background-color: transparent;
   border: 0px;
-  color: #848689;
+  color: var(--disabled-color);
   white-space: nowrap;
 }
 
@@ -811,41 +877,54 @@ module.exports = {
 }
 
 .tabs .list-group-item.active {
-  color: white;
+  color: var(--text-color);
 }
 
 /* BOTTONE */
 .btn {
-  background-color: #1a1c2c;
+  background-color: var(--form-color);
+  border: none;
+  border-radius: 10px;
+}
+
+.btn:hover {
+  background-color: var(--hover-color);
   border: none;
   border-radius: 10px;
 }
 
 .btn.darker {
-  background-color: #090a11;
+  background-color: var(--tertiary-color);
 }
 
 /* LENTE INGRANDIMENTO INPUT */
 .input-group-text {
-  background-color: #1a1c2c;
-  color: #848689;
+  background-color: var(--form-color);
+  color: var(--disabled-color);
   border: none;
   border-radius: 10px;
 }
 
 /* TEXT BOX INPUT */
 .form-control {
-  background-color: #1a1c2c;
-  color: #ffffff;
+  background-color: var(--form-color);
+  color: var(--text-color);
   border: none;
   border-radius: 10px;
 }
 
 .form-control:focus {
-  background-color: #1a1c2c;
-  color: #ffffff;
+  background-color: var(--form-color);
+  color: var(--text-color);
   border: none;
   box-shadow: none;
+}
+
+.custom-select {
+  background-color: var(--form-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
 }
 
 /* TABELLA STORIE/MISSIONI/ATTIVITA' */
@@ -855,12 +934,12 @@ module.exports = {
 }
 
 .table-row {
-  background-color: #171926;
-  color: #ffffff;
+  background-color: var(--object-color);
+  color: var(--text-color);
 }
 
 .cell-default {
-  color: #ffffff;
+  color: var(--text-color);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -884,21 +963,25 @@ module.exports = {
   white-space: nowrap;
 }
 
+.table-hover tbody tr:hover {
+  background-color: var(--hover-color);
+}
+
 /* MODAL */
 
 .modal-header {
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
   border: 0px;
 }
 
 .modal-footer {
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
   border: 0px;
 }
 
 .modal-content {
-  background-color: #121421;
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 
 .modal-body {
@@ -907,20 +990,20 @@ module.exports = {
 
 .modal-xl .modal-header {
   padding: 0px;
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
   border: 0px;
   height: 60px;
 }
 
 .modal-xl .modal-footer {
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
   border: 0px;
   height: 68px;
 }
 
 .modal-xl .modal-content {
-  background-color: #121421;
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--text-color);
   height: calc(100vh - 56px);
 }
 
@@ -931,27 +1014,27 @@ module.exports = {
 
 /* ELEMENTO MISSIONE NEL MODAL */
 .mission-group-item .list-group-item {
-  background-color: #171926;
-  color: #ffffff;
+  background-color: var(--object-color);
+  color: var(--text-color);
   text-align: center;
   border-radius: 10px;
-  box-shadow: 0 2px 0 #00bd58;
+  box-shadow: 0 2px 0 var(--active-color);
   overflow-y: auto;
   outline: 0;
 }
 
 .mission-group-item .list-group-item:hover {
-  background-color: #1c1e2b;
+  background-color: var(--hover-color);
 }
 
 .mission-group-item .list-group-item:focus {
-  background-color: #1c1e2b;
+  background-color: var(--hover-color);
 }
 
 /* ELEMENTO INATTIVO MISSIONE NEL MODAL */
 .mission-group-item .list-group-item.unavailable {
-  color: #848689;
-  box-shadow: 0 2px 0 #848689;
+  color: var(--disabled-color);
+  box-shadow: 0 2px 0 var(--disabled-color);
 }
 
 /* PRIMA COLONNA DEL MODAL */
@@ -959,13 +1042,13 @@ module.exports = {
   height: calc(100vh - 60px - 68px - 28px - 28px);
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #090a11;
+  background-color: var(--tertiary-color);
 }
 
 .menu-column .list-group-item {
   background-color: transparent;
   border: 0px;
-  color: #848689;
+  color: var(--disabled-color);
   box-sizing: border-box;
   transition: 0.5s;
   outline: 0;
@@ -973,16 +1056,16 @@ module.exports = {
 }
 
 .menu-column .list-group-item:hover {
-  background-color: #28293d;
+  background-color: var(--hover-color);
 }
 
 .menu-column .list-group-item:focus {
-  background-color: #28293d;
+  background-color: var(--hover-color);
 }
 
 .menu-column .list-group-item.active {
-  color: white;
-  box-shadow: 0px 3px 0px #00bd58;
+  color: var(--text-color);
+  box-shadow: 0px 3px 0px var(--active-color);
 }
 
 .activity-button {
@@ -1004,14 +1087,14 @@ module.exports = {
 }
 
 .mission-group-item .list-group-item.selected_path {
-  background-color: #00bd58;
+  background-color: var(--active-color);
 }
 
 .selezionate {
   border-right-color: white;
   border-right-width: 1px;
   border-right-style: solid;
-  color: #ffffff;
+  color: var(--text-color);
   text-align: center;
   overflow-y: auto;
   overflow-x: hidden;
@@ -1027,12 +1110,12 @@ module.exports = {
 }
 
 .path-label {
-  color: #ffffff;
+  color: var(--text-color);
   background-color: transparent;
 }
 
 .unavailable .path-label {
-  color: #848689;
+  color: var(--disabled-color);
 }
 
 .path-label:disabled {
@@ -1041,14 +1124,6 @@ module.exports = {
 
 .path-label:hover {
   background-color: transparent;
-}
-
-.red {
-  background-color: #848689;
-}
-
-.red:hover {
-  background-color: #ff3d4a;
 }
 
 ::-webkit-scrollbar {
@@ -1062,7 +1137,7 @@ module.exports = {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #28293d;
+  background: var(--tertiary-color);
   border-radius: 3px;
 }
 
@@ -1072,27 +1147,80 @@ module.exports = {
 }
 
 .pad .mission-group-item .selected-component {
-  background-color: #00bd58;
+  background-color: var(--active-color);
 }
 
-.table.b-table > thead > tr > .table-b-table-default {
-  background-color: #121421;
-  color: white;
+.custom-control-label::before {
+  background: transparent !important;
+  border-color: var(--text-color);
 }
 
-.table.b-table > tbody > tr > .table-b-table-default {
-  background-color: rgb(23, 25, 38);
+.custom-control-input:checked ~ .custom-control-label::before {
+  background: transparent !important;
+  border-color: var(--active-color);
 }
 
-.table.b-table > tbody > tr > .table-b-table-default {
-  color: white;
+.b-form-tag {
+  background-color: var(--disabled-color);
 }
 
-.table.b-table.table-hover > tbody > tr:hover > .table-b-table-default {
-  color: white;
+.background-preview {
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 3px 3px 5px rgb(0, 0, 0);
+  border-radius: 10px;
 }
 
-.table.b-table.table-hover > tbody > tr:hover > .table-b-table-default {
-  background-color: rgb(18 20 33);
+.image-container {
+  width: 200px;
+  height: 200px;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-top: 1em;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.5s;
+  background-color: var(--object-color);
+  box-shadow: 3px 3px 5px rgb(0, 0, 0);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.image-container:hover {
+  transition: 0.5s;
+  background-color: var(--hover-color);
+}
+
+.memory-grid {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--object-color);
+}
+
+.b-form-tags {
+  background-color: var(--form-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
+}
+
+.b-form-tags.focus {
+  background-color: var(--form-color);
+  color: var(--text-color);
+  border: none;
+  box-shadow: none;
+}
+
+.b-form-tags-input {
+  background-color: var(--form-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
 }
 </style>

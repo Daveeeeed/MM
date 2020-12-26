@@ -39,7 +39,7 @@
                 </h5>
                 <b-popover
                   target="info-required-component"
-                  positioning=""
+                  positioning="rightbottom"
                   triggers="hover focus"
                   >Un componente necessario è richiesto in ogni attività, ne
                   determina il tipo e non ne può essere aggiunto più di
@@ -66,7 +66,7 @@
                 </h5>
                 <b-popover
                   target="info-component"
-                  positioning=""
+                  positioning="rightbottom"
                   triggers="hover focus"
                   >I componenti aggiuntivi vengono usati per arricchire
                   l'attività di dettagli, possono essere aggiunti senza
@@ -93,7 +93,7 @@
                 </h5>
                 <b-popover
                   target="info-minigames"
-                  positioning=""
+                  positioning="rightbottom"
                   triggers="hover focus"
                   >I minigiochi sono componenti indipendenti ed unici, possono
                   essere aggiunti soltanto ad un'attività vuota.</b-popover
@@ -144,7 +144,7 @@
                     </div>
                     <div>
                       <b-button
-                        class="red align-self-start mx-1"
+                        class="align-self-start mx-1"
                         @click.stop="removeElement(element)"
                       >
                         <b-icon-x></b-icon-x>
@@ -198,9 +198,9 @@
 
       <template #modal-footer>
         <div d-flex justify-content-end>
-          <b-button class="darker mx-1" @click="reset()"> Indietro </b-button>
+          <b-button class="mx-1" @click="reset()"> Indietro </b-button>
           <b-button
-            class="darker mx-1"
+            class="mx-1"
             v-on="
               valid_activity
                 ? { click: () => save() }
@@ -280,18 +280,36 @@ module.exports = {
         },
         {
           type: "Immagine",
-          photo_key: "",
-          name: null,
+          url: "",
         },
         {
           type: "Video",
-          text: "",
+          url: "",
         },
       ],
       minigames: [
         {
           type: "Memory",
-          images: [],
+          images: [
+            {
+              url: "",
+            },
+            {
+              url: "",
+            },
+            {
+              url: "",
+            },
+            {
+              url: "",
+            },
+            {
+              url: "",
+            },
+            {
+              url: "",
+            },
+          ],
         },
       ],
 
@@ -463,5 +481,4 @@ module.exports = {
 };
 </script>
 
-<style>
-</style>
+<style></style>

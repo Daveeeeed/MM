@@ -7,7 +7,7 @@
           ><b-icon-chat-fill></b-icon-chat-fill
         ></b-button>
       </div>
-      <div id="activity">
+      <div id="activity" :style="background_style">
         <div id="activity-container" class="mt-5">
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
@@ -81,6 +81,16 @@ module.exports = {
       points: 0,
     };
   },
+  computed: {
+    background_style: function () {
+      return {
+        "background-image": "url(" + this.story.settings.background + ")",
+        "background-size": "cover",
+        "background-repeat": "no-repeat",
+        "background-position": "center",
+      };
+    },
+  },
   methods: {
     // Initialization
     initPlayer() {
@@ -107,8 +117,8 @@ module.exports = {
                 this.player_id
             )
               .then((response) => response.json())
-              .then((data) => {
-                this.player = data;
+              .then((player_data) => {
+                this.player = player_data;
                 setInterval(this.updateStatus, 2000);
               });
           }
@@ -235,25 +245,18 @@ WebSocketClient.prototype.open = function (url) {
     this.onmessage(data, flags, this.number);
   };
   this.instance.onclose = (e) => {
-    switch (e.code) {
-      case 1000: // CLOSE_NORMAL
-        console.log("WebSocket: closed");
-        break;
-      default:
-        // Abnormal closure
-        this.reconnect(e);
-        break;
+    if (e.code == 1000) {
+      console.log("WebSocket: closed");
+    } else {
+      this.reconnect(e);
     }
     this.onclose(e);
   };
   this.instance.onerror = (e) => {
-    switch (e.code) {
-      case "ECONNREFUSED":
-        this.reconnect(e);
-        break;
-      default:
-        this.onerror(e);
-        break;
+    if (e.code == "ECONNREFUSED") {
+      this.reconnect(e);
+    } else {
+      this.onerror(e);
     }
   };
 };

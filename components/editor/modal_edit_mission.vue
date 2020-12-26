@@ -151,7 +151,7 @@
                       <b-form-select
                         text-field="title"
                         value-field="key"
-                        :options="mission.activities"
+                        :options="next_activity_select"
                         v-model="selected_activity.correct.key"
                       ></b-form-select>
                       <h3 class="mt-3">Ottieni</h3>
@@ -205,7 +205,7 @@
                     class="px-0 py-2 my-1"
                     style="width: 70%"
                   >
-                    {{ element.type }}
+                    {{ element.component.type }}
                   </b-list-group-item>
                 </b-col>
               </b-row>
@@ -247,9 +247,9 @@
 
       <template #modal-footer>
         <b-row d-flex justify-content-end>
-          <b-button class="darker mx-1" @click="reset()"> Indietro </b-button>
+          <b-button class="mx-1" @click="reset()"> Indietro </b-button>
           <b-button
-            class="darker mx-1"
+            class="mx-1"
             v-on="
               valid_mission
                 ? { click: () => save() }
@@ -295,6 +295,14 @@ module.exports = {
             a.push(activity);
           }
         }
+      });
+      return a;
+    },
+    next_activity_select: function () {
+      let a = JSON.parse(JSON.stringify(this.mission.activities));
+      a.push({
+        key: "-1",
+        title: "Fine missione",
       });
       return a;
     },

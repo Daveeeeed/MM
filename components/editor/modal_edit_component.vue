@@ -7,7 +7,10 @@
     hide-footer
   >
     <template #default>
-      <b-container class="my-3 d-flex flex-column justify-content-around">
+      <b-container
+        class="my-3 d-flex flex-column justify-content-around"
+        style="width: 100%"
+      >
         <!-- DOMANDA -->
         <div v-if="component.type == 'Domanda'">
           <h5>Domanda</h5>
@@ -19,6 +22,7 @@
           ></b-form-input>
           <h5>Risposte</h5>
           <b-form-tags
+            class="white-text"
             placeholder="Risposte..."
             v-model="component.answers"
           ></b-form-tags>
@@ -194,35 +198,84 @@
         </div>
 
         <!-- IMMAGINE -->
-        <div v-if="component.type == 'Immagine'">
+        <div v-if="component.type == 'Immagine'" style="width: 100%">
           <h5>Immagine</h5>
           <p>La seguente immagine sarà mostrata nella schermata</p>
-          <b-form-file
-            accept="image/*"
-            placeholder="Seleziona foto..."
-            v-model="component.name"
-            @input="uploadFile"
-          ></b-form-file>
+          <div class="d-flex justify-content-center" style="width: 100%">
+            <div
+              class="image-container"
+              @click="openImageSelector()"
+              :style="'background-image: url(' + component.url + ')'"
+            >
+              <b-icon
+                font-scale="4"
+                v-show="!component.url"
+                icon="plus"
+              ></b-icon>
+            </div>
+            <b-form-file
+              v-model="photo_file_input"
+              accept="image/*"
+              id="image-photo-selector"
+              style="display: none"
+              ref="imageFileInput"
+            ></b-form-file>
+          </div>
         </div>
 
         <!-- VIDEO -->
         <div v-if="component.type == 'Video'">
           <h5>Video</h5>
           <p>Il seguente video sarà mostrato nella schermata</p>
-          <p>E' richiesto l'URL embedded</p>
-          <b-form-input
-            class="mb-2"
-            type="text"
-            v-model="component.text"
-            placeholder="Inserisci il link qui..."
-          ></b-form-input>
+          <div class="d-flex justify-content-center flex-column" style="width: 100%">
+            <b-button
+              @click="openVideoSelector()"
+            >
+              Carica
+            </b-button>
+            <video v-if="component.url" :src="component.url" class="mt-2 background-preview" controls></video>
+            <b-form-file
+              v-model="photo_file_input"
+              accept="video/mp4,video/webm,video/ogg"
+              id="video-selector"
+              style="display: none"
+              ref="videoFileInput"
+            ></b-form-file>
+          </div>
+        </div>
+
+        <!-- MEMORY -->
+        <div v-if="component.type == 'Memory'" style="width: 100%">
+          <h5>Memory</h5>
+          <p>Seleziona 6 foto per il memory</p>
+          <div
+            class="d-flex justify-content-center flex-wrap"
+            style="width: 100%"
+          >
+            <div
+              v-for="(image, index) in images"
+              :key="index"
+              class="image-container"
+              @click="openSelector(index)"
+              :style="'background-image: url(' + image.url + ')'"
+            >
+              <b-icon font-scale="4" v-show="!image.url" icon="plus"></b-icon>
+            </div>
+            <b-form-file
+              v-model="memory_file_input"
+              accept="image/*"
+              id="memory-photo-selector"
+              style="display: none"
+              ref="memoryFileInput"
+            ></b-form-file>
+          </div>
         </div>
 
         <!-- BOTTONI -->
         <div class="d-flex justify-content-end mt-3">
-          <b-button class="darker mx-1" @click="reset()"> Indietro </b-button>
+          <b-button class="mx-1" @click="reset()"> Indietro </b-button>
           <b-button
-            class="darker mx-1"
+            class="mx-1"
             v-on="
               valid_component
                 ? { click: () => save() }
@@ -242,6 +295,9 @@ module.exports = {
   data() {
     return {
       component: null,
+      current_loaded_index: 0,
+      memory_file_input: null,
+      photo_file_input: null,
     };
   },
   props: {
@@ -250,6 +306,9 @@ module.exports = {
     },
   },
   computed: {
+    images: function () {
+      return this.component.images;
+    },
     valid_component: function () {
       let component = this.component;
       switch (component.type) {
@@ -287,6 +346,9 @@ module.exports = {
           return true;
         }
         case "Memory": {
+          for (let i = 0; i < component.images.length; i++) {
+            if (!component.images[i].url) return false;
+          }
           return true;
         }
         default: {
@@ -296,9 +358,23 @@ module.exports = {
     },
   },
   methods: {
+    openImageSelector() {
+      let el = document.getElementById("image-photo-selector");
+      if (el) el.click();
+    },
+    openVideoSelector() {
+      let el = document.getElementById("video-selector");
+      if (el) el.click();
+    },
+    openSelector(index) {
+      this.current_loaded_index = index;
+      let el = document.getElementById("memory-photo-selector");
+      if (el) el.click();
+    },
     reset() {
       this.$bvModal.hide("modal-edit-component");
       this.component = JSON.parse(JSON.stringify(this.component_prop));
+      this.current_loaded_index = 0;
     },
     save() {
       this.$emit("component-edited", this.component);
@@ -318,9 +394,47 @@ module.exports = {
     component_prop(new_value) {
       this.component = JSON.parse(JSON.stringify(new_value));
     },
+    memory_file_input(file) {
+      if (file) {
+        let formData = new FormData();
+        formData.append("photo", file);
+
+        fetch("/api/uploadPhoto", {
+          method: "POST",
+          body: formData,
+        }).then((response) => {
+          if (response.ok) {
+            response.json().then((data) => {
+              this.component.images[this.current_loaded_index].url = data.path;
+            });
+          }
+        });
+
+        this.$refs.memoryFileInput.reset();
+      }
+    },
+    photo_file_input(file) {
+      if (file) {
+        let formData = new FormData();
+        formData.append("photo", file);
+
+        fetch("/api/uploadPhoto", {
+          method: "POST",
+          body: formData,
+        }).then((response) => {
+          if (response.ok) {
+            response.json().then((data) => {
+              this.component.url = data.path;
+            });
+          }
+        });
+
+        this.$refs.imageFileInput.reset();
+      }
+    },
   },
 };
 </script>
 
-<style>
+<style
 </style>
