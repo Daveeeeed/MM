@@ -2,7 +2,7 @@
   <div id="editor">
     <!-- Navbar -->
     <b-navbar sticky id="topbar" type="dark" class="py-0 px-0">
-      <b-navbar-brand class="py-0 mx-5">
+      <b-navbar-brand class="py-0 mx-5" href="/">
         <img src="../public/images/logo2.png" alt="Logo" height="46" />
       </b-navbar-brand>
       <b-navbar-nav>

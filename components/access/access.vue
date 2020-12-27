@@ -4,12 +4,9 @@
       fluid
       class="d-flex flex-column align-items-center justify-content-center"
     >
-      <img
-        class="mb-4 mt-3"
-        src="../public/images/logo2.png"
-        alt="Logo"
-        height="150"
-      />
+      <a class="mb-4 mt-3" href="/">
+        <img src="../public/images/logo2.png" alt="Logo" height="150"
+      /></a>
       <b-button
         class="m-3 darker"
         style="height: 25vh; width: 90vw"
