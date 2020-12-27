@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div class="activity-text">{{ element.component.description }}</div>
 </template>
 
 <script>
@@ -9,14 +9,7 @@ module.exports = {
   },
   props: {
     element: Object,
-    answer_confirmed: Boolean,
   },
-  methods: {
-    sendAnswer(){
-      let answer;
-      this.$emit("answer-done", answer);
-    }
-  }
 };
 </script>
 

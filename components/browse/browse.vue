@@ -15,7 +15,9 @@
       class="story-card"
       :style="'background-image: url(' + story.settings.background + ')'"
     >
-      <h3 class="my-2 story-name">{{ story.title }}</h3>
+      <h3 class="my-2 story-name">
+        {{ story.title }}
+      </h3>
       <b-button
         :href="'/play?key=' + story.key"
         class="my-2 play-button"
@@ -55,8 +57,8 @@ module.exports = {
 
 <style>
 body {
-  background-color: #121421;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 
 #browse {
@@ -68,12 +70,12 @@ body {
 .story-card {
   width: calc(100vw - 100px);
   height: 200px;
-  background: #171926;
+  background: var(--object-color);
   border-radius: 20px;
   border: none;
   margin-top: 10px;
   margin-bottom: 10px;
-  box-shadow: 0px 3px 0px #00bd58;
+  box-shadow: 0px 3px 0px var(--active-color), 3px 3px 8px black;
 
   display: flex;
   flex-direction: column;
@@ -82,13 +84,21 @@ body {
   background-position: center;
 }
 
+.story-name {
+  text-shadow: 0px 0px 20px black, 0px 0px 8px black;
+}
+
 .play-button {
-  background: #232538;
-  color: white;
+  background: var(--form-color);
+  color: var(--text-color);
   border: none;
 }
 
 .play-button:hover {
-  background: #28293d;
+  background: var(--hover-color);
+}
+
+.play-button:focus {
+  background: var(--hover-color);
 }
 </style>

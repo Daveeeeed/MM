@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column">
-    <div id="question">{{ element.component.question }}</div>
-    <b-input id="answer" class="mt-4" v-model="answer"></b-input>
+    <div class="activity-text" id="question">{{ element.component.question }}</div>
+    <b-input class="mb-4" v-model="answer" placeholder="Inserisci la risposta..."></b-input>
   </div>
 </template>
 
@@ -40,11 +40,6 @@ module.exports = {
 
 <style>
 #question {
-  font-size: 1.5em;
   text-align: center;
-}
-
-#answer {
-  height: 2em;
 }
 </style>

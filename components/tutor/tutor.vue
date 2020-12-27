@@ -112,10 +112,8 @@
             </template>
             <template #modal-footer="{ hide, ok }">
               <div class="d-flex justify-content-end">
-                <b-button class="darker m-1" @click="hide()">
-                  Indietro
-                </b-button>
-                <b-button class="darker m-1" @click="ok()"> Salva </b-button>
+                <b-button class="m-1" @click="hide()"> Indietro </b-button>
+                <b-button class="m-1" @click="ok()"> Salva </b-button>
               </div>
             </template>
           </b-modal>
@@ -145,9 +143,7 @@
             </template>
             <template #modal-footer>
               <div class="d-flex" style="width: 100%">
-                <b-button @click="sendMessage()" class="m-1 darker"
-                  >Invia</b-button
-                >
+                <b-button @click="sendMessage()" class="m-1">Invia</b-button>
                 <b-form-input class="m-1" v-model="message"></b-form-input>
               </div>
             </template>
@@ -171,10 +167,10 @@
             </template>
             <template #modal-footer>
               <div class="d-flex justify-content-center" style="width: 100%">
-                <b-button class="flex-fill darker m-1" @click="rejectPhoto">
+                <b-button class="flex-fill m-1" @click="rejectPhoto">
                   Rifiuta
                 </b-button>
-                <b-button class="flex-fill darker m-1" @click="confirmPhoto">
+                <b-button class="flex-fill m-1" @click="confirmPhoto">
                   Accetta
                 </b-button>
               </div>
@@ -485,13 +481,13 @@ WebSocketClient.prototype.onclose = function (e) {
 
 <style>
 body {
-  color: #ffffff;
-  background-color: #121421;
+  color: var(--text-color);
+  background-color: var(--primary-color);
 }
 
 .topbar {
   height: 10%;
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
 }
 
 .scrollable {
@@ -502,61 +498,58 @@ body {
 }
 
 .btn {
-  background-color: #1a1c2c;
-  color: #ffffff;
+  background-color: var(--form-color);
+  color: var(--text-color);
   margin: 0;
   border: none;
   outline: none;
 }
 
 .btn:focus {
-  background-color: #1a1c2c;
+  background-color: var(--hover-color);
   outline: none;
   border: none;
 }
 
-.btn.darker {
-  background-color: #090a11;
-}
-
 .player-row {
-  background-color: #28293d;
+  background-color: var(--object-color);
   border: 0px;
   border-radius: 4px;
-  color: white;
+  color: var(--text-color);
   white-space: nowrap;
   text-align: left;
   margin-top: 15px;
 }
 
 .form-control {
-  background-color: #1a1c2c;
-  color: #ffffff;
+  background-color: var(--form-color);
+  color: var(--text-color);
   border: none;
   border-radius: 10px;
 }
 
 .form-control:focus {
-  background-color: #1a1c2c;
-  color: #ffffff;
+  background-color: var(--form-color);
+  color: var(--text-color);
   border: none;
   box-shadow: none;
 }
 
 .modal-header {
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
   border: none;
 }
 
 .modal-footer {
   padding: 0;
   border: none;
-  background-color: #121421;
+  height: 68px;
+  background-color: var(--secondary-color);
 }
 
 .modal-body {
-  background-color: #121421;
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 
 .modal-body {
@@ -576,7 +569,7 @@ body {
 }
 
 .player-message {
-  color: #ffffff;
+  color: var(--text-color);
   text-align: end;
 }
 

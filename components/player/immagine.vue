@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <img class="activity-image" :src="element.component.url" :alt="element.component.description" />
 </template>
 
 <script>
@@ -10,14 +10,7 @@ module.exports = {
   props: {
     element: Object,
   },
-  methods: {
-    sendAnswer(){
-      let answer;
-      this.$emit("answer-done", answer);
-    }
-  }
 };
 </script>
 
-<style>
-</style>
+<style></style>

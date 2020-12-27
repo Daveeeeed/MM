@@ -8,13 +8,13 @@
         <img src="../public/images/logo2.png" alt="Logo" height="150"
       /></a>
       <b-button
-        class="m-3 darker"
+        class="m-3"
         style="height: 25vh; width: 90vw"
         @click="openPlayerModal"
       >
         <h1>GIOCA</h1>
       </b-button>
-      <b-modal id="player-modal" centered ok-only>
+      <b-modal id="player-modal" centered>
         <template #default>
           <b-container
             fluid
@@ -40,20 +40,27 @@
         </template>
       </b-modal>
       <b-button
-        class="m-3 darker"
+        class="m-3"
         style="height: 25vh; width: 90vw"
         @click="openTutorModal"
       >
-        <h1>SNITCHA</h1>
+        <h1>SUPERVISIONA</h1>
       </b-button>
-      <b-modal id="tutor-modal" centered ok-only @ok="confirmTutor">
-        <b-container
-          fluid
-          class="d-flex flex-column align-items-center justify-content-center"
-        >
-          <h5>Fornisci il seguente codice agli utenti</h5>
-          <h1>{{ tutor_game_key }}</h1>
-        </b-container>
+      <b-modal id="tutor-modal" centered>
+        <template #default>
+          <b-container
+            fluid
+            class="d-flex flex-column align-items-center justify-content-center"
+          >
+            <h5>Fornisci il seguente codice agli utenti</h5>
+            <h1>{{ tutor_game_key }}</h1>
+          </b-container>
+        </template>
+        <template #modal-footer>
+          <b-row d-flex justify-content-end>
+            <b-button @click="confirmTutor"> Ok </b-button>
+          </b-row>
+        </template>
       </b-modal>
     </b-container>
   </div>
@@ -143,24 +150,24 @@ module.exports = {
 
 <style>
 body {
-  background-color: #090a11;
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--text-color);
   margin: 0px;
 }
 
 .modal-header {
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
   border: 0px;
 }
 
 .modal-footer {
-  background-color: #1c1e2b;
+  background-color: var(--secondary-color);
   border: 0px;
 }
 
 .modal-content {
-  background-color: #1c1e2b;
-  color: #ffffff;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
 }
 
 .modal-body {
@@ -168,24 +175,33 @@ body {
 }
 
 .btn {
-  background-color: #171926;
-  color: #ffffff;
+  background-color: var(--object-color);
+  color: var(--text-color);
   text-align: center;
   border-radius: 20px;
-  box-shadow: 0 2px 0 #00bd58;
+  border: none;
+  box-shadow: 0 2px 0 var(--active-color);
   overflow-y: auto;
   outline: 0;
 }
 
+.btn:focus {
+  background: var(--hover-color);
+}
+
+.btn:hover {
+  background: var(--hover-color);
+}
+
 .form-control {
-  background-color: #1a1c2c;
-  color: #ffffff;
+  background: var(--form-color);
+  color: var(--text-color);
   border-radius: 10px;
 }
 
 .form-control:focus {
-  background-color: #1a1c2c;
-  color: #ffffff;
+  background: var(--hover-color);
+  color: var(--text-color);
   box-shadow: none;
 }
 </style>

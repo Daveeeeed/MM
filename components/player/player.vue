@@ -3,12 +3,15 @@
     <div v-if="player" class="d-flex flex-column">
       <div id="toolbar" class="px-3">
         <strong id="score" style="color: white">Punteggio: {{ points }}</strong>
-        <b-button v-b-toggle.sidebar-chat
+        <b-button class="chat-btn" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
         ></b-button>
       </div>
-      <div id="activity" :style="background_style">
-        <div id="activity-container" class="mt-5">
+      <div
+        id="activity"
+        :style="'background-image: url(' + this.story.settings.background + ')'"
+      >
+        <div id="activity-container" class="my-5">
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
               <component
@@ -40,7 +43,7 @@
         <div
           id="message-box"
           class="d-flex flex-column"
-          style="height: 100%; overflow-y: auto"
+          style="height: 50%; overflow-y: auto"
         >
           <div
             v-for="(message, index) in messages"
@@ -77,19 +80,9 @@ module.exports = {
       current_activity: null,
       current_path: null,
       current_mission: null,
-      check_answer: null,
+      check_answer: false,
       points: 0,
     };
-  },
-  computed: {
-    background_style: function () {
-      return {
-        "background-image": "url(" + this.story.settings.background + ")",
-        "background-size": "cover",
-        "background-repeat": "no-repeat",
-        "background-position": "center",
-      };
-    },
   },
   methods: {
     // Initialization
@@ -185,26 +178,58 @@ module.exports = {
     // Utilities
     findObject(array, key) {
       for (let i = 0; i < array.length; i++) {
-        if ((array[i].key = key)) return array[i];
+        if (array[i].key == key) return array[i];
       }
     },
     handleAnswer(answer) {
-      console.log(this.current_activity);
-
       let result = answer
         ? this.current_activity.correct
         : this.current_activity.wrong;
+
       let activity_points = result.points;
-      let next_activity = this.findObject(
-        this.current_mission.activities,
-        result.key
-      );
-      //this.current_activity = next_activity;
-      // TODO: handle last activity of the mission, mission switch, last mission of the path
       this.points += parseInt(activity_points);
+
+      if (result.key != "-1") {
+        // Missione non finita
+        this.current_activity = this.findObject(
+          this.current_mission.activities,
+          result.key
+        );
+      } else {
+        // Missione finita
+        let next_mission_key = this.findNextMissionKey(
+          this.current_mission,
+          this.points
+        );
+
+        if (next_mission_key != "-1") {
+          // Storia non finita
+          this.current_mission = this.findObject(
+            this.current_path.missions,
+            next_mission_key
+          );
+          this.current_activity = this.findObject(
+            this.current_mission.activities,
+            this.current_mission.first_activity
+          );
+        } else {
+          // Storia finita
+          // Schermata finale
+        }
+      }
+    },
+    findNextMissionKey(mission, points) {
+      for (let i = 0; i < mission.results.length; i++) {
+        if (
+          points >= mission.results[i].range_min &&
+          points <= mission.results[i].range_max
+        ) {
+          return mission.results[i].key;
+        }
+      }
+      console.log("ERROR ON NEXT MISSION KEY");
     },
     confirmAnswer() {
-      console.log(this.current_activity);
       this.check_answer = true;
     },
   },
@@ -215,7 +240,7 @@ module.exports = {
     Foto: httpVueLoader("comp/player/foto.vue"),
     Immagine: httpVueLoader("comp/player/immagine.vue"),
     Memory: httpVueLoader("comp/player/memory.vue"),
-    Scelta_Multipla: httpVueLoader("comp/player/scelta_multipla.vue"),
+    "Scelta Multipla": httpVueLoader("comp/player/scelta_multipla.vue"),
     Testo: httpVueLoader("comp/player/testo.vue"),
     Video: httpVueLoader("comp/player/video.vue"),
   },
@@ -292,15 +317,32 @@ WebSocketClient.prototype.onclose = function (e) {
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
 
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+}
+
 #player {
   font-family: "Lato", sans-serif;
-  background-color: #ffffff;
-  color: #001427;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  height: 100%;
+  width: 100%;
 }
 
 .full-centered {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -309,25 +351,52 @@ WebSocketClient.prototype.onclose = function (e) {
 
 #toolbar {
   height: 60px;
-  background-color: #001427;
+  background-color: var(--secondary-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+}
+
+.chat-btn {
+  background: var(--form-color);
+  color: var(--text-color);
+  border: none;
+}
+
+.chat-btn:focus {
+  background: var(--form-color);
+}
+
+.chat-btn:hover {
+  background: var(--hover-color);
 }
 
 #activity {
-  display: flex;
+  position: fixed;
   justify-content: center;
-  height: calc(100vh - 60px);
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  top: 60px;
+  display: flex;
+  overflow-y: auto;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #activity-container {
-  background-color: #6666ff;
+  background-color: var(--secondary-color);
   border-radius: 10px;
   height: 80%;
   min-height: 300px;
   max-width: 600px;
   width: 90vw;
+  opacity: 0.95;
 }
 
 #activity-wrapper {
@@ -338,6 +407,9 @@ WebSocketClient.prototype.onclose = function (e) {
 
 #activity-content {
   height: auto;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
 #next-button {
@@ -345,28 +417,85 @@ WebSocketClient.prototype.onclose = function (e) {
   width: 100%;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  background-color: #8e44ad;
+  background-color: var(--form-color);
   border: none;
-  color: white;
+  color: var(--text-color);
   cursor: pointer;
 }
 
+.btn {
+  background-color: var(--form-color);
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.btn:hover {
+  background-color: var(--hover-color);
+  border: none;
+}
+
+.form-control {
+  background-color: var(--form-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
+}
+
+.form-control:focus {
+  background-color: var(--form-color);
+  color: var(--text-color);
+  border: none;
+  box-shadow: none;
+}
+
+.close {
+  color: var(--text-color) !important;
+}
+
 .player-message {
-  background-color: #d7d7d7;
+  background-color: var(--secondary-color);
   text-align: end;
-  margin-left: 40px !important;
+  margin-left: 60px !important;
 }
 
 .tutor-message {
-  background-color: #ffffff;
+  background-color: var(--form-color);
   text-align: left;
-  margin-right: 40px !important;
+  margin-right: 60px !important;
 }
 
 .message {
-  border: 1px solid #001427;
   border-radius: 5px;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  box-shadow: 3px 3px 8px black;
+}
+
+.b-sidebar-footer {
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  width: 100%;
+}
+
+.b-sidebar {
+  height: 100% !important;
+  background-color: var(--primary-color) !important;
+  color: var(--text-color) !important;
+}
+
+.activity-image {
+  max-width: 90%;
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+.activity-text {
+  margin-bottom: 20px;
+  width: 100%;
 }
 </style>

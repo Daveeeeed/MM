@@ -184,7 +184,7 @@
                       <b-form-select
                         text-field="title"
                         value-field="key"
-                        :options="mission.activities"
+                        :options="next_activity_select"
                         v-model="selected_activity.wrong.key"
                       ></b-form-select>
                       <h3 class="mt-3">Ottieni</h3>

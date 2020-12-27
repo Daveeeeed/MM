@@ -1,23 +1,53 @@
 <template>
-  <div></div>
+  <div class="d-flex flex-column">
+    <div class="activity-text" id="question">
+      {{ element.component.question }}
+    </div>
+    <b-form-group>
+      <b-form-radio
+        v-for="(radio_answer, index) in element.component.answers"
+        :key="index"
+        v-model="answer"
+        :value="index"
+        name="answers"
+        class="my-1"
+        >{{ radio_answer }}
+      </b-form-radio>
+    </b-form-group>
+  </div>
 </template>
 
 <script>
 module.exports = {
   data() {
-    return {};
+    return {
+      answer: null,
+    };
   },
   props: {
     element: Object,
+    answer_confirmed: Boolean,
   },
   methods: {
-    sendAnswer(){
-      let answer;
-      this.$emit("answer-done", answer);
-    }
-  }
+    sendAnswer() {
+      let is_correct =
+        parseInt(this.element.component.correct_answer) == this.answer;
+      this.$emit("answer-sent", is_correct);
+    },
+  },
+  watch: {
+    answer_confirmed(isConfirmed) {
+      if (isConfirmed) {
+        this.sendAnswer();
+        this.$emit("answer-checked");
+      }
+    },
+  },
 };
 </script>
 
 <style>
+#question {
+  text-align: center;
+}
 </style>

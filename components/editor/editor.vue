@@ -789,35 +789,6 @@ module.exports = {
 </script>
 
 <style>
-/* SCHEMA DI COLORI DAL PIù CHIARO AL PIù SCURO */
-:root {
-  --primary-color: #ffe0e9 !important; /* colore di fondo */
-  --object-color: #ffc2d4 !important; /* interactive elements */
-  --tertiary-color: #ff9ebb !important; /* colore dei menu */
-  --hover-color: #ff7aa2 !important; /* colore di hover */
-  --secondary-color: #e05780 !important; /* colore di header/footer */
-  --form-color: #b9375e !important; /* form elements (buttons and inputs) */
-  --disabled-color: #b9375e !important; /* colore degli oggetti disabilitati */
-  --selection-color: #8a2846 !important; /* colore di selezione */
-  --active-color: #602437 !important; /* colore dei bordi e degli oggetti attivi */
-  --text-color: #522e38 !important; /* colore del testo */
-}
-
-:root {
-  --primary-color: #121421 !important; /* colore di fondo */
-  --secondary-color: #1c1e2b !important; /* colore di header/footer */
-  --tertiary-color: #090a11 !important; /* colore dei menu */
-
-  --object-color: #171926 !important; /* interactive elements */
-  --form-color: #232538 !important; /* form elements (buttons and inputs) */
-
-  --active-color: #00bd58 !important; /* colore dei bordi e degli oggetti attivi */
-  --disabled-color: #848689 !important; /* colore degli oggetti disabilitati */
-  --hover-color: #28293d !important; /* colore di hover */
-
-  --selection-color: #00bd58 !important; /* colore di selezione */
-  --text-color: #ffffff !important; /* colore del testo */
-}
 
 /* NAVBAR */
 
@@ -891,10 +862,6 @@ module.exports = {
   background-color: var(--hover-color);
   border: none;
   border-radius: 10px;
-}
-
-.btn.darker {
-  background-color: var(--tertiary-color);
 }
 
 /* LENTE INGRANDIMENTO INPUT */
@@ -1124,26 +1091,6 @@ module.exports = {
 
 .path-label:hover {
   background-color: transparent;
-}
-
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: var(--tertiary-color);
-  border-radius: 3px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }
 
 .pad .mission-group-item .selected-component {
