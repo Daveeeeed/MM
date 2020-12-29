@@ -808,8 +808,9 @@ module.exports = {
   color: var(--text-color);
 }
 
-.editor-wrapper {
+body {
   background-color: var(--primary-color);
+  color: var(--text-color);
 }
 
 .navbar {
