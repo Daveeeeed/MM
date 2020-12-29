@@ -19,7 +19,7 @@
     </b-navbar>
 
     <!-- Page content -->
-    <b-container fluid v-if="active_section">
+    <b-container class="editor-wrapper" fluid v-if="active_section">
       <!-- Section header -->
       <b-row>
         <b-col cols="auto" class="mr-auto ml-4">
@@ -789,7 +789,6 @@ module.exports = {
 </script>
 
 <style>
-
 /* NAVBAR */
 
 ::-moz-selection {
@@ -807,6 +806,10 @@ module.exports = {
   width: 100vw;
   height: 100vh;
   color: var(--text-color);
+}
+
+.editor-wrapper {
+  background-color: var(--primary-color);
 }
 
 .navbar {
