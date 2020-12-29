@@ -487,6 +487,7 @@ body {
 }
 
 .activity-image {
+  height: auto;
   max-width: 90%;
   border-style: solid;
   border-width: 2px;

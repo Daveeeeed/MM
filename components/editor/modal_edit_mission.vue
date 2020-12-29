@@ -106,8 +106,13 @@
                       v-for="(activity, index) in mission.activities"
                       :key="index"
                       class="px-0 py-2 my-1"
+                      :class="activityClass(activity)"
                       button
-                      @click="showActivityInfos(activity)"
+                      @click="
+                        showActivityInfos(
+                          selected_activity == activity ? null : activity
+                        )
+                      "
                     >
                       {{ activity.title }}
                     </b-list-group-item>
@@ -117,11 +122,13 @@
             </b-col>
             <!-- Outcome selection -->
             <b-col cols="7" v-if="active_section == sections[1]">
-              <b-row v-if="!selected_activity" class="m-0">
-                <b-col class="p-0 mt-2 mb-1">
-                  <h3 style="height: 34px">Nessuna attività selezionata</h3>
-                </b-col>
-              </b-row>
+              <div
+                v-if="!selected_activity"
+                class="d-flex align-items-center justify-content-center"
+                style="height: 100%"
+              >
+                <h6>Nessuna attività selezionata.</h6>
+              </div>
               <b-row v-else class="p-0 scrollable-full-body-height">
                 <b-col
                   class="p-0 m-0 d-flex flex-column align-items-center mission-group-item"
@@ -223,9 +230,8 @@
                     style="width: 50%"
                     class="m-2"
                     type="text"
-                    v-model="mission.title"
-                    required
                     maxlength="25"
+                    v-model="mission.title"
                     placeholder="Inserisci il titolo..."
                   ></b-form-input>
                 </div>
@@ -363,7 +369,11 @@ module.exports = {
         a.push("Inserisci gli esiti delle attività");
       return a;
     },
-
+    activityClass(activity) {
+      return {
+        unavailable: activity != this.selected_activity,
+      };
+    },
     showActivityInfos(activity) {
       this.selected_activity = activity;
     },
@@ -395,5 +405,4 @@ module.exports = {
 };
 </script>
 
-<style>
-</style>
+<style></style>

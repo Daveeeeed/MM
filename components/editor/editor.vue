@@ -986,7 +986,7 @@ module.exports = {
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 2px 0 var(--active-color);
-  overflow-y: auto;
+  overflow: hidden;
   outline: 0;
 }
 

@@ -104,7 +104,7 @@
                     <b-form-input
                       spellcheck="false"
                       type="search"
-                      placeholder="Cerca..."
+                      placeholder="Cerca"
                       v-model="mission_filter"
                     ></b-form-input>
                   </b-input-group>
@@ -248,7 +248,7 @@
               cols="10"
             >
               <b-container class="d-flex flex-column" fluid>
-                <div class="m-4 d-flex flex-column align-items-center">
+                <div class="m-3 d-flex flex-column align-items-center">
                   <h5>Titolo</h5>
                   <b-form-input
                     style="width: 50%"
@@ -258,6 +258,8 @@
                     v-model="selected_path.name"
                     placeholder="Inserisci il titolo..."
                   ></b-form-input>
+                </div>
+                <div class="m-3 d-flex flex-column align-items-center">
                   <h5>Missione d'inizio</h5>
                   <b-form-select
                     style="width: 50%"

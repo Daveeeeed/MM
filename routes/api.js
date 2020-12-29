@@ -301,6 +301,7 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     let data_path = dir_path + "/" + Date.now() + "." + type;
     if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
     fs.writeFile(data_path, data, "base64", (err) => {}); // save photo
+    let response_path = data_path.replace("./public", "http://localhost:8000/public")
     res.send({ path: data_path });
   } catch (error) {
     console.log(error);
