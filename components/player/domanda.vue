@@ -1,7 +1,13 @@
 <template>
   <div class="d-flex flex-column">
-    <div class="activity-text" id="question">{{ element.component.question }}</div>
-    <b-input class="mb-4" v-model="answer" placeholder="Inserisci la risposta..."></b-input>
+    <div class="activity-text" id="question">
+      {{ element.component.question }}
+    </div>
+    <b-input
+      class="mb-4"
+      v-model="answer"
+      placeholder="Inserisci la risposta..."
+    ></b-input>
   </div>
 </template>
 
@@ -15,6 +21,11 @@ module.exports = {
   props: {
     element: Object,
     answer_confirmed: Boolean,
+  },
+  computed: {
+    is_answer_done: function () {
+      return this.answer != null;
+    },
   },
   methods: {
     sendAnswer() {
@@ -30,7 +41,7 @@ module.exports = {
   watch: {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
-        this.sendAnswer();
+        if (this.is_answer_done) this.sendAnswer();
         this.$emit("answer-checked");
       }
     },

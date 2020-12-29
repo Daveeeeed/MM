@@ -10,37 +10,43 @@
         <div class="scrollable mx-5">
           <b-list-group v-if="selected_section == sections[0]">
             <b-list-group-item
-              v-for="(item, index) in game.players"
+              v-for="(player, index) in game.players"
               :key="index"
               class="px-2 player-row"
             >
               <div class="d-flex align-items-center">
                 <div class="ml-3" style="width: 44%">
-                  {{ item.name }}
+                  {{ player.name }}
                 </div>
                 <div class="flex-grow-1">
-                  {{ item.username }}
+                  {{ player.username }}
                 </div>
                 <div class="mr-3">
                   <b-button
-                    @click="showInfo(item)"
-                    :class="setPlayerClass1(item)"
+                    class="status-button"
+                    @click="showInfo(player)"
+                    :class="setPlayerClass1(player)"
                   >
                     <b-icon-info-circle></b-icon-info-circle>
                   </b-button>
                   <b-button
-                    @click="openChat(item)"
-                    :class="setPlayerClass3(item)"
+                    class="status-button"
+                    @click="openChat(player)"
+                    :class="setPlayerClass3(player)"
                   >
                     <b-icon-chat></b-icon-chat>
                   </b-button>
                   <b-button
-                    @click="showPhoto(item)"
-                    :class="setPlayerClass2(item)"
+                    class="status-button"
+                    @click="showPhotoModal(player)"
+                    :class="photoButtonClass(player)"
                   >
                     <b-icon-camera></b-icon-camera>
                   </b-button>
-                  <b-button :class="setPlayerClass4(item)">
+                  <b-button
+                    class="status-button"
+                    :class="setPlayerClass4(player)"
+                  >
                     <b-icon icon="bell"></b-icon>
                   </b-button>
                 </div>
@@ -50,19 +56,19 @@
 
           <b-list-group v-if="selected_section == sections[1]">
             <b-list-group-item
-              v-for="(item, index) in ordinate_player"
+              v-for="(player, index) in ordinate_player"
               :key="index"
               class="px-2 player-row"
             >
               <div class="d-flex align-items-center">
                 <div class="ml-3" style="width: 30%">
-                  {{ item.name }}
+                  {{ player.name }}
                 </div>
                 <div style="width: 30%">
-                  {{ item.username }}
+                  {{ player.username }}
                 </div>
-                <div class="flex-grow-1">Tempo totale: {{ item.time }}</div>
-                <div class="mr-3">Punteggio: {{ item.points }}</div>
+                <div class="flex-grow-1">Tempo totale: {{ player.time }}</div>
+                <div class="mr-3">Punteggio: {{ player.points }}</div>
               </div>
             </b-list-group-item>
           </b-list-group>
@@ -149,32 +155,48 @@
             </template>
           </b-modal>
 
-          <b-modal id="photo-modal" size="lg">
-            <template #modal-header>
-              <h4 class="m-0" v-if="selected_player">
-                {{ selected_player.name }}
-              </h4>
-            </template>
-            <template #default>
-              <div v-if="selected_player" style="height: 60vh">
+          <!-- Photo modal -->
+          <b-modal
+            id="photo-modal"
+            size="lg"
+            hide-footer
+            :title="selected_player ? 'Foto da ' + selected_player.name : ''"
+          >
+            <div v-if="selected_player_id">
+              <div
+                v-if="photos[selected_player_id].question"
+                class="d-flex flex-column align-items-center"
+              >
+                <div class="mt-4 mb-2">
+                  Il giocatore ha risposta alla domanda
+                </div>
+                <h6 class="m-2">
+                  " {{ photos[selected_player_id].question }} "
+                </h6>
+                <div class="m-2">con la seguente foto</div>
+                <img
+                  :src="photos[selected_player_id].answer"
+                  width="70%"
+                  height="auto"
+                  class="m-2"
+                />
+                <div class="m-2">La foto risulta corretta o sbagliata?</div>
                 <div
-                  class="d-flex flex-column"
-                  style="width: 100%; height: 100%; overflow-y: auto"
+                  class="d-flex justify-content-center mt-2 mb-4"
+                  style="width: 100%"
                 >
-                  <h1>Foto</h1>
+                  <b-button class="mx-2 py-3" style="width: 35%" @click="photoResponse(false)">
+                    Rifiuta
+                  </b-button>
+                  <b-button class="mx-2 py-3" style="width: 35%" @click="photoResponse(true)">
+                    Accetta
+                  </b-button>
                 </div>
               </div>
-            </template>
-            <template #modal-footer>
-              <div class="d-flex justify-content-center" style="width: 100%">
-                <b-button class="flex-fill m-1" @click="rejectPhoto">
-                  Rifiuta
-                </b-button>
-                <b-button class="flex-fill m-1" @click="confirmPhoto">
-                  Accetta
-                </b-button>
+              <div v-else class="my-5 d-flex flex-column align-items-center">
+                Nessuna foto in attesa di valutazione
               </div>
-            </template>
+            </div>
           </b-modal>
           <b-container
             v-if="selected_section == sections[2]"
@@ -226,6 +248,7 @@ module.exports = {
       message: "",
       name_to_edit: "",
       messages: {},
+      photos: {},
       sections: [
         {
           title: "GIOCATORI",
@@ -287,6 +310,8 @@ module.exports = {
           this.game.players.forEach((player) => {
             if (this.messages[player.id] == undefined)
               this.messages[player.id] = [];
+            if (this.photos[player.id] == undefined)
+              this.photos[player.id] = {};
           });
           setInterval(this.updateTutor, 2000);
         });
@@ -304,10 +329,20 @@ module.exports = {
           message.game_key == that.game_key &&
           message.sender == false
         ) {
-          that.messages[message.player_id].push({
-            text: message.message,
-            sender: false,
-          });
+          switch (message.type) {
+            case "msg":
+              that.messages[message.player_id].push({
+                text: message.message,
+                sender: false,
+              });
+              break;
+            case "photo":
+              that.photos[message.player_id].answer = message.answer;
+              that.photos[message.player_id].question = message.question;
+              break;
+            default:
+              break;
+          }
         }
       };
     },
@@ -319,6 +354,8 @@ module.exports = {
           this.game.players.forEach((player) => {
             if (this.messages[player.id] == undefined)
               this.messages[player.id] = [];
+            if (this.photos[player.id] == undefined)
+              this.photos[player.id] = {};
           });
         });
     },
@@ -346,18 +383,19 @@ module.exports = {
     setInfoModal() {
       this.name_to_edit = JSON.parse(JSON.stringify(this.selected_player.name));
     },
-    openChat(item) {
-      this.selected_player_id = item.id;
+    openChat(player) {
+      this.selected_player_id = player.id;
       this.$bvModal.show("chat-modal");
     },
-    showInfo(item) {
-      this.selected_player_id = item.id;
+    showInfo(player) {
+      this.selected_player_id = player.id;
       this.$bvModal.show("info-modal");
     },
     sendMessage() {
       if (this.message) {
         this.wsc.send(
           JSON.stringify({
+            type: "msg",
             message: this.message,
             player_id: this.selected_player.id,
             game_key: this.game_key,
@@ -372,32 +410,43 @@ module.exports = {
         this.message = "";
       }
     },
-    setPlayerClass1(item) {
+    setPlayerClass1(player) {
       return {
-        blue: item.status.time_stuck > 6,
+        blue: player.status.time_stuck > 6,
       };
     },
-    setPlayerClass2(item) {
+    photoButtonClass(player) {
       return {
-        orange: item.status.photo_sent,
+        orange: this.photos[player.id].question,
       };
     },
-    setPlayerClass3(item) {
+    setPlayerClass3(player) {
       return {
-        red: item.status.need_help,
+        red: player.status.need_help,
       };
     },
-    setPlayerClass4(item) {
+    setPlayerClass4(player) {
       return {
-        green: item.status.chat,
+        green: player.status.chat,
       };
     },
-    showPhoto(item) {
-      this.selected_player_id = item.id;
+    showPhotoModal(player) {
+      this.selected_player_id = player.id;
       this.$bvModal.show("photo-modal");
     },
-    confirmPhoto() {},
-    rejectPhoto() {},
+    photoResponse(answer) {
+      this.wsc.send(
+        JSON.stringify({
+          type: "photo",
+          answer: answer,
+          player_id: this.selected_player.id,
+          game_key: this.game_key,
+          story_key: this.story_key,
+          sender: true,
+        })
+      );
+      this.photos[this.selected_player_id] = {};
+    },
   },
   created: function () {
     let urlParams = new URLSearchParams(window.location.search);
@@ -593,5 +642,10 @@ body {
   outline: none;
   border: 5px solid;
   border-color: #00ca5b;
+}
+
+.status-button:focus {
+  background-color: unset;
+
 }
 </style>

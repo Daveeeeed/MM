@@ -94,6 +94,14 @@ module.exports = {
   margin-bottom: 20px;
 }
 
+.activity-webcam {
+  height: auto;
+  max-width: 90%;
+  border-style: solid;
+  border-width: 5px;
+  border-color: var(--form-color);
+}
+
 .activity-text {
   margin-bottom: 20px;
   width: 100%;

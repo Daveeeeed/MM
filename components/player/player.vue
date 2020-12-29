@@ -2,7 +2,9 @@
   <div id="player">
     <div v-if="player" class="d-flex flex-column">
       <div id="toolbar" class="px-3">
-        <strong id="score" style="color: white">Punteggio: {{ points }}</strong>
+        <strong id="score" style="color: white"
+          >Punteggio: {{ player.points }}</strong
+        >
         <b-button class="chat-btn" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
         ></b-button>
@@ -11,7 +13,12 @@
         id="activity"
         :style="'background-image: url(' + this.story.settings.background + ')'"
       >
-        <div id="activity-container" class="my-5">
+        <b-overlay
+          id="activity-container"
+          class="my-5"
+          :show="verifying_answer"
+          variant="dark"
+        >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
               <component
@@ -20,7 +27,9 @@
                 :is="element.component.type"
                 :element="element"
                 :answer_confirmed="check_answer"
+                :answer_verified="answer_verified"
                 @answer-checked="check_answer = false"
+                @verify-answer="verifyAnswer"
                 @answer-sent="handleAnswer"
               >
               </component>
@@ -29,7 +38,13 @@
           <b-button id="next-button" @click="confirmAnswer()"
             ><strong>Invia</strong></b-button
           >
-        </div>
+          <template #overlay>
+            <div class="text-center">
+              <b-spinner label="Spinning"></b-spinner>
+              <div>Attendi la verifica della risposta...</div>
+            </div></template
+          >
+        </b-overlay>
       </div>
     </div>
     <div v-else id="story-loading" class="full-centered">
@@ -81,7 +96,10 @@ module.exports = {
       current_path: null,
       current_mission: null,
       check_answer: false,
-      points: 0,
+      // overlay trigger
+      verifying_answer: false,
+      // received answer from tutor
+      answer_verified: false,
     };
   },
   methods: {
@@ -131,10 +149,19 @@ module.exports = {
           message.game_key == that.game_key &&
           message.sender == true
         ) {
-          that.messages.push({
-            text: message.message,
-            sender: false,
-          });
+          switch (message.type) {
+            case "msg":
+              that.messages.push({
+                text: message.message,
+                sender: false,
+              });
+              break;
+            case "photo":
+              that.handleAnswer(message.answer);
+              break;
+            default:
+              break;
+          }
         }
       };
     },
@@ -160,6 +187,7 @@ module.exports = {
       if (this.message_input) {
         this.wsc.send(
           JSON.stringify({
+            type: "msg",
             message: this.message_input,
             player_id: this.player_id,
             game_key: this.game_key,
@@ -182,12 +210,14 @@ module.exports = {
       }
     },
     handleAnswer(answer) {
+      this.verifying_answer = false;
+
       let result = answer
         ? this.current_activity.correct
         : this.current_activity.wrong;
 
       let activity_points = result.points;
-      this.points += parseInt(activity_points);
+      this.player.points += parseInt(activity_points);
 
       if (result.key != "-1") {
         // Missione non finita
@@ -199,7 +229,7 @@ module.exports = {
         // Missione finita
         let next_mission_key = this.findNextMissionKey(
           this.current_mission,
-          this.points
+          this.player.points
         );
 
         if (next_mission_key != "-1") {
@@ -228,6 +258,20 @@ module.exports = {
         }
       }
       console.log("ERROR ON NEXT MISSION KEY");
+    },
+    verifyAnswer(answer, question) {
+      this.verifying_answer = true;
+      this.wsc.send(
+        JSON.stringify({
+          type: "photo",
+          answer: answer,
+          question: question,
+          player_id: this.player_id,
+          game_key: this.game_key,
+          story_key: this.story_key,
+          sender: false,
+        })
+      );
     },
     confirmAnswer() {
       this.check_answer = true;
@@ -493,6 +537,14 @@ body {
   border-width: 2px;
   border-color: var(--text-color);
   margin-bottom: 20px;
+}
+
+.activity-webcam {
+  height: auto;
+  max-width: 90%;
+  border-style: solid;
+  border-width: 5px;
+  border-color: var(--form-color);
 }
 
 .activity-text {
