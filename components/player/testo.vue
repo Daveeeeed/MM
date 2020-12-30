@@ -11,12 +11,6 @@ module.exports = {
     element: Object,
     answer_confirmed: Boolean,
   },
-  methods: {
-    sendAnswer() {
-      let answer;
-      this.$emit("answer-done", answer);
-    },
-  },
   watch: {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {

@@ -121,7 +121,6 @@ module.exports = {
                 this.player = player_data;
                 setInterval(this.updateStatus, 2000);
                 let new_game = !this.player.status.path;
-                console.log(new_game);
                 this.current_path = new_game
                   ? this.story.paths[
                       Math.round(Math.random() * (this.story.paths.length - 1))
@@ -202,10 +201,6 @@ module.exports = {
     updateStatus() {
       this.player.status.time_stuck += 2;
       this.player.time += 2;
-      /*
-          console.log("ooooo"),
-          console.log(this.player),
-          console.log(this.player.points),*/
       fetch(
         "/api/player/update?game_key=" +
           this.game_key +
@@ -251,7 +246,6 @@ module.exports = {
       return -1;
     },
     handleAnswer(answer) {
-
       this.verifying_answer = false;
       this.player.status.time_stuck = 0;
 
@@ -272,7 +266,6 @@ module.exports = {
         this.player.mission_activities++;
         this.player.total_activities++;
       } else {
-        console.log("mission finita")
         // Missione finita
         this.player.mission_activities = 1;
         let next_mission_key = this.findNextMissionKey(
@@ -280,9 +273,7 @@ module.exports = {
           this.player.mission_points
         );
         this.player.mission_points = 0;
-        console.log(next_mission_key)
         if (next_mission_key != -1) {
-          console.log("storia non finita")
           // Storia non finita
           this.current_mission = this.findObject(
             this.current_path.missions,
@@ -308,12 +299,9 @@ module.exports = {
         key: this.current_activity.key,
         max_time: this.current_activity.time * 60,
       };
-      console.log(this.player.status);
     },
     findNextMissionKey(mission, mission_points) {
-      let percentage = (mission_points/this.player.mission_activities) * 100;
-      console.log(percentage)
-      console.log(mission.results)
+      let percentage = (mission_points / this.player.mission_activities) * 100;
       for (let i = 0; i < mission.results.length; i++) {
         if (
           percentage >= mission.results[i].range_min &&
@@ -361,9 +349,9 @@ module.exports = {
     this.initPlayer();
     this.initWebSocket();
     let that;
-    window.onbeforeunload = function(){
+    window.onbeforeunload = function () {
       that.updateStatus();
-    }
+    };
   },
 };
 
@@ -619,5 +607,37 @@ body {
 .activity-text {
   margin-bottom: 20px;
   width: 100%;
+}
+
+#memory {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#memory-grid {
+  width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--object-color);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: all 0.3s ease 0s;
+  margin-bottom: 1em;
+}
+
+.memory-card {
+  box-sizing: border-box;
+  border: white solid 2px;
+  width: calc(100% / 4);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: brightness(0);
+  transition: all 0.3s ease 0s;
 }
 </style>

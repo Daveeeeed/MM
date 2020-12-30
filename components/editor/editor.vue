@@ -411,7 +411,6 @@ module.exports = {
       let collection_name = this.collectionName(
         this.active_section.navbar_name
       );
-      let section_name = this.active_section.navbar_name;
       fetch("/api/" + collection_name + "/new", {
         method: "POST",
         headers: {
@@ -461,13 +460,10 @@ module.exports = {
       switch (name) {
         case "Storie":
           return "stories";
-          break;
         case "Missioni":
           return "missions";
-          break;
         case "Attività":
           return "activities";
-          break;
         default:
           break;
       }
@@ -548,8 +544,8 @@ module.exports = {
             if (!response.ok) throw new Error("Network response was not ok");
             else return response.json();
           })
-          .then((data) => {
-            this.stories = data;
+          .then((data_stories) => {
+            this.stories = data_stories;
             this.isBusy = false;
           })
           .catch((error) => {
@@ -584,8 +580,8 @@ module.exports = {
           if (!response.ok) throw new Error("Network response was not ok");
           else return response.json();
         })
-        .then((data) => {
-          this.setCollectionByName(collection_name, data);
+        .then((data_collection) => {
+          this.setCollectionByName(collection_name, data_collection);
           this.isBusy = false;
         })
         .catch((error) => {
@@ -670,8 +666,8 @@ module.exports = {
           if (!response.ok) throw new Error("Network response was not ok");
           else return response.json();
         })
-        .then((data) => {
-          this.setCollectionByName(collection_name, data);
+        .then((data_collection) => {
+          this.setCollectionByName(collection_name, data_collection);
           this.isBusy = false;
         })
         .catch((error) => {
@@ -1168,26 +1164,36 @@ body {
   background-color: var(--hover-color);
 }
 
+#memory {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #memory-grid {
-  width: 70%;
+  width: 80%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   background-color: var(--object-color);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: all 0.3s ease 0s;
+  margin-bottom: 1em;
 }
 
 .memory-card {
-  background-color: white;
   box-sizing: border-box;
-  border: black solid 2px;
+  border: white solid 2px;
   width: calc(100% / 4);
-}
-
-.flipped-card {
-}
-
-.coupled-card {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: brightness(0);
+  transition: all 0.3s ease 0s;
 }
 
 .b-form-tags {

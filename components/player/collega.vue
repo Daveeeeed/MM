@@ -13,7 +13,7 @@ module.exports = {
   methods: {
     sendAnswer(){
       let answer;
-      this.$emit("answer-done", answer);
+      this.$emit("answer-sent", answer);
     }
   }
 };
