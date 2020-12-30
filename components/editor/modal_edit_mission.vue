@@ -158,18 +158,10 @@
                       <b-form-select
                         text-field="title"
                         value-field="key"
+                        class="mb-2"
                         :options="next_activity_select"
                         v-model="selected_activity.correct.key"
                       ></b-form-select>
-                      <h3 class="mt-3">Ottieni</h3>
-                      <b-form-input
-                        style="text-align: center"
-                        class="my-3"
-                        type="text"
-                        placeholder="Punti..."
-                        v-model="selected_activity.correct.points"
-                      ></b-form-input>
-                      <h3 class="mb-3">punti</h3>
                     </b-col>
                     <b-col
                       cols="4"
@@ -191,18 +183,10 @@
                       <b-form-select
                         text-field="title"
                         value-field="key"
+                        class="mb-2"
                         :options="next_activity_select"
                         v-model="selected_activity.wrong.key"
                       ></b-form-select>
-                      <h3 class="mt-3">Ottieni</h3>
-                      <b-form-input
-                        style="text-align: center"
-                        class="my-3"
-                        type="text"
-                        placeholder="Punti..."
-                        v-model="selected_activity.wrong.points"
-                      ></b-form-input>
-                      <h3 class="mb-3">punti</h3>
                     </b-col>
                   </b-row>
                   <h5 class="pt-3">Elementi dell'attività</h5>
@@ -382,11 +366,11 @@ module.exports = {
       a.key = String(Date.now());
       a.correct = {
         key: null,
-        points: "100",
+        points: 1,
       };
       a.wrong = {
         key: null,
-        points: "50",
+        points: 0,
       };
       this.mission.activities.push(a);
     },

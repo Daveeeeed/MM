@@ -174,7 +174,10 @@ router.post("/player/update", (req, res) => {
     .then((response) => {
       let db_index = findPlayerIndex(req.query.player_id, response[0].players);
       response[0].players[db_index].status = req.body.status;
-      response[0].players[db_index].points = req.body.points;
+      response[0].players[db_index].mission_points = req.body.mission_points;
+      response[0].players[db_index].mission_activities = req.body.mission_activities;
+      response[0].players[db_index].total_points = req.body.total_points;
+      response[0].players[db_index].total_activities = req.body.total_activities;
       response[0].players[db_index].time = req.body.time;
       console.log("Il player " + req.body.id + " è all'attività " + req.body.status.activity + " della missione " + req.body.status.mission)
       db.get("games")
@@ -221,8 +224,11 @@ router.post("/player", (req, res) => {
             activity: null,
             time_stuck: 0,
           },
-          points: 0,
           time: 0,
+          mission_points: 1,
+          mission_activities: 1,
+          total_points: 1,
+          total_activities: 1,
         });
         db.get("games")
           .update(

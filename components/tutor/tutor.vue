@@ -62,7 +62,7 @@
                   {{ player.username }}
                 </div>
                 <div class="flex-grow-1">Tempo totale: {{ player.time }}</div>
-                <div class="mr-3">Punteggio: {{ player.points }}</div>
+                <div class="mr-3">Percentuale: {{ (player.total_points / player.total_activities) * 100 }} %</div>
               </div>
             </b-list-group-item>
           </b-list-group>
@@ -111,9 +111,9 @@
                   <h5 class="mt-4 ml-4">
                     {{ selected_player.time }}
                   </h5>
-                  <h5 class="mt-4 ml-4">Punti</h5>
+                  <h5 class="mt-4 ml-4">Percentuale</h5>
                   <h5 class="mt-4 ml-4">
-                    {{ selected_player.points }}
+                    {{ (selected_player.total_points / selected_player.total_activities) * 100 }} %
                   </h5>
                 </div>
               </div>
@@ -283,7 +283,7 @@ module.exports = {
       for (let i = 0; i < a.length; i++) {
         var swapped = new Boolean(false);
         for (let j = 1; j < a.length - i; j++) {
-          if (a[j - 1].points == a[j].points) {
+          if ((a[j - 1].total_points / a[j - 1].total_activities) == (a[j].total_points / a[j].total_activities)) {
             if (a[j - 1].time > a[j].time) {
               let temp = a[j - 1];
               a[j - 1] = a[j];
@@ -291,7 +291,7 @@ module.exports = {
               swapped = true;
             }
           }
-          if (a[j - 1].points < a[j].points) {
+          if (a[j - 1].total_points / a[j - 1].total_activities < a[j].total_points / a[j].total_activities) {
             let temp = a[j - 1];
             a[j - 1] = a[j];
             a[j] = temp;
@@ -414,7 +414,7 @@ module.exports = {
     },
     setPlayerClass1(player) {
       return {
-        blue: item.status.time_stuck > item.status.activity.max_time,
+        blue: player.status.time_stuck > player.status.activity.max_time,
       };
     },
     photoButtonClass(player) {
@@ -425,11 +425,6 @@ module.exports = {
     setPlayerClass3(player) {
       return {
         red: player.status.need_help,
-      };
-    },
-    setPlayerClass4(player) {
-      return {
-        green: player.status.chat,
       };
     },
     showPhotoModal(player) {

@@ -208,7 +208,7 @@
                 <div
                   class="d-flex justify-content-between align-items-center my-3"
                 >
-                  <h5>Esiti</h5>
+                  <h5>Percentuale risposte corrette</h5>
                   <b-button @click="addResult()">+ Aggiungi esito</b-button>
                 </div>
                 <b-list-group class="mission-group-item">
@@ -538,7 +538,7 @@ module.exports = {
       return a;
     },
     addResult() {
-      if (this.selected_mission.results.length < 5) {
+      if (this.selected_mission.results.length < 4) {
         this.selected_mission.results.push({
           id: String(Date.now()),
           key: null,
@@ -567,13 +567,13 @@ module.exports = {
     },
     rangeMin(index, mission = this.selected_mission) {
       let unit =
-        this.maxResult(mission) /
+        100 /
         (mission.results ? mission.results.length : 1);
       return Math.round(unit * index + 1);
     },
     rangeMax(index, mission = this.selected_mission) {
       let unit =
-        this.maxResult(mission) /
+        100 /
         (mission.results ? mission.results.length : 1);
       return Math.round(unit * (index + 1));
     },

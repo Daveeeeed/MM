@@ -3,7 +3,7 @@
     <div v-if="player" class="d-flex flex-column">
       <div id="toolbar" class="px-3">
         <strong id="score" style="color: white"
-          >Punteggio: {{ player.points }}</strong
+          >Punteggio: {{ player.total_points }}</strong
         >
         <b-button class="chat-btn" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
@@ -251,6 +251,7 @@ module.exports = {
       return -1;
     },
     handleAnswer(answer) {
+
       this.verifying_answer = false;
       this.player.status.time_stuck = 0;
 
@@ -259,7 +260,8 @@ module.exports = {
         : this.current_activity.wrong;
 
       let activity_points = result.points;
-      this.player.points += parseInt(activity_points);
+      this.player.total_points += parseInt(activity_points);
+      this.player.mission_points += parseInt(activity_points);
 
       if (result.key != "-1") {
         // Missione non finita
@@ -267,13 +269,20 @@ module.exports = {
           this.current_mission.activities,
           result.key
         );
+        this.player.mission_activities++;
+        this.player.total_activities++;
       } else {
+        console.log("mission finita")
         // Missione finita
+        this.player.mission_activities = 1;
         let next_mission_key = this.findNextMissionKey(
           this.current_mission,
-          this.player.points
+          this.player.mission_points
         );
-        if (next_mission_key != "-1") {
+        this.player.mission_points = 0;
+        console.log(next_mission_key)
+        if (next_mission_key != -1) {
+          console.log("storia non finita")
           // Storia non finita
           this.current_mission = this.findObject(
             this.current_path.missions,
@@ -287,6 +296,7 @@ module.exports = {
             title: this.current_mission.title,
             key: this.current_mission.key,
           };
+          this.player.total_activities++;
         } else {
           this.player.status.mission = "Storia finita";
           // Storia finita
@@ -300,11 +310,14 @@ module.exports = {
       };
       console.log(this.player.status);
     },
-    findNextMissionKey(mission, points) {
+    findNextMissionKey(mission, mission_points) {
+      let percentage = (mission_points/this.player.mission_activities) * 100;
+      console.log(percentage)
+      console.log(mission.results)
       for (let i = 0; i < mission.results.length; i++) {
         if (
-          points >= mission.results[i].range_min &&
-          points <= mission.results[i].range_max
+          percentage >= mission.results[i].range_min &&
+          percentage <= mission.results[i].range_max
         ) {
           return mission.results[i].key;
         }
@@ -347,6 +360,10 @@ module.exports = {
     this.player_id = urlParams.get("player_id");
     this.initPlayer();
     this.initWebSocket();
+    let that;
+    window.onbeforeunload = function(){
+      that.updateStatus();
+    }
   },
 };
 
