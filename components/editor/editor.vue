@@ -19,7 +19,7 @@
     </b-navbar>
 
     <!-- Page content -->
-    <b-container fluid v-if="active_section">
+    <b-container class="editor-wrapper" fluid v-if="active_section">
       <!-- Section header -->
       <b-row>
         <b-col cols="auto" class="mr-auto ml-4">
@@ -789,7 +789,6 @@ module.exports = {
 </script>
 
 <style>
-
 /* NAVBAR */
 
 ::-moz-selection {
@@ -806,6 +805,11 @@ module.exports = {
   background-color: var(--primary-color);
   width: 100vw;
   height: 100vh;
+  color: var(--text-color);
+}
+
+body {
+  background-color: var(--primary-color);
   color: var(--text-color);
 }
 
@@ -986,7 +990,7 @@ module.exports = {
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 2px 0 var(--active-color);
-  overflow-y: auto;
+  overflow: hidden;
   outline: 0;
 }
 
@@ -1141,13 +1145,49 @@ module.exports = {
   background-color: var(--hover-color);
 }
 
-.memory-grid {
-  width: 100%;
+.background-container {
+  width: 664px;
+  height: 498px;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-top: 1em;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.5s;
+  background-color: var(--object-color);
+  box-shadow: 3px 3px 5px rgb(0, 0, 0);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.background-container:hover {
+  transition: 0.5s;
+  background-color: var(--hover-color);
+}
+
+#memory-grid {
+  width: 70%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   background-color: var(--object-color);
+}
+
+.memory-card {
+  background-color: white;
+  box-sizing: border-box;
+  border: black solid 2px;
+  width: calc(100% / 4);
+}
+
+.flipped-card {
+}
+
+.coupled-card {
 }
 
 .b-form-tags {

@@ -5,7 +5,7 @@
       class="d-flex flex-column align-items-center justify-content-center"
     >
       <a class="mb-4 mt-3" href="/">
-        <img src="../public/images/logo2.png" alt="Logo" height="150"
+        <img src="http://localhost:8000/public/images/logo2.png" alt="Logo" height="150"
       /></a>
       <b-button
         class="m-3"

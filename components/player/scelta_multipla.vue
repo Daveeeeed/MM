@@ -28,6 +28,11 @@ module.exports = {
     element: Object,
     answer_confirmed: Boolean,
   },
+  computed: {
+    is_answer_done: function () {
+      return this.answer != null;
+    },
+  },
   methods: {
     sendAnswer() {
       let is_correct =
@@ -38,7 +43,7 @@ module.exports = {
   watch: {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
-        this.sendAnswer();
+        if (this.is_answer_done) this.sendAnswer();
         this.$emit("answer-checked");
       }
     },

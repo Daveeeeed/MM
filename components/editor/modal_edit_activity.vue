@@ -39,11 +39,12 @@
                 </h5>
                 <b-popover
                   target="info-required-component"
-                  positioning="rightbottom"
+                  placement="right"
                   triggers="hover focus"
-                  >Un componente necessario è richiesto in ogni attività, ne
-                  determina il tipo e non ne può essere aggiunto più di
-                  uno.</b-popover
+                  >Un componente necessario è<br />
+                  richiesto in ogni attività, ne<br />
+                  determina il tipo e non ne può<br />
+                  essere aggiunto più di uno.</b-popover
                 >
                 <div class="d-flex flex-wrap mission-group-item">
                   <b-button
@@ -66,11 +67,12 @@
                 </h5>
                 <b-popover
                   target="info-component"
-                  positioning="rightbottom"
+                  placement="right"
                   triggers="hover focus"
-                  >I componenti aggiuntivi vengono usati per arricchire
-                  l'attività di dettagli, possono essere aggiunti senza
-                  limiti.</b-popover
+                  >I componenti aggiuntivi <br />
+                  vengono usati per arricchire<br />
+                  l'attività di dettagli, possono<br />
+                  essere aggiunti senza limiti.</b-popover
                 >
                 <div class="d-flex flex-wrap mission-group-item">
                   <b-button
@@ -93,10 +95,12 @@
                 </h5>
                 <b-popover
                   target="info-minigames"
-                  positioning="rightbottom"
+                  placement="right"
                   triggers="hover focus"
-                  >I minigiochi sono componenti indipendenti ed unici, possono
-                  essere aggiunti soltanto ad un'attività vuota.</b-popover
+                  >I minigiochi sono componenti<br />
+                  indipendenti ed unici, possono<br />
+                  essere aggiunti soltanto ad <br />
+                  un'attività vuota.</b-popover
                 >
                 <div class="d-flex flex-wrap mission-group-item">
                   <b-button
@@ -120,7 +124,7 @@
                   <h3 style="height: 34px">Struttura</h3>
                 </b-col>
                 <b-col cols="auto" class="my-2 px-0">
-                  <b-button> Anteprima </b-button>
+                  <b-button @click="showPreview"> Anteprima </b-button>
                 </b-col>
               </b-row>
               <b-row class="scrollable p-0 m-0">
@@ -168,25 +172,24 @@
               cols="10"
             >
               <b-container class="d-flex flex-column" fluid>
-                <div class="m-4 d-flex flex-column align-items-center">
+                <div class="m-3 d-flex flex-column align-items-center">
                   <h5>Titolo</h5>
                   <b-form-input
                     style="width: 50%"
                     class="m-2"
                     type="text"
-                    v-model="activity.title"
                     maxlength="25"
+                    v-model="activity.title"
                     placeholder="Inserisci il titolo..."
                   ></b-form-input>
                 </div>
-                <div class="m-4 d-flex flex-column align-items-center">
+                <div class="m-3 d-flex flex-column align-items-center">
                   <h5>Tempo stimato</h5>
                   <p>in minuti</p>
                   <b-form-input
                     style="width: 50%"
-                    class="m-2"
-                    v-model="activity.time"
                     type="number"
+                    v-model="activity.time"
                     placeholder="Inserisci un valore..."
                   ></b-form-input>
                 </div>
@@ -219,6 +222,8 @@
       @component-edited="updateComponent"
       @found-errors="$emit('found-errors', $event)"
     ></modal-edit-component>
+
+    <modal-preview :activity="activity"> </modal-preview>
   </div>
 </template>
 
@@ -238,7 +243,7 @@ module.exports = {
           answers: [],
         },
         {
-          type: "Scelta Multipla",
+          type: "Scelta-Multipla",
           question: "",
           answers: ["", "", "", ""],
           correct_answer: null,
@@ -310,6 +315,7 @@ module.exports = {
               url: "",
             },
           ],
+          background: { url: "" },
         },
       ],
 
@@ -469,6 +475,10 @@ module.exports = {
       let index = this.activity.elements.indexOf(element);
       if (index != -1) this.activity.elements.splice(index, 1);
     },
+
+    showPreview() {
+      this.$bvModal.show("modal-preview");
+    },
   },
   watch: {
     activity_prop(new_value) {
@@ -477,6 +487,7 @@ module.exports = {
   },
   components: {
     modalEditComponent: httpVueLoader("comp/editor/modal_edit_component.vue"),
+    modalPreview: httpVueLoader("comp/editor/modal_preview.vue"),
   },
 };
 </script>

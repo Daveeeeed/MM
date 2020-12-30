@@ -13,7 +13,12 @@
         id="activity"
         :style="'background-image: url(' + this.story.settings.background + ')'"
       >
-        <div id="activity-container" class="my-5">
+        <b-overlay
+          id="activity-container"
+          class="my-5"
+          :show="verifying_answer"
+          variant="dark"
+        >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
               <component
@@ -22,7 +27,9 @@
                 :is="element.component.type"
                 :element="element"
                 :answer_confirmed="check_answer"
+                :answer_verified="answer_verified"
                 @answer-checked="check_answer = false"
+                @verify-answer="verifyAnswer"
                 @answer-sent="handleAnswer"
               >
               </component>
@@ -31,7 +38,13 @@
           <b-button id="next-button" @click="confirmAnswer()"
             ><strong>Invia</strong></b-button
           >
-        </div>
+          <template #overlay>
+            <div class="text-center">
+              <b-spinner label="Spinning"></b-spinner>
+              <div>Attendi la verifica della risposta...</div>
+            </div></template
+          >
+        </b-overlay>
       </div>
     </div>
     <div v-else id="story-loading" class="full-centered">
@@ -83,6 +96,10 @@ module.exports = {
       current_path: null,
       current_mission: null,
       check_answer: false,
+      // overlay trigger
+      verifying_answer: false,
+      // received answer from tutor
+      answer_verified: false,
     };
   },
   methods: {
@@ -165,17 +182,26 @@ module.exports = {
           message.game_key == that.game_key &&
           message.sender == true
         ) {
-          that.messages.push({
-            text: message.message,
-            sender: false,
-          });
+          switch (message.type) {
+            case "msg":
+              that.messages.push({
+                text: message.message,
+                sender: false,
+              });
+              break;
+            case "photo":
+              that.handleAnswer(message.answer);
+              break;
+            default:
+              break;
+          }
         }
       };
     },
     // Send player data to server
     updateStatus() {
       this.player.status.time_stuck += 2;
-      this.player.time += 2; 
+      this.player.time += 2;
       /*
           console.log("ooooo"),
           console.log(this.player),
@@ -201,6 +227,7 @@ module.exports = {
       if (this.message_input) {
         this.wsc.send(
           JSON.stringify({
+            type: "msg",
             message: this.message_input,
             player_id: this.player_id,
             game_key: this.game_key,
@@ -224,6 +251,7 @@ module.exports = {
       return -1;
     },
     handleAnswer(answer) {
+      this.verifying_answer = false;
       this.player.status.time_stuck = 0;
 
       let result = answer
@@ -283,6 +311,20 @@ module.exports = {
       }
       console.log("ERROR ON NEXT MISSION KEY");
     },
+    verifyAnswer(answer, question) {
+      this.verifying_answer = true;
+      this.wsc.send(
+        JSON.stringify({
+          type: "photo",
+          answer: answer,
+          question: question,
+          player_id: this.player_id,
+          game_key: this.game_key,
+          story_key: this.story_key,
+          sender: false,
+        })
+      );
+    },
     confirmAnswer() {
       this.check_answer = true;
     },
@@ -294,7 +336,7 @@ module.exports = {
     Foto: httpVueLoader("comp/player/foto.vue"),
     Immagine: httpVueLoader("comp/player/immagine.vue"),
     Memory: httpVueLoader("comp/player/memory.vue"),
-    "Scelta Multipla": httpVueLoader("comp/player/scelta_multipla.vue"),
+    "Scelta-Multipla": httpVueLoader("comp/player/scelta_multipla.vue"),
     Testo: httpVueLoader("comp/player/testo.vue"),
     Video: httpVueLoader("comp/player/video.vue"),
   },
@@ -541,11 +583,20 @@ body {
 }
 
 .activity-image {
+  height: auto;
   max-width: 90%;
   border-style: solid;
   border-width: 2px;
   border-color: var(--text-color);
   margin-bottom: 20px;
+}
+
+.activity-webcam {
+  height: auto;
+  max-width: 90%;
+  border-style: solid;
+  border-width: 5px;
+  border-color: var(--form-color);
 }
 
 .activity-text {
