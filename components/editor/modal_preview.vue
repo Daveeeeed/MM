@@ -43,7 +43,7 @@ module.exports = {
     Foto: httpVueLoader("comp/player/foto.vue"),
     Immagine: httpVueLoader("comp/player/immagine.vue"),
     Memory: httpVueLoader("comp/player/memory.vue"),
-    "Scelta Multipla": httpVueLoader("comp/player/scelta_multipla.vue"),
+    "Scelta-Multipla": httpVueLoader("comp/player/scelta_multipla.vue"),
     Testo: httpVueLoader("comp/player/testo.vue"),
     Video: httpVueLoader("comp/player/video.vue"),
   },

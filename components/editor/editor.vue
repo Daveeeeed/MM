@@ -1145,13 +1145,49 @@ body {
   background-color: var(--hover-color);
 }
 
-.memory-grid {
-  width: 100%;
+.background-container {
+  width: 664px;
+  height: 498px;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-top: 1em;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.5s;
+  background-color: var(--object-color);
+  box-shadow: 3px 3px 5px rgb(0, 0, 0);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.background-container:hover {
+  transition: 0.5s;
+  background-color: var(--hover-color);
+}
+
+#memory-grid {
+  width: 70%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   background-color: var(--object-color);
+}
+
+.memory-card {
+  background-color: white;
+  box-sizing: border-box;
+  border: black solid 2px;
+  width: calc(100% / 4);
+}
+
+.flipped-card {
+}
+
+.coupled-card {
 }
 
 .b-form-tags {

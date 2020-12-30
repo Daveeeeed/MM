@@ -29,7 +29,7 @@
         </div>
 
         <!-- SCELTA MULTIPLA -->
-        <div v-if="component.type == 'Scelta Multipla'">
+        <div v-if="component.type == 'Scelta-Multipla'">
           <h5>Domanda</h5>
           <p>
             Per superare l'attività sarà richiesto di selezionare una delle 4
@@ -227,13 +227,17 @@
         <div v-if="component.type == 'Video'">
           <h5>Video</h5>
           <p>Il seguente video sarà mostrato nella schermata</p>
-          <div class="d-flex justify-content-center flex-column" style="width: 100%">
-            <b-button
-              @click="openVideoSelector()"
-            >
-              Carica
-            </b-button>
-            <video v-if="component.url" :src="component.url" class="mt-2 background-preview" controls></video>
+          <div
+            class="d-flex justify-content-center flex-column"
+            style="width: 100%"
+          >
+            <b-button @click="openVideoSelector()"> Carica </b-button>
+            <video
+              v-if="component.url"
+              :src="component.url"
+              class="mt-2 background-preview"
+              controls
+            ></video>
             <b-form-file
               v-model="photo_file_input"
               accept="video/mp4,video/webm,video/ogg"
@@ -247,10 +251,10 @@
         <!-- MEMORY -->
         <div v-if="component.type == 'Memory'" style="width: 100%">
           <h5>Memory</h5>
-          <p>Seleziona 6 foto per il memory</p>
+          <div class="my-2">Seleziona 6 foto per il memory</div>
           <div
             class="d-flex justify-content-center flex-wrap"
-            style="width: 100%"
+            style="width: 100%; margin-bottom: 1em"
           >
             <div
               v-for="(image, index) in images"
@@ -267,6 +271,32 @@
               id="memory-photo-selector"
               style="display: none"
               ref="memoryFileInput"
+            ></b-form-file>
+          </div>
+          <div class="my-2">
+            Seleziona una foto per il background (opzionale)
+          </div>
+          <div
+            class="d-flex justify-content-center flex-wrap"
+            style="width: 100%; margin-bottom: 1em"
+          >
+            <div
+              class="background-container"
+              @click="openBackgroundSelector()"
+              :style="'background-image: url(' + component.background.url + ')'"
+            >
+              <b-icon
+                font-scale="4"
+                v-show="!component.background.url"
+                icon="plus"
+              ></b-icon>
+            </div>
+            <b-form-file
+              v-model="background_file_input"
+              accept="image/*"
+              id="background-photo-selector"
+              style="display: none"
+              ref="backgroundFileInput"
             ></b-form-file>
           </div>
         </div>
@@ -298,6 +328,7 @@ module.exports = {
       current_loaded_index: 0,
       memory_file_input: null,
       photo_file_input: null,
+      background_file_input: null,
     };
   },
   props: {
@@ -315,7 +346,7 @@ module.exports = {
         case "Domanda": {
           return component.question && component.answers.length;
         }
-        case "Scelta Multipla": {
+        case "Scelta-Multipla": {
           if (component.question && component.correct_answer) {
             for (let i = 0; i < component.answers.length; i++) {
               if (!component.answers[i]) return false;
@@ -369,6 +400,10 @@ module.exports = {
     openSelector(index) {
       this.current_loaded_index = index;
       let el = document.getElementById("memory-photo-selector");
+      if (el) el.click();
+    },
+    openBackgroundSelector() {
+      let el = document.getElementById("background-photo-selector");
       if (el) el.click();
     },
     reset() {
@@ -432,9 +467,27 @@ module.exports = {
         this.$refs.imageFileInput.reset();
       }
     },
+    background_file_input(file) {
+      if (file) {
+        let formData = new FormData();
+        formData.append("photo", file);
+
+        fetch("/api/uploadPhoto", {
+          method: "POST",
+          body: formData,
+        }).then((response) => {
+          if (response.ok) {
+            response.json().then((data) => {
+              this.component.background.url = data.path;
+            });
+          }
+        });
+
+        this.$refs.backgroundFileInput.reset();
+      }
+    },
   },
 };
 </script>
 
-<style
-</style>
+<style></style>

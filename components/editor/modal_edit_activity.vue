@@ -243,7 +243,7 @@ module.exports = {
           answers: [],
         },
         {
-          type: "Scelta Multipla",
+          type: "Scelta-Multipla",
           question: "",
           answers: ["", "", "", ""],
           correct_answer: null,
@@ -315,6 +315,7 @@ module.exports = {
               url: "",
             },
           ],
+          background: { url: "" },
         },
       ],
 
