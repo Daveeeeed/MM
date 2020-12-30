@@ -40,9 +40,6 @@
                   >
                     <b-icon-camera></b-icon-camera>
                   </b-button>
-                  <b-button :class="setPlayerClass4(item)">
-                    <b-icon icon="bell"></b-icon>
-                  </b-button>
                 </div>
               </div>
             </b-list-group-item>
@@ -96,16 +93,24 @@
                   <h4 class="mt-4 ml-4">Stato del giocatore</h4>
                   <h5 class="mt-4 ml-4">Missione corrente</h5>
                   <h5 class="mt-4 ml-4">
-                    {{ selected_player.status.mission }}
+                    {{ selected_player.status.mission.title }}
                   </h5>
 
                   <h5 class="mt-4 ml-4">Attività corrente</h5>
                   <h5 class="mt-4 ml-4">
-                    {{ selected_player.status.activity }}
+                    {{ selected_player.status.activity.title }}
                   </h5>
                   <h5 class="mt-4 ml-4">Time stuck</h5>
                   <h5 class="mt-4 ml-4">
                     {{ selected_player.status.time_stuck }}
+                  </h5>
+                  <h5 class="mt-4 ml-4">Tempo totale</h5>
+                  <h5 class="mt-4 ml-4">
+                    {{ selected_player.time }}
+                  </h5>
+                  <h5 class="mt-4 ml-4">Punti</h5>
+                  <h5 class="mt-4 ml-4">
+                    {{ selected_player.points }}
                   </h5>
                 </div>
               </div>
@@ -374,7 +379,7 @@ module.exports = {
     },
     setPlayerClass1(item) {
       return {
-        blue: item.status.time_stuck > 6,
+        blue: item.status.time_stuck > item.status.activity.max_time,
       };
     },
     setPlayerClass2(item) {
@@ -385,11 +390,6 @@ module.exports = {
     setPlayerClass3(item) {
       return {
         red: item.status.need_help,
-      };
-    },
-    setPlayerClass4(item) {
-      return {
-        green: item.status.chat,
       };
     },
     showPhoto(item) {

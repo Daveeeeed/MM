@@ -2,7 +2,9 @@
   <div id="player">
     <div v-if="player" class="d-flex flex-column">
       <div id="toolbar" class="px-3">
-        <strong id="score" style="color: white">Punteggio: {{ points }}</strong>
+        <strong id="score" style="color: white"
+          >Punteggio: {{ player.points }}</strong
+        >
         <b-button class="chat-btn" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
         ></b-button>
@@ -81,7 +83,6 @@ module.exports = {
       current_path: null,
       current_mission: null,
       check_answer: false,
-      points: 0,
     };
   },
   methods: {
@@ -92,17 +93,6 @@ module.exports = {
         .then((data) => {
           if (data.length == 1) {
             this.story = data[0];
-            this.current_path = this.story.paths[
-              Math.round(Math.random() * (this.story.paths.length - 1))
-            ];
-            this.current_mission = this.findObject(
-              this.current_path.missions,
-              this.current_path.first_mission
-            );
-            this.current_activity = this.findObject(
-              this.current_mission.activities,
-              this.current_mission.first_activity
-            );
             fetch(
               "/api/player?game_key=" +
                 this.game_key +
@@ -113,6 +103,50 @@ module.exports = {
               .then((player_data) => {
                 this.player = player_data;
                 setInterval(this.updateStatus, 2000);
+                let new_game = !this.player.status.path;
+                console.log(new_game);
+                this.current_path = new_game
+                  ? this.story.paths[
+                      Math.round(Math.random() * (this.story.paths.length - 1))
+                    ]
+                  : this.findObject(
+                      this.story.paths,
+                      this.player.status.path.key
+                    );
+
+                let mission_key = new_game
+                  ? this.current_path.first_mission
+                  : this.player.status.mission.key;
+
+                this.current_mission = this.findObject(
+                  this.current_path.missions,
+                  mission_key
+                );
+
+                let activity_key = new_game
+                  ? this.current_mission.first_activity
+                  : this.player.status.activity.key;
+
+                this.current_activity = this.findObject(
+                  this.current_mission.activities,
+                  activity_key
+                );
+                if (new_game) {
+                  this.player.status.path = {
+                    title: this.current_path.title,
+                    key: this.current_path.key,
+                  };
+                  this.player.status.activity = {
+                    title: this.current_activity.title,
+                    key: this.current_activity.key,
+                    max_time: this.current_activity.time * 60,
+                  };
+                  this.player.status.mission = {
+                    title: this.current_mission.title,
+                    key: this.current_mission.key,
+                  };
+                }
+                this.updateStatus();
               });
           }
         });
@@ -140,6 +174,12 @@ module.exports = {
     },
     // Send player data to server
     updateStatus() {
+      this.player.status.time_stuck += 2;
+      this.player.time += 2; 
+      /*
+          console.log("ooooo"),
+          console.log(this.player),
+          console.log(this.player.points),*/
       fetch(
         "/api/player/update?game_key=" +
           this.game_key +
@@ -150,6 +190,7 @@ module.exports = {
           headers: {
             "Content-Type": "application/json",
           },
+
           body: JSON.stringify(this.player),
         }
       )
@@ -180,14 +221,17 @@ module.exports = {
       for (let i = 0; i < array.length; i++) {
         if (array[i].key == key) return array[i];
       }
+      return -1;
     },
     handleAnswer(answer) {
+      this.player.status.time_stuck = 0;
+
       let result = answer
         ? this.current_activity.correct
         : this.current_activity.wrong;
 
       let activity_points = result.points;
-      this.points += parseInt(activity_points);
+      this.player.points += parseInt(activity_points);
 
       if (result.key != "-1") {
         // Missione non finita
@@ -199,9 +243,8 @@ module.exports = {
         // Missione finita
         let next_mission_key = this.findNextMissionKey(
           this.current_mission,
-          this.points
+          this.player.points
         );
-
         if (next_mission_key != "-1") {
           // Storia non finita
           this.current_mission = this.findObject(
@@ -212,11 +255,22 @@ module.exports = {
             this.current_mission.activities,
             this.current_mission.first_activity
           );
+          this.player.status.mission = {
+            title: this.current_mission.title,
+            key: this.current_mission.key,
+          };
         } else {
+          this.player.status.mission = "Storia finita";
           // Storia finita
           // Schermata finale
         }
       }
+      this.player.status.activity = {
+        title: this.current_activity.title,
+        key: this.current_activity.key,
+        max_time: this.current_activity.time * 60,
+      };
+      console.log(this.player.status);
     },
     findNextMissionKey(mission, points) {
       for (let i = 0; i < mission.results.length; i++) {

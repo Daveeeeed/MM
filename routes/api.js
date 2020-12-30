@@ -174,6 +174,9 @@ router.post("/player/update", (req, res) => {
     .then((response) => {
       let db_index = findPlayerIndex(req.query.player_id, response[0].players);
       response[0].players[db_index].status = req.body.status;
+      response[0].players[db_index].points = req.body.points;
+      response[0].players[db_index].time = req.body.time;
+      console.log("Il player " + req.body.id + " è all'attività " + req.body.status.activity + " della missione " + req.body.status.mission)
       db.get("games")
         .update(
           { game_key: req.query.game_key },
@@ -213,9 +216,10 @@ router.post("/player", (req, res) => {
           name: req.query.player_id,
           username: "Nome in codice",
           status: {
+            path: null,
             mission: null,
             activity: null,
-            time_stuck: null,
+            time_stuck: 0,
           },
           points: 0,
           time: 0,
@@ -307,5 +311,12 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     res.sendStatus(500);
   }
 });
+
+router.get("/resetGames", (req, res) => {
+  db.get("games").remove()
+  .then(() => {
+    res.send("game removed")
+  });
+})
 
 module.exports = router;
