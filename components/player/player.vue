@@ -14,10 +14,10 @@
         :style="'background-image: url(' + this.story.settings.background + ')'"
       >
         <b-overlay
-          id="activity-container"
-          class="my-5"
+          class="activity-container my-5"
           :show="verifying_answer"
           variant="dark"
+          v-if="current_activity"
         >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
@@ -45,6 +45,31 @@
             </div></template
           >
         </b-overlay>
+        <div
+          v-else-if="current_mission.key == '-1'"
+          class="activity-container my-5"
+        >
+          <div id="activity-wrapper" class="p-5">
+            <div id="activity-content">
+              <div class="mb-2">
+                Hai completato la storia con {{ player.total_points }} /
+                {{ player.total_activities }} punti
+              </div>
+              <div class="mb-2">
+                Percentuale di completamento pari a
+                {{ (player.total_points / player.total_activities) * 100 }}%
+              </div>
+              <a href="/" class="my-2">
+                <img
+                  src="http://localhost:8000/public/images/logo2.png"
+                  alt="Logo"
+                  height="200"
+                />
+              </a>
+              <div class="mt-2">Torna alla home</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div v-else id="story-loading" class="full-centered">
@@ -105,11 +130,13 @@ module.exports = {
   methods: {
     // Initialization
     initPlayer() {
+      // fetch story
       fetch("/api/stories?key=" + this.story_key)
         .then((response) => response.json())
         .then((data) => {
           if (data.length == 1) {
             this.story = data[0];
+            // fetch player
             fetch(
               "/api/player?game_key=" +
                 this.game_key +
@@ -118,6 +145,7 @@ module.exports = {
             )
               .then((response) => response.json())
               .then((player_data) => {
+                // check if gsmr is new or already started
                 this.player = player_data;
                 setInterval(this.updateStatus, 2000);
                 let new_game = !this.player.status.path;
@@ -256,6 +284,8 @@ module.exports = {
       let activity_points = result.points;
       this.player.total_points += parseInt(activity_points);
       this.player.mission_points += parseInt(activity_points);
+      this.player.mission_activities++;
+      this.player.total_activities++;
 
       if (result.key != "-1") {
         // Missione non finita
@@ -263,17 +293,20 @@ module.exports = {
           this.current_mission.activities,
           result.key
         );
-        this.player.mission_activities++;
-        this.player.total_activities++;
+        this.player.status.activity = {
+          title: this.current_activity.title,
+          key: this.current_activity.key,
+          max_time: this.current_activity.time * 60,
+        };
       } else {
         // Missione finita
-        this.player.mission_activities = 1;
         let next_mission_key = this.findNextMissionKey(
           this.current_mission,
           this.player.mission_points
         );
+        this.player.mission_activities = 1;
         this.player.mission_points = 0;
-        if (next_mission_key != -1) {
+        if (next_mission_key != "-1") {
           // Storia non finita
           this.current_mission = this.findObject(
             this.current_path.missions,
@@ -287,18 +320,30 @@ module.exports = {
             title: this.current_mission.title,
             key: this.current_mission.key,
           };
-          this.player.total_activities++;
+          this.player.status.activity = {
+            title: this.current_activity.title,
+            key: this.current_activity.key,
+            max_time: this.current_activity.time * 60,
+          };
         } else {
-          this.player.status.mission = "Storia finita";
+          console.log("finita");
           // Storia finita
-          // Schermata finale
+          this.player.status.mission = {
+            title: "Partita finita",
+            key: "-1",
+          };
+          this.player.status.activity = {
+            title: "Partita finita",
+            key: "-1",
+            max_time: 10000000000,
+          };
+          this.current_mission = this.findObject(
+            this.current_path.missions,
+            next_mission_key
+          );
+          this.current_activity = null;
         }
       }
-      this.player.status.activity = {
-        title: this.current_activity.title,
-        key: this.current_activity.key,
-        max_time: this.current_activity.time * 60,
-      };
     },
     findNextMissionKey(mission, mission_points) {
       let percentage = (mission_points / this.player.mission_activities) * 100;
@@ -490,7 +535,7 @@ body {
   background-position: center;
 }
 
-#activity-container {
+.activity-container {
   background-color: var(--secondary-color);
   border-radius: 10px;
   height: 80%;

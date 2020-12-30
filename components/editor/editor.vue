@@ -718,18 +718,20 @@ module.exports = {
       let a = true;
       data.item.paths.forEach((path) => {
         path.missions.forEach((mission) => {
-          mission.activities.forEach((activity) => {
-            activity.elements.forEach((element) => {
-              if (
-                element.type == "Foto" ||
-                element.type == "Immagine" ||
-                element.type == "Video" ||
-                element.type == "Word Invaders" ||
-                element.type == "Memory"
-              )
-                a = false;
+          if (mission.key != "-1") {
+            mission.activities.forEach((activity) => {
+              activity.elements.forEach((element) => {
+                if (
+                  element.type == "Foto" ||
+                  element.type == "Immagine" ||
+                  element.type == "Video" ||
+                  element.type == "Word Invaders" ||
+                  element.type == "Memory"
+                )
+                  a = false;
+              });
             });
-          });
+          }
         });
       });
       return a;

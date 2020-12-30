@@ -1,7 +1,13 @@
 <template>
   <div>
     <!-- Modal edit mission -->
-    <b-modal @show="init()" @hide="reset()" size="xl" id="modal-edit-story">
+    <b-modal
+      @show="init()"
+      @hide="reset()"
+      @hidden="story = null"
+      size="xl"
+      id="modal-edit-story"
+    >
       <template #modal-header>
         <b-container
           fluid
@@ -134,12 +140,12 @@
               </b-row>
               <b-row>
                 <b-col class="mission-group-item scrollable px-3 py-3 m-0">
-                  <h6 v-if="selected_path.missions.length == 0">
+                  <h6 v-if="path_missions.length == 0">
                     Aggiungi almeno una missione.
                   </h6>
                   <b-list-group v-else>
                     <b-list-group-item
-                      v-for="(mission, index) in selected_path.missions"
+                      v-for="(mission, index) in path_missions"
                       :key="index"
                       class="py-2 px-3 my-1 d-flex justify-content-between align-items-center"
                     >
@@ -160,12 +166,12 @@
               </b-row>
               <b-row>
                 <b-col class="mission-group-item scrollable px-3 py-3 m-0">
-                  <h6 v-if="selected_path.missions.length == 0">
+                  <h6 v-if="path_missions.length == 0">
                     Aggiungi almeno una missione.
                   </h6>
                   <b-list-group v-else>
                     <b-list-group-item
-                      v-for="(mission, index) in selected_path.missions"
+                      v-for="(mission, index) in path_missions"
                       :key="index"
                       class="px-0 py-2 my-1"
                       button
@@ -222,15 +228,14 @@
                         cols="6"
                         class="p-0 d-flex align-items-center mr-auto"
                       >
-                        da {{ result.range_min }} punti a
-                        {{ result.range_max }} punti
+                        da {{ result.range_min }}% a {{ result.range_max }}%
                       </b-col>
                       <b-col cols="6" class="p-0 d-flex">
                         <b-form-select
                           text-field="title"
                           value-field="key"
                           v-model="selected_mission.results[index].key"
-                          :options="resultsSelect"
+                          :options="selected_path.missions"
                         >
                         </b-form-select>
                         <b-button @click="removeResult(result)" class="ml-2"
@@ -266,7 +271,7 @@
                     text-field="title"
                     value-field="key"
                     v-model="selected_path.first_mission"
-                    :options="selected_path.missions"
+                    :options="path_missions"
                   >
                   </b-form-select>
                 </div>
@@ -422,6 +427,7 @@ module.exports = {
   computed: {
     available_filtered_missions: function () {
       let a = [];
+      console.log("available_filtered_missions");
       this.missions.forEach((mission) => {
         if (mission.activities.length > 0) {
           if (this.mission_filter) {
@@ -433,12 +439,14 @@ module.exports = {
       });
       return a;
     },
-    resultsSelect: function () {
-      let a = JSON.parse(JSON.stringify(this.selected_path.missions));
-      a.push({
-        key: "-1",
-        title: "Fine storia",
-      });
+    path_missions: function () {
+      let a = [];
+      if (this.selected_path) {
+        console.log("path_missions");
+        this.selected_path.missions.forEach((mission) => {
+          if (mission.key != "-1") a.push(mission);
+        });
+      }
       return a;
     },
     valid_title: function () {
@@ -465,7 +473,7 @@ module.exports = {
     },
     valid_story_missions: function () {
       for (let i = 0; i < this.story.paths.length; i++) {
-        if (this.story.paths[i].missions.length == 0) return false;
+        if (this.story.paths[i].missions.length == 1) return false;
       }
       return true;
     },
@@ -476,19 +484,20 @@ module.exports = {
       return true;
     },
     valid_story_results: function () {
-      for (let i = 0; i < this.story.paths.length; i++) {
-        for (let j = 0; j < this.story.paths[i].missions.length; j++) {
-          for (
-            let k = 0;
-            k < this.story.paths[i].missions[j].results.length;
-            k++
-          ) {
-            if (this.story.paths[i].missions[j].results[k].key == null)
-              return false;
+      let final_result = true;
+      console.log("valid_story_results1");
+      this.story.paths.forEach((path) => {
+        console.log("valid_story_results2");
+        path.missions.forEach((mission) => {
+          if (mission.key != "-1") {
+            console.log("valid_story_results3");
+            mission.results.forEach((result) => {
+              if (result.key == null) final_result = false;
+            });
           }
-        }
-      }
-      return true;
+        });
+      });
+      return final_result;
     },
     valid_story: function () {
       return (
@@ -510,7 +519,12 @@ module.exports = {
     addPath() {
       this.story.paths.push({
         name: "Senza nome",
-        missions: [],
+        missions: [
+          {
+            key: "-1",
+            title: "Fine storia",
+          },
+        ],
         first_mission: null,
         key: String(Date.now()),
       });
@@ -521,6 +535,7 @@ module.exports = {
     },
     selectMission(data) {
       let a = [];
+      console.log("selectMission");
       this.selected_path.missions.forEach((mission) => {
         if (data.item.key != mission.key)
           a.push({
@@ -532,6 +547,7 @@ module.exports = {
     },
     maxResult(mission) {
       let a = 0;
+      console.log("maxResult");
       mission.activities.forEach((activity) => {
         a = a + parseInt(activity.correct.points);
       });
@@ -566,15 +582,11 @@ module.exports = {
       }
     },
     rangeMin(index, mission = this.selected_mission) {
-      let unit =
-        100 /
-        (mission.results ? mission.results.length : 1);
+      let unit = 100 / (mission.results ? mission.results.length : 1);
       return Math.round(unit * index + 1);
     },
     rangeMax(index, mission = this.selected_mission) {
-      let unit =
-        100 /
-        (mission.results ? mission.results.length : 1);
+      let unit = 100 / (mission.results ? mission.results.length : 1);
       return Math.round(unit * (index + 1));
     },
     onPathClick(path) {
@@ -607,13 +619,11 @@ module.exports = {
       this.selected_path.missions.push(a);
     },
     removeMission(mission) {
-      for (let i = 0; i < this.selected_path.missions.length; i++) {
-        if (this.selected_path.missions[i].key === mission.key) {
-          this.selected_path.missions.splice(i, 1);
-          if (this.selected_mission.key == mission.key)
-            this.selected_mission = null;
-          i--;
-        }
+      let index = this.selected_path.missions.indexOf(mission);
+      this.selected_path.missions.splice(index, 1);
+      if (this.selected_mission) {
+        if (this.selected_mission.key == mission.key)
+          this.selected_mission = null;
       }
     },
     addSuccessiveMission() {
@@ -662,6 +672,7 @@ module.exports = {
 
     init() {
       this.active_section = this.sections[0];
+      console.log("init");
       this.story = JSON.parse(JSON.stringify(this.story_prop));
     },
     reset() {
@@ -699,7 +710,7 @@ module.exports = {
   },
   watch: {
     story_prop(new_value) {
-      this.story = new_value;
+      this.story = JSON.parse(JSON.stringify(new_value));
     },
     background_selector(file) {
       if (file) {

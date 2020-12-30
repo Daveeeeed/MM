@@ -121,6 +121,7 @@ module.exports = {
                 group: this.gruppo,
                 class: this.classe,
               },
+              final_phrases: ["","",""],
               background: null,
             },
           };

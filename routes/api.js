@@ -175,11 +175,12 @@ router.post("/player/update", (req, res) => {
       let db_index = findPlayerIndex(req.query.player_id, response[0].players);
       response[0].players[db_index].status = req.body.status;
       response[0].players[db_index].mission_points = req.body.mission_points;
-      response[0].players[db_index].mission_activities = req.body.mission_activities;
+      response[0].players[db_index].mission_activities =
+        req.body.mission_activities;
       response[0].players[db_index].total_points = req.body.total_points;
-      response[0].players[db_index].total_activities = req.body.total_activities;
+      response[0].players[db_index].total_activities =
+        req.body.total_activities;
       response[0].players[db_index].time = req.body.time;
-      console.log("Il player " + req.body.id + " è all'attività " + req.body.status.activity + " della missione " + req.body.status.mission)
       db.get("games")
         .update(
           { game_key: req.query.game_key },
@@ -201,9 +202,11 @@ router.get("/player", (req, res) => {
     .find({
       game_key: req.query.game_key,
     })
-    .then((response) =>
-      res.send(findPlayer(req.query.player_id, response[0].players))
-    );
+    .then((response) => {
+      if (response.length)
+        res.send(findPlayer(req.query.player_id, response[0].players));
+      else res.sendStatus(400);
+    });
 });
 
 // Chiamata alla creazione di un nuovo player
@@ -222,12 +225,18 @@ router.post("/player", (req, res) => {
             path: null,
             mission: null,
             activity: null,
+            // tempo impiegato per l'attività corrente
             time_stuck: 0,
           },
+          // tempo totale di gioco
           time: 0,
+          // punti della missione corrente
           mission_points: 1,
+          // attività visitate nella missione corrente
           mission_activities: 1,
+          // punti totali
           total_points: 1,
+          // attività visitate totali
           total_activities: 1,
         });
         db.get("games")
@@ -269,16 +278,15 @@ router.get("/tutor/update", (req, res) => {
     .then((response) => res.send(response));
 });
 
+// Tutor aggiorna i dati dei giocatori
 router.post("/tutor/update", (req, res) => {
   db.get("games")
     .find({
       game_key: req.query.game_key,
     })
     .then((response) => {
-      let player_on_db = findPlayer(req.query.player_id, response[0].players);
       let db_index = findPlayerIndex(req.query.player_id, response[0].players);
-      player_on_db.name = req.body.name;
-      response[0].players[db_index] = player_on_db;
+      response[0].players[db_index].name = req.body.name;
       db.get("games")
         .update(
           { game_key: req.query.game_key },
@@ -289,7 +297,7 @@ router.post("/tutor/update", (req, res) => {
           }
         )
         .then(() => {
-          res.send(player_on_db);
+          res.send(response[0].players[db_index]);
         });
     });
 });
@@ -311,7 +319,10 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     let data_path = dir_path + "/" + Date.now() + "." + type;
     if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
     fs.writeFile(data_path, data, "base64", (err) => {}); // save photo
-    let response_path = data_path.replace("./public", "http://localhost:8000/public")
+    let response_path = data_path.replace(
+      "./public",
+      "http://localhost:8000/public"
+    );
     res.send({ path: data_path });
   } catch (error) {
     console.log(error);
@@ -320,10 +331,11 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
 });
 
 router.get("/resetGames", (req, res) => {
-  db.get("games").remove()
-  .then(() => {
-    res.send("game removed")
-  });
-})
+  db.get("games")
+    .remove()
+    .then(() => {
+      res.send("Games successfully removed.");
+    });
+});
 
 module.exports = router;
