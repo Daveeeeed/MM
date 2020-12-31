@@ -9,7 +9,7 @@ router.get("/testing", function (req, res, next) {
 
 /* GET homepage */
 router.get("/", function (req, res, next) {
-  res.sendFile("./views/homepage.html");
+  res.sendFile(path.resolve("views/homepage.html"));
 });
 
 /* GET editor */
