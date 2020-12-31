@@ -6,7 +6,7 @@ var userRouter = require("./routes/user");
 var app = express();
 
 app.use(express.json());
-app.use("/public", express.static("public"));
+app.use("/public", express.static("/webapp/MM/public"));
 
 app.use("/api", apiRouter);
 app.use("/", userRouter);
