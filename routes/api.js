@@ -309,10 +309,10 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     let dir_path;
     if (req.file.mimetype.includes("image/")) {
       type = req.file.mimetype.replace("image/", "");
-      dir_path = "./public/uploads/images";
+      dir_path = "/webapp/MM/public/uploads/images";
     } else if (req.file.mimetype.includes("video/")) {
       type = req.file.mimetype.replace("video/", "");
-      dir_path = "./public/uploads/videos";
+      dir_path = "/webapp/MM/public/uploads/videos";
     } else {
       throw "Mimetype Error";
     }
@@ -320,10 +320,10 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
     fs.writeFile(data_path, data, "base64", (err) => {}); // save photo
     let response_path = data_path.replace(
-      "./public",
+      "/webapp/MM/public",
       "http://site181982.tw.cs.unibo.it/public"
     );
-    res.send({ path: data_path });
+    res.send({ path: response_path });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
