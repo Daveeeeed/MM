@@ -4,7 +4,7 @@ var path = require("path");
 
 /* GET test route */
 router.get("/testing", function (req, res, next) {
-  res.send(__dirname);
+  res.send("Test route");
 });
 
 /* GET homepage */
@@ -14,34 +14,34 @@ router.get("/", function (req, res, next) {
 
 /* GET editor */
 router.get("/play", (req, res) => {
-  res.sendFile(path.resolve("views/access.html"));
+  res.sendFile("views/access.html", { root: __dirname });
 });
 
 /* GET editor */
 router.get("/editor", (req, res) => {
-  res.sendFile(path.resolve("views/editor.html"));
+  res.sendFile("views/editor.html", { root: __dirname });
 });
 
 router.get("/tutor", (req, res) => {
-  res.sendFile(path.resolve("views/tutor.html"));
+  res.sendFile("views/tutor.html", { root: __dirname });
 });
 
 router.get("/player", (req, res) => {
-  res.sendFile(path.resolve("views/player.html"));
+  res.sendFile("views/player.html", { root: __dirname });
 });
 
 router.get("/browse", (req, res) => {
-  res.sendFile(path.resolve("views/browse.html"));
+  res.sendFile("views/browse.html", { root: __dirname });
 });
 
 router.get("/comp/:app/:name", (req, res) => {
   let app = req.params.app;
   let component_name = req.params.name;
-  res.sendFile(path.resolve("components/" + app + "/" + component_name));
+  res.sendFile("components/" + app + "/" + component_name, { root: __dirname });
 });
 
 router.get("/*", (req, res) => {
-  res.sendFile(path.resolve("views/404.html"));
+  res.sendFile("views/404.html", { root: __dirname });
 });
 
 module.exports = router;
