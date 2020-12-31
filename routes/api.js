@@ -317,7 +317,7 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
       throw "Mimetype Error";
     }
     let data_path = dir_path + "/" + Date.now() + "." + type;
-    if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
+    //if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
     fs.writeFile(data_path, data, "base64", (err) => {}); // save photo
     let response_path = data_path.replace(
       "/webapp/MM/public",
