@@ -4,12 +4,12 @@ var path = require("path");
 
 /* GET test route */
 router.get("/testing", function (req, res, next) {
-  res.send("Test route");
+  res.send(__dirname);
 });
 
 /* GET homepage */
 router.get("/", function (req, res, next) {
-  res.sendFile(path.resolve("views/homepage.html"));
+  res.sendFile("views/homepage.html", { root: __dirname });
 });
 
 /* GET editor */
@@ -31,8 +31,8 @@ router.get("/player", (req, res) => {
 });
 
 router.get("/browse", (req, res) => {
-    res.sendFile(path.resolve("views/browse.html"));
-  });
+  res.sendFile(path.resolve("views/browse.html"));
+});
 
 router.get("/comp/:app/:name", (req, res) => {
   let app = req.params.app;
@@ -41,7 +41,7 @@ router.get("/comp/:app/:name", (req, res) => {
 });
 
 router.get("/*", (req, res) => {
-    res.sendFile(path.resolve("views/404.html"));
+  res.sendFile(path.resolve("views/404.html"));
 });
 
 module.exports = router;
