@@ -338,4 +338,9 @@ router.get("/resetGames", (req, res) => {
     });
 });
 
+/* GET test route */
+router.get("/testing", function (req, res, next) {
+  res.send("Test route");
+});
+
 module.exports = router;
