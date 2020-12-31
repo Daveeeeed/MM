@@ -3,7 +3,7 @@
     <a href="/">
       <img
         class="mt-3"
-        src="http://localhost:8000/public/images/logo2.png"
+        src="http://site181982.tw.cs.unibo.it/public/images/logo2.png"
         alt="Logo"
         height="100"
       />

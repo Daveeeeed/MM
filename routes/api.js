@@ -321,7 +321,7 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     fs.writeFile(data_path, data, "base64", (err) => {}); // save photo
     let response_path = data_path.replace(
       "./public",
-      "http://localhost:8000/public"
+      "http://site181982.tw.cs.unibo.it/public"
     );
     res.send({ path: data_path });
   } catch (error) {

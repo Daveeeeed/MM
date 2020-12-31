@@ -61,7 +61,7 @@
               </div>
               <a href="/" class="my-2">
                 <img
-                  src="http://localhost:8000/public/images/logo2.png"
+                  src="http://site181982.tw.cs.unibo.it/public/images/logo2.png"
                   alt="Logo"
                   height="200"
                 />
