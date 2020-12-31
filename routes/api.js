@@ -7,7 +7,7 @@ var upload = multer();
 
 // WEB SOCKET
 var ws = require("ws");
-var webSocketServer = new ws.Server({ port: 8080 });
+var webSocketServer = new ws.Server({ port: 8345 });
 
 webSocketServer.on("connection", (webSocket) => {
   webSocket.on("message", (data) => {
