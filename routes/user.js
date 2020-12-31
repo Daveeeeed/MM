@@ -2,6 +2,11 @@ var express = require("express");
 var router = express.Router();
 var path = require("path");
 
+/* GET test route */
+router.get("/testing", function (req, res, next) {
+  res.send("Test route");
+});
+
 /* GET homepage */
 router.get("/", function (req, res, next) {
   res.sendFile(path.resolve("views/homepage.html"));
