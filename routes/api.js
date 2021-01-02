@@ -21,18 +21,18 @@ webSocketServer.on("connection", (webSocket) => {
 
 // MONK
 var monk = require("monk");
-var user = "davide";
-var passw = "zJRJBT3skYKKVWaw";
-var dbName = "techweb";
-//const url = "mongodb://127.0.0.1:27017";
-var url =
-  "mongodb+srv://" +
-  user +
-  ":" +
-  passw +
-  "@clustertw.wi8xg.gcp.mongodb.net/" +
-  dbName +
-  "?retryWrites=true&w=majority";
+//var user = "davide";
+//var passw = "zJRJBT3skYKKVWaw";
+//var dbName = "techweb";
+const url = "mongodb://127.0.0.1:27017";
+//var url =
+//  "mongodb+srv://" +
+//  user +
+//  ":" +
+//  passw +
+//  "@clustertw.wi8xg.gcp.mongodb.net/" +
+//  dbName +
+//  "?retryWrites=true&w=majority";
 var db = monk(url);
 
 router.use(express.urlencoded({ extended: true }));
