@@ -81,21 +81,36 @@ router.post("/activities/new", (req, res) => {
 });
 
 router.post("/stories/delete", (req, res) => {
-  db.get("stories")
-    .findOneAndDelete({ key: req.body.key })
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("stories");
+    collection.findOneAndDelete({ key: req.body.key }).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/missions/delete", (req, res) => {
-  db.get("missions")
-    .findOneAndDelete({ key: req.body.key })
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection.findOneAndDelete({ key: req.body.key }).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/activities/delete", (req, res) => {
-  db.get("activities")
-    .findOneAndDelete({ key: req.body.key })
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection.findOneAndDelete({ key: req.body.key }).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/stories/edit", (req, res) => {
