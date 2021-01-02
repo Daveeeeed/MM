@@ -8,12 +8,11 @@ var app = express();
 app.use(express.json());
 app.use("/public", express.static("/webapp/MM/public"));
 
-app.use((req, res, next) => {
-  console.log(req.protocol);
-  console.log(req.secure);
-  if (req.protocol == "http") {
-    res.redirect("https://site181982.tw.cs.unibo.it" + req.originalUrl);
-  } else next();
+app.all("*", (req, res, next) => {
+  if (req.secure) {
+    return next();
+  }
+  res.redirect("https://" + req.hostname + req.originalUrl); // express 4.x
 });
 
 app.use("/api", apiRouter);
