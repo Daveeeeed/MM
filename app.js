@@ -9,6 +9,7 @@ app.use(express.json());
 app.use("/public", express.static("/webapp/MM/public"));
 
 app.all("*", (req, res, next) => {
+    console.log(req)
   if (req.secure) {
     return next();
   }
