@@ -10,7 +10,7 @@ app.use("/public", express.static("/webapp/MM/public"));
 
 app.use((req, res, next) => {
   console.log(req.protocol);
-  console.log(re.secure);
+  console.log(req.secure);
   if (req.protocol == "http") {
     res.redirect("https://site181982.tw.cs.unibo.it" + req.originalUrl);
   } else next();
