@@ -46,7 +46,10 @@ router.post("/stories/new", (req, res) => {
   console.log(db);
   db.get("stories")
     .insert(req.body)
-    .then((response) => {console.log("FATTO");res.send(response)});
+    .then((response) => {
+      console.log("FATTO");
+      res.send(response);
+    });
 });
 
 router.post("/missions/new", (req, res) => {
@@ -320,8 +323,10 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     let data_path = dir_path + "/" + Date.now() + "." + type;
     if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
     fs.writeFile(data_path, data, "base64", (err) => {
-      console.log(err);
-      throw "Write File Error";
+      if (err) {
+        console.log(err);
+        throw "Write File Error";
+      }
     }); // save photo
     let response_path = data_path.replace(
       "/webapp/MM/public",
