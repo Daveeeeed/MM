@@ -310,10 +310,10 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     let dir_path;
     if (req.file.mimetype.includes("image/")) {
       type = req.file.mimetype.replace("image/", "");
-      dir_path = "./../public/uploads/images";
+      dir_path = "/webapp/MM/public/uploads/images";
     } else if (req.file.mimetype.includes("video/")) {
       type = req.file.mimetype.replace("video/", "");
-      dir_path = "./../public/uploads/videos";
+      dir_path = "/webapp/MM/public/uploads/videos";
     } else {
       throw "Mimetype Error";
     }
@@ -328,7 +328,7 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     });
     
     let response_path = data_path.replace(
-      "./public",
+      "/webapp/MM/public",
       "http://site181982.tw.cs.unibo.it/public"
     );
     res.send({ path: response_path });
