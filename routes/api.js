@@ -114,18 +114,25 @@ router.post("/activities/delete", (req, res) => {
 });
 
 router.post("/stories/edit", (req, res) => {
-  db.get("stories")
-    .update(
-      { key: req.body.key },
-      {
-        $set: {
-          title: req.body.title,
-          paths: req.body.paths,
-          settings: req.body.settings,
-        },
-      }
-    )
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("stories");
+    collection
+      .updateOne(
+        { key: req.body.key },
+        {
+          $set: {
+            title: req.body.title,
+            paths: req.body.paths,
+            settings: req.body.settings,
+          },
+        }
+      )
+      .then((response) => {
+        res.send(response.result);
+        client.close();
+      });
+  });
 });
 
 router.post("/missions/edit", (req, res) => {
