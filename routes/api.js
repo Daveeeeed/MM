@@ -319,7 +319,9 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     }
     let data_path = dir_path + "/" + Date.now() + "." + type;
     if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
-    fs.writeFile(data_path, data, "base64", (err) => {}); // save photo
+    fs.writeFile(data_path, data, "base64", (err) => {
+      console.log(err)
+    }); // save photo
     // stampa il contenuto della cartella
     fs.readdir(dir_path, function (err, items) {
       for (var i = 0; i < items.length; i++) {
