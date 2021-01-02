@@ -9,11 +9,12 @@ app.use(express.json());
 app.use("/public", express.static("/webapp/MM/public"));
 
 app.all("*", (req, res, next) => {
-    console.log(req)
-  if (req.secure) {
+    console.log("ciao")
+    console.log(req.get('X-Forwarded-Protocol'))
+  if (req.get('X-Forwarded-Protocol')) {
     return next();
   }
-  res.redirect("https://" + req.hostname + req.originalUrl); // express 4.x
+  res.redirect("https://" + req.hostname + req.originalUrl);
 });
 
 app.use("/api", apiRouter);
