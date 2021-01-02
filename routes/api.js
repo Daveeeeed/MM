@@ -331,7 +331,7 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
     
     let response_path = data_path.replace(
       "/webapp/MM/public",
-      "http://site181982.tw.cs.unibo.it/public"
+      "https://site181982.tw.cs.unibo.it/public"
     );
     res.send({ path: response_path });
   } catch (error) {

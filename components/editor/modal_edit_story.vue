@@ -654,7 +654,7 @@ module.exports = {
           ratio: null,
           fill: "#000",
           back: "#fff",
-          text: "http://site181982.tw.cs.unibo.it/play?key=" + this.story.key,
+          text: "https://site181982.tw.cs.unibo.it/play?key=" + this.story.key,
           rounded: 0,
           quiet: 0,
           // label/image size and pos in pc: 0..100
