@@ -35,6 +35,11 @@ var url =
   "?retryWrites=true&w=majority";
 var db = monk(url);
 
+const MongoClient = require("mongodb").MongoClient;
+
+const mongo_url = "mongodb://site181982:Ko9sheeg@mongo_site181982";
+const mongo_dbName = "techweb";
+
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
@@ -43,6 +48,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/stories/new", (req, res) => {
+  /*
   console.log(db);
   db.get("stories")
     .insert(req.body)
@@ -50,6 +56,17 @@ router.post("/stories/new", (req, res) => {
       console.log("FATTO");
       res.send(response);
     });
+    */
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("documents");
+    collection.insertOne(req.body).then((response) => {
+      console.log("FATTA SCRITTURA");
+      console.log(response);
+      res.send(response);
+      client.close();
+    });
+  });
 });
 
 router.post("/missions/new", (req, res) => {
@@ -128,11 +145,24 @@ router.post("/activities/edit", (req, res) => {
 });
 
 router.get("/stories", (req, res) => {
+  /*
   db.get("stories")
     .find(req.query)
     .then((response) => {
       res.send(response);
     });
+  */
+  MongoClient.connect(mongo_url, function (err, client) {
+    if (err) throw err;
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("customers");
+    collection.find({}).toArray((response) => {
+      console.log("FATTA LETTURA");
+      console.log(response);
+      res.send(response);
+      client.close();
+    });
+  });
 });
 
 router.get("/missions", (req, res) => {
