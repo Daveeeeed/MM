@@ -303,22 +303,24 @@ router.post("/tutor/update", (req, res) => {
 });
 
 router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
+  console.log(__dirname);
   try {
     let data = req.file.buffer;
     let type;
     let dir_path;
     if (req.file.mimetype.includes("image/")) {
       type = req.file.mimetype.replace("image/", "");
-      dir_path = "./public/uploads/images";
+      dir_path = "public/uploads/images";
     } else if (req.file.mimetype.includes("video/")) {
       type = req.file.mimetype.replace("video/", "");
-      dir_path = "./public/uploads/videos";
+      dir_path = "public/uploads/videos";
     } else {
       throw "Mimetype Error";
     }
     let data_path = dir_path + "/" + Date.now() + "." + type;
     if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
     fs.writeFile(data_path, data, "base64", (err) => {}); // save photo
+
     let response_path = data_path.replace(
       "./public",
       "http://site181982.tw.cs.unibo.it/public"
