@@ -52,8 +52,6 @@ router.post("/stories/new", (req, res) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.insertOne(req.body).then((response) => {
-      console.log("FATTA SCRITTURA");
-      console.log(response);
       res.send(response.result);
       client.close();
     });
@@ -61,15 +59,25 @@ router.post("/stories/new", (req, res) => {
 });
 
 router.post("/missions/new", (req, res) => {
-  db.get("missions")
-    .insert(req.body)
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection.insertOne(req.body).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/activities/new", (req, res) => {
-  db.get("activities")
-    .insert(req.body)
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection.insertOne(req.body).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/stories/delete", (req, res) => {
@@ -136,21 +144,10 @@ router.post("/activities/edit", (req, res) => {
 });
 
 router.get("/stories", (req, res) => {
-  /*
-  db.get("stories")
-    .find(req.query)
-    .then((response) => {
-      res.send(response);
-    });
-  */
   MongoClient.connect(mongo_url, function (err, client) {
-    if (err) throw err;
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.find({}).toArray((err, response) => {
-      if (err) throw err;
-      console.log("FATTA LETTURA");
-      console.log(response);
       res.send(response);
       client.close();
     });
@@ -158,19 +155,25 @@ router.get("/stories", (req, res) => {
 });
 
 router.get("/missions", (req, res) => {
-  db.get("missions")
-    .find(req.query)
-    .then((response) => {
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection.find({}).toArray((err, response) => {
       res.send(response);
+      client.close();
     });
+  });
 });
 
 router.get("/activities", (req, res) => {
-  db.get("activities")
-    .find(req.query)
-    .then((response) => {
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection.find({}).toArray((err, response) => {
       res.send(response);
+      client.close();
     });
+  });
 });
 
 router.get("/tutor", (req, res) => {
