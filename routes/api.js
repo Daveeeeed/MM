@@ -303,7 +303,6 @@ router.post("/tutor/update", (req, res) => {
 });
 
 router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
-  console.log(__dirname);
   try {
     let data = req.file.buffer;
     let type;
@@ -318,17 +317,11 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
       throw "Mimetype Error";
     }
     let data_path = dir_path + "/" + Date.now() + "." + type;
-    //if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
+    if (!fs.existsSync(dir_path)) fs.mkdirSync(dir_path); // check folder existance
     fs.writeFile(data_path, data, "base64", (err) => {
-      console.log(err)
-    }) // save photo
-    // stampa il contenuto della cartella
-    fs.readdir(dir_path, function (err, items) {
-      for (var i = 0; i < items.length; i++) {
-        console.log(items[i]);
-      }
-    });
-    
+      console.log(err);
+      throw "Write File Error";
+    }); // save photo
     let response_path = data_path.replace(
       "/webapp/MM/public",
       "https://site181982.tw.cs.unibo.it/public"
