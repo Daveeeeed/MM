@@ -3,10 +3,6 @@ var router = express.Router();
 var path = require("path");
 var base_path = "/webapp/MM/";
 
-router.get("http://*", (req, res) => {
-  res.redirect("https://site181982.tw.cs.unibo.it" + req.path)
-})
-
 /* GET homepage */
 router.get("/", function (req, res, next) {
   res.sendFile("views/homepage.html", { root: base_path });
