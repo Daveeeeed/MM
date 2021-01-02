@@ -24,7 +24,7 @@ var monk = require("monk");
 //var user = "davide";
 //var passw = "zJRJBT3skYKKVWaw";
 //var dbName = "techweb";
-const url = "mongodb://127.0.0.1:27017";
+const url = "mongodb://mongo_site181982/techweb";
 //var url =
 //  "mongodb+srv://" +
 //  user +
@@ -43,9 +43,10 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/stories/new", (req, res) => {
+  console.log(db);
   db.get("stories")
     .insert(req.body)
-    .then((response) => res.send(response));
+    .then((response) => {console.log("FATTO");res.send(response)});
 });
 
 router.post("/missions/new", (req, res) => {
