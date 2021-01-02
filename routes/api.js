@@ -59,11 +59,11 @@ router.post("/stories/new", (req, res) => {
     */
   MongoClient.connect(mongo_url, function (err, client) {
     let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("documents");
+    let collection = mongo_db.collection("stories");
     collection.insertOne(req.body).then((response) => {
       console.log("FATTA SCRITTURA");
       console.log(response);
-      res.send(response);
+      res.send(response.result);
       client.close();
     });
   });
@@ -155,8 +155,9 @@ router.get("/stories", (req, res) => {
   MongoClient.connect(mongo_url, function (err, client) {
     if (err) throw err;
     let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("customers");
-    collection.find({}).toArray((response) => {
+    let collection = mongo_db.collection("stories");
+    collection.find({}).toArray((err, response) => {
+      if (err) throw err;
       console.log("FATTA LETTURA");
       console.log(response);
       res.send(response);
