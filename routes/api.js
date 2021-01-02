@@ -136,33 +136,47 @@ router.post("/stories/edit", (req, res) => {
 });
 
 router.post("/missions/edit", (req, res) => {
-  db.get("missions")
-    .update(
-      { key: req.body.key },
-      {
-        $set: {
-          title: req.body.title,
-          activities: req.body.activities,
-          first_activity: req.body.first_activity,
-        },
-      }
-    )
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection
+      .updateOne(
+        { key: req.body.key },
+        {
+          $set: {
+            title: req.body.title,
+            activities: req.body.activities,
+            first_activity: req.body.first_activity,
+          },
+        }
+      )
+      .then((response) => {
+        res.send(response.result);
+        client.close();
+      });
+  });
 });
 
 router.post("/activities/edit", (req, res) => {
-  db.get("activities")
-    .update(
-      { key: req.body.key },
-      {
-        $set: {
-          title: req.body.title,
-          elements: req.body.elements,
-          time: req.body.time,
-        },
-      }
-    )
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection
+      .updateOne(
+        { key: req.body.key },
+        {
+          $set: {
+            title: req.body.title,
+            elements: req.body.elements,
+            time: req.body.time,
+          },
+        }
+      )
+      .then((response) => {
+        res.send(response.result);
+        client.close();
+      });
+  });
 });
 
 router.get("/stories", (req, res) => {
