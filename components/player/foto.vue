@@ -21,6 +21,7 @@
           class="activity-webcam"
           :src="shooted_photo"
           id="shoot"
+          alt="Foto scattata"
         />
         <video
           v-show="!shooted_photo"
@@ -68,9 +69,9 @@ module.exports = {
     answer_verified: Boolean,
   },
   computed: {
-    is_answer_done: function(){
+    is_answer_done: function () {
       return this.shooted_photo != null;
-    }
+    },
   },
   methods: {
     swapCam() {

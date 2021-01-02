@@ -25,14 +25,14 @@
                   <b-button
                     class="status-button"
                     @click="showInfo(player)"
-                    :class="setPlayerClass1(player)"
+                    :class="infoButtonClass(player)"
                   >
                     <b-icon-info-circle></b-icon-info-circle>
                   </b-button>
                   <b-button
                     class="status-button"
                     @click="openChat(player)"
-                    :class="setPlayerClass3(player)"
+                    :class="chatButtonClass(player)"
                   >
                     <b-icon-chat></b-icon-chat>
                   </b-button>
@@ -62,7 +62,10 @@
                   {{ player.username }}
                 </div>
                 <div class="flex-grow-1">Tempo totale: {{ player.time }}</div>
-                <div class="mr-3">Percentuale: {{ (player.total_points / player.total_activities) * 100 }} %</div>
+                <div class="mr-3">
+                  Percentuale:
+                  {{ (player.total_points / player.total_activities) * 100 }} %
+                </div>
               </div>
             </b-list-group-item>
           </b-list-group>
@@ -113,7 +116,12 @@
                   </h5>
                   <h5 class="mt-4 ml-4">Percentuale</h5>
                   <h5 class="mt-4 ml-4">
-                    {{ (selected_player.total_points / selected_player.total_activities) * 100 }} %
+                    {{
+                      (selected_player.total_points /
+                        selected_player.total_activities) *
+                      100
+                    }}
+                    %
                   </h5>
                 </div>
               </div>
@@ -181,16 +189,25 @@
                   width="70%"
                   height="auto"
                   class="m-2"
+                  alt="Foto inviata dall'utente"
                 />
                 <div class="m-2">La foto risulta corretta o sbagliata?</div>
                 <div
                   class="d-flex justify-content-center mt-2 mb-4"
                   style="width: 100%"
                 >
-                  <b-button class="mx-2 py-3" style="width: 35%" @click="photoResponse(false)">
+                  <b-button
+                    class="mx-2 py-3"
+                    style="width: 35%"
+                    @click="photoResponse(false)"
+                  >
                     Rifiuta
                   </b-button>
-                  <b-button class="mx-2 py-3" style="width: 35%" @click="photoResponse(true)">
+                  <b-button
+                    class="mx-2 py-3"
+                    style="width: 35%"
+                    @click="photoResponse(true)"
+                  >
                     Accetta
                   </b-button>
                 </div>
@@ -281,9 +298,12 @@ module.exports = {
       let a = JSON.parse(JSON.stringify(this.game.players));
 
       for (let i = 0; i < a.length; i++) {
-        var swapped = new Boolean(false);
+        var swapped = false;
         for (let j = 1; j < a.length - i; j++) {
-          if ((a[j - 1].total_points / a[j - 1].total_activities) == (a[j].total_points / a[j].total_activities)) {
+          if (
+            a[j - 1].total_points / a[j - 1].total_activities ==
+            a[j].total_points / a[j].total_activities
+          ) {
             if (a[j - 1].time > a[j].time) {
               let temp = a[j - 1];
               a[j - 1] = a[j];
@@ -291,7 +311,10 @@ module.exports = {
               swapped = true;
             }
           }
-          if (a[j - 1].total_points / a[j - 1].total_activities < a[j].total_points / a[j].total_activities) {
+          if (
+            a[j - 1].total_points / a[j - 1].total_activities <
+            a[j].total_points / a[j].total_activities
+          ) {
             let temp = a[j - 1];
             a[j - 1] = a[j];
             a[j] = temp;
@@ -412,7 +435,7 @@ module.exports = {
         this.message = "";
       }
     },
-    setPlayerClass1(player) {
+    infoButtonClass(player) {
       return {
         blue: player.status.time_stuck > player.status.activity.max_time,
       };
@@ -422,7 +445,7 @@ module.exports = {
         orange: this.photos[player.id].question,
       };
     },
-    setPlayerClass3(player) {
+    chatButtonClass(player) {
       return {
         red: player.status.need_help,
       };
@@ -471,26 +494,13 @@ WebSocketClient.prototype.open = function (url) {
     this.onmessage(data, flags, this.number);
   };
   this.instance.onclose = (e) => {
-    switch (e.code) {
-      case 1000: // CLOSE_NORMAL
-        console.log("WebSocket: closed");
-        break;
-      default:
-        // Abnormal closure
-        this.reconnect(e);
-        break;
-    }
+    if (e.code == 1000) console.log("WebSocket: closed"); // CLOSE_NORMAL
+    else this.reconnect(e); // Abnormal closure
     this.onclose(e);
   };
   this.instance.onerror = (e) => {
-    switch (e.code) {
-      case "ECONNREFUSED":
-        this.reconnect(e);
-        break;
-      default:
-        this.onerror(e);
-        break;
-    }
+    if (e.code == "ECONNREFUSED") this.reconnect(e);
+    else this.onerror(e);
   };
 };
 
@@ -643,6 +653,5 @@ body {
 
 .status-button:focus {
   background-color: unset;
-
 }
 </style>
