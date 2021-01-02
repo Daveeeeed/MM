@@ -19,22 +19,7 @@ webSocketServer.on("connection", (webSocket) => {
   });
 });
 
-// MONK
-var monk = require("monk");
-var user = "davide";
-var passw = "zJRJBT3skYKKVWaw";
-var dbName = "techweb";
-//const url = "mongodb://site181982:Ko9sheeg@mongo_site181982/techweb";
-var url =
-  "mongodb+srv://" +
-  user +
-  ":" +
-  passw +
-  "@clustertw.wi8xg.gcp.mongodb.net/" +
-  dbName +
-  "?retryWrites=true&w=majority";
-var db = monk(url);
-
+// MONGODB
 const MongoClient = require("mongodb").MongoClient;
 
 const mongo_url = "mongodb://site181982:Ko9sheeg@mongo_site181982";
@@ -48,21 +33,10 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/stories/new", (req, res) => {
-  /*
-  console.log(db);
-  db.get("stories")
-    .insert(req.body)
-    .then((response) => {
-      console.log("FATTO");
-      res.send(response);
-    });
-    */
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, function (client) {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.insertOne(req.body).then((response) => {
-      console.log("FATTA SCRITTURA");
-      console.log(response);
       res.send(response.result);
       client.close();
     });
@@ -70,96 +44,131 @@ router.post("/stories/new", (req, res) => {
 });
 
 router.post("/missions/new", (req, res) => {
-  db.get("missions")
-    .insert(req.body)
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection.insertOne(req.body).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/activities/new", (req, res) => {
-  db.get("activities")
-    .insert(req.body)
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection.insertOne(req.body).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/stories/delete", (req, res) => {
-  db.get("stories")
-    .findOneAndDelete({ key: req.body.key })
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("stories");
+    collection.deleteOne({ key: req.body.key }).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/missions/delete", (req, res) => {
-  db.get("missions")
-    .findOneAndDelete({ key: req.body.key })
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection.deleteOne({ key: req.body.key }).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/activities/delete", (req, res) => {
-  db.get("activities")
-    .findOneAndDelete({ key: req.body.key })
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection.deleteOne({ key: req.body.key }).then((response) => {
+      res.send(response.result);
+      client.close();
+    });
+  });
 });
 
 router.post("/stories/edit", (req, res) => {
-  db.get("stories")
-    .update(
-      { key: req.body.key },
-      {
-        $set: {
-          title: req.body.title,
-          paths: req.body.paths,
-          settings: req.body.settings,
-        },
-      }
-    )
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("stories");
+    collection
+      .updateOne(
+        { key: req.body.key },
+        {
+          $set: {
+            title: req.body.title,
+            paths: req.body.paths,
+            settings: req.body.settings,
+          },
+        }
+      )
+      .then((response) => {
+        res.send(response.result);
+        client.close();
+      });
+  });
 });
 
 router.post("/missions/edit", (req, res) => {
-  db.get("missions")
-    .update(
-      { key: req.body.key },
-      {
-        $set: {
-          title: req.body.title,
-          activities: req.body.activities,
-          first_activity: req.body.first_activity,
-        },
-      }
-    )
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection
+      .updateOne(
+        { key: req.body.key },
+        {
+          $set: {
+            title: req.body.title,
+            activities: req.body.activities,
+            first_activity: req.body.first_activity,
+          },
+        }
+      )
+      .then((response) => {
+        res.send(response.result);
+        client.close();
+      });
+  });
 });
 
 router.post("/activities/edit", (req, res) => {
-  db.get("activities")
-    .update(
-      { key: req.body.key },
-      {
-        $set: {
-          title: req.body.title,
-          elements: req.body.elements,
-          time: req.body.time,
-        },
-      }
-    )
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection
+      .updateOne(
+        { key: req.body.key },
+        {
+          $set: {
+            title: req.body.title,
+            elements: req.body.elements,
+            time: req.body.time,
+          },
+        }
+      )
+      .then((response) => {
+        res.send(response.result);
+        client.close();
+      });
+  });
 });
 
 router.get("/stories", (req, res) => {
-  /*
-  db.get("stories")
-    .find(req.query)
-    .then((response) => {
-      res.send(response);
-    });
-  */
-  MongoClient.connect(mongo_url, function (err, client) {
-    if (err) throw err;
+  MongoClient.connect(mongo_url, function (client) {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
-    collection.find({}).toArray((err, response) => {
-      if (err) throw err;
-      console.log("FATTA LETTURA");
-      console.log(response);
+    collection.find({}).toArray((response) => {
       res.send(response);
       client.close();
     });
@@ -167,37 +176,64 @@ router.get("/stories", (req, res) => {
 });
 
 router.get("/missions", (req, res) => {
-  db.get("missions")
-    .find(req.query)
-    .then((response) => {
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("missions");
+    collection.find({}).toArray((response) => {
       res.send(response);
+      client.close();
     });
+  });
 });
 
 router.get("/activities", (req, res) => {
-  db.get("activities")
-    .find(req.query)
-    .then((response) => {
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("activities");
+    collection.find({}).toArray((response) => {
       res.send(response);
+      client.close();
     });
+  });
 });
-
+/*
 router.get("/tutor", (req, res) => {
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .find({
+        game_key: req.query.game_key,
+      })
+      .toArray((response) => {
+        res.send(response);
+        client.close();
+      });
+  });
+
   db.get("games")
     .find({
       game_key: req.query.game_key,
     })
     .then((response) => res.send(response[0]));
+
 });
 
 router.post("/tutor", (req, res) => {
-  db.get("games")
-    .insert({
-      story_key: req.query.story_key,
-      game_key: req.query.game_key,
-      players: [],
-    })
-    .then(() => res.send());
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .insertOne({
+        story_key: req.query.story_key,
+        game_key: req.query.game_key,
+        players: [],
+      })
+      .then((response) => {
+        res.send(response.result);
+        client.close();
+      });
+  });
 });
 
 // Player esegue l'update dello status
@@ -336,6 +372,7 @@ router.post("/tutor/update", (req, res) => {
         });
     });
 });
+*/
 
 router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
   try {
@@ -371,11 +408,14 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
 });
 
 router.get("/resetGames", (req, res) => {
-  db.get("games")
-    .remove()
-    .then(() => {
+  MongoClient.connect(mongo_url, function (client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection.deleteMany().then((response) => {
       res.send("Games successfully removed.");
+      client.close();
     });
+  });
 });
 
 /* GET test route */
