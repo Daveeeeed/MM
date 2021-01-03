@@ -173,20 +173,11 @@ router.get("/tutor", (req, res) => {
 
 // Creazione nuova partita
 router.post("/tutor", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("games");
-    collection
-      .insertOne({
-        story_key: req.query.story_key,
-        game_key: req.query.game_key,
-        players: [],
-      })
-      .then(() => {
-        res.send();
-        client.close();
-      });
-  });
+  insertOne("games", {
+    story_key: req.query.story_key,
+    game_key: req.query.game_key,
+    players: [],
+  }).then(() => res.send());
 });
 
 // Fetch dei dati dei giocatori
