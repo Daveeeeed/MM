@@ -225,13 +225,6 @@ router.get("/tutor", (req, res) => {
         client.close();
       });
   });
-  /*
-  db.get("games")
-    .find({
-      game_key: req.query.game_key,
-    })
-    .then((response) => res.send(response[0]));
-    */
 });
 
 router.post("/tutor", (req, res) => {
@@ -284,61 +277,71 @@ router.post("/player/update", (req, res) => {
 
 // Chiamata solo una volta all'apertura del player
 router.get("/player", (req, res) => {
-  db.get("games")
-    .find({
-      game_key: req.query.game_key,
-    })
-    .then((response) => {
-      if (response.length)
-        res.send(findPlayer(req.query.player_id, response[0].players));
-      else res.sendStatus(400);
-    });
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .find({
+        game_key: req.query.game_key,
+      })
+      .toArray((err, response) => {
+        console.log(response);
+        if (response.length)
+          res.send(findPlayer(req.query.player_id, response[0].players));
+        else res.sendStatus(400);
+        client.close();
+      });
+  });
 });
 
 // Chiamata alla creazione di un nuovo player
 router.post("/player", (req, res) => {
-  db.get("games")
-    .find({
-      game_key: req.query.game_key,
-    })
-    .then((response) => {
-      if (response.length == 1) {
-        response[0].players.push({
-          id: req.query.player_id,
-          name: req.query.player_id,
-          username: "Nome in codice",
-          status: {
-            path: null,
-            mission: null,
-            activity: null,
-            // tempo impiegato per l'attività corrente
-            time_stuck: 0,
-          },
-          // tempo totale di gioco
-          time: 0,
-          // punti della missione corrente
-          mission_points: 1,
-          // attività visitate nella missione corrente
-          mission_activities: 1,
-          // punti totali
-          total_points: 1,
-          // attività visitate totali
-          total_activities: 1,
-        });
-        db.get("games")
-          .update(
-            { game_key: req.query.game_key },
-            {
-              $set: {
-                players: response[0].players,
-              },
-            }
-          )
-          .then(() => {
-            res.send({ ok: true });
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .find({
+        game_key: req.query.game_key,
+      })
+      .toArray((err, response) => {
+        if (response.length == 1) {
+          response[0].players.push({
+            id: req.query.player_id,
+            name: req.query.player_id,
+            username: "Nome in codice",
+            status: {
+              path: null,
+              mission: null,
+              activity: null,
+              // tempo impiegato per l'attività corrente
+              time_stuck: 0,
+            },
+            // tempo totale di gioco
+            time: 0,
+            // punti della missione corrente
+            mission_points: 1,
+            // attività visitate nella missione corrente
+            mission_activities: 1,
+            // punti totali
+            total_points: 1,
+            // attività visitate totali
+            total_activities: 1,
           });
-      } else res.send({ ok: false });
-    });
+          collection
+            .updateOne(
+              { game_key: req.query.game_key },
+              {
+                $set: {
+                  players: response[0].players,
+                },
+              }
+            )
+            .then(() => {
+              res.send({ ok: true });
+            });
+        } else res.send({ ok: false });
+      });
+  });
 });
 
 // Ritorna l'oggetto player se trovato nella partita
@@ -357,35 +360,51 @@ function findPlayerIndex(player_id, players) {
 
 // Tutor esegue fetch dei dati dei giocatori
 router.get("/tutor/update", (req, res) => {
-  db.get("games")
-    .find({
-      game_key: req.query.game_key,
-    })
-    .then((response) => res.send(response));
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .find({
+        game_key: req.query.game_key,
+      })
+      .toArray((err, response) => {
+        res.send(response);
+        client.close();
+      });
+  });
 });
 
 // Tutor aggiorna i dati dei giocatori
 router.post("/tutor/update", (req, res) => {
-  db.get("games")
-    .find({
-      game_key: req.query.game_key,
-    })
-    .then((response) => {
-      let db_index = findPlayerIndex(req.query.player_id, response[0].players);
-      response[0].players[db_index].name = req.body.name;
-      db.get("games")
-        .update(
-          { game_key: req.query.game_key },
-          {
-            $set: {
-              players: response[0].players,
-            },
-          }
-        )
-        .then(() => {
-          res.send(response[0].players[db_index]);
-        });
-    });
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .find({
+        game_key: req.query.game_key,
+      })
+      .toArray((err, response) => {
+        console.log(response);
+        let db_index = findPlayerIndex(
+          req.query.player_id,
+          response[0].players
+        );
+        response[0].players[db_index].name = req.body.name;
+        collection
+          .updateOne(
+            { game_key: req.query.game_key },
+            {
+              $set: {
+                players: response[0].players,
+              },
+            }
+          )
+          .then(() => {
+            res.send(response[0].players[db_index]);
+          });
+        client.close();
+      });
+  });
 });
 
 router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
