@@ -437,7 +437,9 @@ module.exports = {
     },
     infoButtonClass(player) {
       return {
-        blue: player.status.time_stuck > player.status.activity.max_time,
+        blue: player.status.activity
+          ? player.status.time_stuck > player.status.activity.max_time
+          : false,
       };
     },
     photoButtonClass(player) {

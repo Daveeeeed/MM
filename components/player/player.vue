@@ -3,7 +3,7 @@
     <div v-if="player" class="d-flex flex-column">
       <div id="toolbar" class="px-3">
         <strong id="score" style="color: white"
-          >Punteggio: {{ player.total_points }}</strong
+          >Punteggio: {{ player.total_points }} / {{player.total_activities}}</strong
         >
         <b-button class="chat-btn" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
@@ -277,7 +277,7 @@ module.exports = {
     },
     handleAnswer(answer) {
       this.verifying_answer = false;
-      this.player.status.time_stuck = 0;
+      if (answer) this.player.status.time_stuck = 0;
 
       let result = answer
         ? this.current_activity.correct
