@@ -463,8 +463,8 @@ module.exports = {
             });
           }
         });
-
-        this.$refs.imageFileInput.reset();
+        if (this.$refs.imageFileInput) this.$refs.imageFileInput.reset();
+        else this.$refs.videoFileInput.reset();
       }
     },
     background_file_input(file) {

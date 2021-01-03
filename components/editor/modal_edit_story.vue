@@ -427,7 +427,6 @@ module.exports = {
   computed: {
     available_filtered_missions: function () {
       let a = [];
-      console.log("available_filtered_missions");
       this.missions.forEach((mission) => {
         if (mission.activities.length > 0) {
           if (this.mission_filter) {
@@ -442,7 +441,6 @@ module.exports = {
     path_missions: function () {
       let a = [];
       if (this.selected_path) {
-        console.log("path_missions");
         this.selected_path.missions.forEach((mission) => {
           if (mission.key != "-1") a.push(mission);
         });
@@ -485,12 +483,9 @@ module.exports = {
     },
     valid_story_results: function () {
       let final_result = true;
-      console.log("valid_story_results1");
       this.story.paths.forEach((path) => {
-        console.log("valid_story_results2");
         path.missions.forEach((mission) => {
           if (mission.key != "-1") {
-            console.log("valid_story_results3");
             mission.results.forEach((result) => {
               if (result.key == null) final_result = false;
             });
@@ -535,7 +530,6 @@ module.exports = {
     },
     selectMission(data) {
       let a = [];
-      console.log("selectMission");
       this.selected_path.missions.forEach((mission) => {
         if (data.item.key != mission.key)
           a.push({
@@ -547,7 +541,6 @@ module.exports = {
     },
     maxResult(mission) {
       let a = 0;
-      console.log("maxResult");
       mission.activities.forEach((activity) => {
         a = a + parseInt(activity.correct.points);
       });
@@ -672,7 +665,6 @@ module.exports = {
 
     init() {
       this.active_section = this.sections[0];
-      console.log("init");
       this.story = JSON.parse(JSON.stringify(this.story_prop));
     },
     reset() {
