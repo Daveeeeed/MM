@@ -167,7 +167,7 @@ router.get("/stories", (req, res) => {
   MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
-    collection.find({}).toArray((response) => {
+    collection.find(req.query).toArray((response) => {
       res.send(response);
       client.close();
     });
@@ -178,7 +178,7 @@ router.get("/missions", (req, res) => {
   MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
-    collection.find({}).toArray((response) => {
+    collection.find(req.query).toArray((response) => {
       res.send(response);
       client.close();
     });
@@ -189,7 +189,7 @@ router.get("/activities", (req, res) => {
   MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
-    collection.find({}).toArray((response) => {
+    collection.find(req.query).toArray((response) => {
       res.send(response);
       client.close();
     });
