@@ -19,22 +19,6 @@ webSocketServer.on("connection", (webSocket) => {
   });
 });
 
-// MONK
-var monk = require("monk");
-var user = "davide";
-var passw = "zJRJBT3skYKKVWaw";
-var dbName = "techweb";
-//const url = "mongodb://site181982:Ko9sheeg@mongo_site181982/techweb";
-var url =
-  "mongodb+srv://" +
-  user +
-  ":" +
-  passw +
-  "@clustertw.wi8xg.gcp.mongodb.net/" +
-  dbName +
-  "?retryWrites=true&w=majority";
-var db = monk(url);
-
 const MongoClient = require("mongodb").MongoClient;
 
 const mongo_url = "mongodb://site181982:Ko9sheeg@mongo_site181982";
@@ -48,7 +32,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/stories/new", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.insertOne(req.body).then((response) => {
@@ -59,7 +43,7 @@ router.post("/stories/new", (req, res) => {
 });
 
 router.post("/missions/new", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
     collection.insertOne(req.body).then((response) => {
@@ -70,7 +54,7 @@ router.post("/missions/new", (req, res) => {
 });
 
 router.post("/activities/new", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
     collection.insertOne(req.body).then((response) => {
@@ -81,7 +65,7 @@ router.post("/activities/new", (req, res) => {
 });
 
 router.post("/stories/delete", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.findOneAndDelete({ key: req.body.key }).then((response) => {
@@ -92,7 +76,7 @@ router.post("/stories/delete", (req, res) => {
 });
 
 router.post("/missions/delete", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
     collection.findOneAndDelete({ key: req.body.key }).then((response) => {
@@ -103,7 +87,7 @@ router.post("/missions/delete", (req, res) => {
 });
 
 router.post("/activities/delete", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
     collection.findOneAndDelete({ key: req.body.key }).then((response) => {
@@ -114,7 +98,7 @@ router.post("/activities/delete", (req, res) => {
 });
 
 router.post("/stories/edit", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection
@@ -136,7 +120,7 @@ router.post("/stories/edit", (req, res) => {
 });
 
 router.post("/missions/edit", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
     collection
@@ -158,7 +142,7 @@ router.post("/missions/edit", (req, res) => {
 });
 
 router.post("/activities/edit", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
     collection
@@ -180,10 +164,10 @@ router.post("/activities/edit", (req, res) => {
 });
 
 router.get("/stories", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
-    collection.find({}).toArray((err, response) => {
+    collection.find({}).toArray((response) => {
       res.send(response);
       client.close();
     });
@@ -191,10 +175,10 @@ router.get("/stories", (req, res) => {
 });
 
 router.get("/missions", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
-    collection.find({}).toArray((err, response) => {
+    collection.find({}).toArray((response) => {
       res.send(response);
       client.close();
     });
@@ -202,10 +186,10 @@ router.get("/missions", (req, res) => {
 });
 
 router.get("/activities", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
-    collection.find({}).toArray((err, response) => {
+    collection.find({}).toArray((response) => {
       res.send(response);
       client.close();
     });
@@ -214,16 +198,14 @@ router.get("/activities", (req, res) => {
 
 // Fetch iniziale del tutor
 router.get("/tutor", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((err1, response) => {
-        console.log(err1)
-        console.log(response)
+      .then((response) => {
         res.send(response);
         client.close();
       });
@@ -250,14 +232,14 @@ router.post("/tutor", (req, res) => {
 
 // Fetch dei dati dei giocatori
 router.get("/tutor/update", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((err, response) => {
+      .then((response) => {
         res.send(response);
         client.close();
       });
@@ -266,14 +248,14 @@ router.get("/tutor/update", (req, res) => {
 
 // Tutor aggiorna i dati dei giocatori
 router.post("/tutor/update", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((err, response) => {
+      .then((response) => {
         let db_index = findPlayerIndex(req.query.player_id, response.players);
         response.players[db_index].name = req.body.name;
         collection
@@ -295,7 +277,7 @@ router.post("/tutor/update", (req, res) => {
 
 // Player esegue l'update dello status
 router.post("/player/update", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
@@ -329,17 +311,16 @@ router.post("/player/update", (req, res) => {
 
 // Chiamata solo una volta all'apertura del player
 router.get("/player", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
-      .find({
+      .findOne({
         game_key: req.query.game_key,
       })
-      .toArray((err, response) => {
-        console.log(response);
+      .then((response) => {
         if (response.length)
-          res.send(findPlayer(req.query.player_id, response[0].players));
+          res.send(findPlayer(req.query.player_id, response.players));
         else res.sendStatus(400);
         client.close();
       });
@@ -348,14 +329,14 @@ router.get("/player", (req, res) => {
 
 // Chiamata alla creazione di un nuovo player
 router.post("/player", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
+  MongoClient.connect(mongo_url, (client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((err, response) => {
+      .then((response) => {
         if (response.length == 1) {
           response.players.push({
             id: req.query.player_id,
