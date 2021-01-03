@@ -1,7 +1,9 @@
 // Packages
 const express = require("express");
 const router = express.Router();
+
 const fs = require("fs");
+
 const multer = require("multer");
 const upload = multer();
 
@@ -14,7 +16,7 @@ const mongo_dbName = "techweb";
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
-// WEB SOCKET
+// Websocket
 var ws = require("ws");
 var webSocketServer = new ws.Server({ port: 8080 });
 

@@ -199,7 +199,7 @@ module.exports = {
       let that = this;
       this.wsc = new WebSocketClient();
 
-      this.wsc.open("ws://frank.cs.unibo.it:8080");
+      this.wsc.open("wss://frank.cs.unibo.it:8080");
 
       this.wsc.onmessage = function (data) {
         let message = JSON.parse(data.data);
@@ -328,7 +328,6 @@ module.exports = {
             max_time: this.current_activity.time * 60,
           };
         } else {
-          console.log("finita");
           // Storia finita
           this.player.status.mission = {
             title: "Partita finita",
