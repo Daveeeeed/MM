@@ -1,9 +1,18 @@
-var express = require("express");
-var router = express.Router();
-var path = require("path");
-var fs = require("fs");
-var multer = require("multer");
-var upload = multer();
+// Packages
+const express = require("express");
+const router = express.Router();
+const fs = require("fs");
+const multer = require("multer");
+const upload = multer();
+
+// Mongo
+const MongoClient = require("mongodb").MongoClient;
+const mongo_url = "mongodb://site181982:Ko9sheeg@mongo_site181982";
+const mongo_dbName = "techweb";
+
+// Middlewares
+router.use(express.urlencoded({ extended: true }));
+router.use(express.json());
 
 // WEB SOCKET
 var ws = require("ws");
@@ -19,49 +28,20 @@ webSocketServer.on("connection", (webSocket) => {
   });
 });
 
-const MongoClient = require("mongodb").MongoClient;
-
-const mongo_url = "mongodb://site181982:Ko9sheeg@mongo_site181982";
-const mongo_dbName = "techweb";
-
-router.use(express.urlencoded({ extended: true }));
-router.use(express.json());
-
 router.get("/", function (req, res, next) {
   res.send("Api page - you shouldn't be here.");
 });
 
 router.post("/stories/new", (req, res) => {
-  MongoClient.connect(mongo_url, (err, client) => {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("stories");
-    collection.insertOne(req.body).then((response) => {
-      res.send(response.result);
-      client.close();
-    });
-  });
+  insertOne("stories", req.body).then((data) => res.send(data.result));
 });
 
 router.post("/missions/new", (req, res) => {
-  MongoClient.connect(mongo_url, (err, client) => {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("missions");
-    collection.insertOne(req.body).then((response) => {
-      res.send(response.result);
-      client.close();
-    });
-  });
+  insertOne("missions", req.body).then((data) => res.send(data.result));
 });
 
 router.post("/activities/new", (req, res) => {
-  MongoClient.connect(mongo_url, (err, client) => {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("activities");
-    collection.insertOne(req.body).then((response) => {
-      res.send(response.result);
-      client.close();
-    });
-  });
+  insertOne("activities", req.body).then((data) => res.send(data.result));
 });
 
 router.post("/stories/delete", (req, res) => {
@@ -319,8 +299,7 @@ router.get("/player", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((response, error) => {
-        if (!error)
-          res.send(findPlayer(req.query.player_id, response.players));
+        if (!error) res.send(findPlayer(req.query.player_id, response.players));
         else res.sendStatus(400);
         client.close();
       });
@@ -377,20 +356,6 @@ router.post("/player", (req, res) => {
   });
 });
 
-// Ritorna l'oggetto player se trovato nella partita
-function findPlayer(player_id, players) {
-  for (let i = 0; i < players.length; i++) {
-    if (players[i].id == player_id) return players[i];
-  }
-}
-
-// Ritorna l'indice dell'oggetto player se trovato nella partita
-function findPlayerIndex(player_id, players) {
-  for (let i = 0; i < players.length; i++) {
-    if (players[i].id == player_id) return i;
-  }
-}
-
 router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
   try {
     let data = req.file.buffer;
@@ -442,5 +407,39 @@ router.get("/resetGames", (req, res) => {
 router.get("/testing", function (req, res, next) {
   res.send("Test route");
 });
+
+// Inserisce l'elemento nella collezione, ritornando il risultato dell'inserimento
+function insertOne(collection_name, element) {
+  return new Promise((resolve, reject) => {
+    try {
+      MongoClient.connect(mongo_url, (err, client) => {
+        if (err) throw "Connection Error";
+        let mongo_db = client.db(mongo_dbName);
+        let collection = mongo_db.collection(collection_name);
+        collection.insertOne(element).then((response) => {
+          client.close();
+          resolve(response);
+        });
+      });
+    } catch (error) {
+      console.log(error);
+      reject();
+    }
+  });
+}
+
+// Ritorna l'oggetto player se trovato nella partita
+function findPlayer(player_id, players) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id == player_id) return players[i];
+  }
+}
+
+// Ritorna l'indice dell'oggetto player se trovato nella partita
+function findPlayerIndex(player_id, players) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id == player_id) return i;
+  }
+}
 
 module.exports = router;
