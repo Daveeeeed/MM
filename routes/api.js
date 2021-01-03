@@ -205,7 +205,9 @@ router.get("/tutor", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((response) => {
+      .then((err1, response) => {
+        console.log(err1)
+        console.log(response)
         res.send(response);
         client.close();
       });
@@ -239,7 +241,9 @@ router.get("/tutor/update", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((response) => {
+      .then((err1, response) => {
+        console.log(err1)
+        console.log(response)
         res.send(response);
         client.close();
       });
