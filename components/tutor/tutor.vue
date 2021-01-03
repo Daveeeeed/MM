@@ -375,7 +375,7 @@ module.exports = {
       fetch("/api/tutor/update?game_key=" + this.game_key)
         .then((response) => response.json())
         .then((data) => {
-          this.game = data[0];
+          this.game = data;
           this.game.players.forEach((player) => {
             if (this.messages[player.id] == undefined)
               this.messages[player.id] = [];
