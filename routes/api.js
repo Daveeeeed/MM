@@ -212,21 +212,23 @@ router.get("/activities", (req, res) => {
   });
 });
 
+// Fetch iniziale del tutor
 router.get("/tutor", (req, res) => {
   MongoClient.connect(mongo_url, function (err, client) {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
-      .find({
+      .findOne({
         game_key: req.query.game_key,
       })
-      .toArray((err, response) => {
+      .then((err, response) => {
         res.send(response);
         client.close();
       });
   });
 });
 
+// Creazione nuova partita
 router.post("/tutor", (req, res) => {
   MongoClient.connect(mongo_url, function (err, client) {
     let mongo_db = client.db(mongo_dbName);
@@ -244,35 +246,83 @@ router.post("/tutor", (req, res) => {
   });
 });
 
+// Fetch dei dati dei giocatori
+router.get("/tutor/update", (req, res) => {
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .findOne({
+        game_key: req.query.game_key,
+      })
+      .then((err, response) => {
+        res.send(response);
+        client.close();
+      });
+  });
+});
+
+// Tutor aggiorna i dati dei giocatori
+router.post("/tutor/update", (req, res) => {
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .findOne({
+        game_key: req.query.game_key,
+      })
+      .then((err, response) => {
+        let db_index = findPlayerIndex(req.query.player_id, response.players);
+        response.players[db_index].name = req.body.name;
+        collection
+          .updateOne(
+            { game_key: req.query.game_key },
+            {
+              $set: {
+                players: response.players,
+              },
+            }
+          )
+          .then(() => {
+            res.send(response.players[db_index]);
+          });
+        client.close();
+      });
+  });
+});
+
 // Player esegue l'update dello status
 router.post("/player/update", (req, res) => {
-  db.get("games")
-    .find({
-      game_key: req.query.game_key,
-    })
-    .then((response) => {
-      let db_index = findPlayerIndex(req.query.player_id, response[0].players);
-      response[0].players[db_index].status = req.body.status;
-      response[0].players[db_index].mission_points = req.body.mission_points;
-      response[0].players[db_index].mission_activities =
-        req.body.mission_activities;
-      response[0].players[db_index].total_points = req.body.total_points;
-      response[0].players[db_index].total_activities =
-        req.body.total_activities;
-      response[0].players[db_index].time = req.body.time;
-      db.get("games")
-        .update(
-          { game_key: req.query.game_key },
-          {
-            $set: {
-              players: response[0].players,
-            },
-          }
-        )
-        .then(() => {
-          res.send(response[0].players[db_index]);
-        });
-    });
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .findOne({
+        game_key: req.query.game_key,
+      })
+      .then((response) => {
+        let db_index = findPlayerIndex(req.query.player_id, response.players);
+        response.players[db_index].status = req.body.status;
+        response.players[db_index].mission_points = req.body.mission_points;
+        response.players[db_index].mission_activities =
+          req.body.mission_activities;
+        response.players[db_index].total_points = req.body.total_points;
+        response.players[db_index].total_activities = req.body.total_activities;
+        response.players[db_index].time = req.body.time;
+        collection
+          .updateOne(
+            { game_key: req.query.game_key },
+            {
+              $set: {
+                players: response.players,
+              },
+            }
+          )
+          .then(() => {
+            res.send(response.players[db_index]);
+          });
+      });
+  });
 });
 
 // Chiamata solo una volta all'apertura del player
@@ -300,12 +350,12 @@ router.post("/player", (req, res) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
-      .find({
+      .findOne({
         game_key: req.query.game_key,
       })
-      .toArray((err, response) => {
+      .then((err, response) => {
         if (response.length == 1) {
-          response[0].players.push({
+          response.players.push({
             id: req.query.player_id,
             name: req.query.player_id,
             username: "Nome in codice",
@@ -332,7 +382,7 @@ router.post("/player", (req, res) => {
               { game_key: req.query.game_key },
               {
                 $set: {
-                  players: response[0].players,
+                  players: response.players,
                 },
               }
             )
@@ -357,55 +407,6 @@ function findPlayerIndex(player_id, players) {
     if (players[i].id == player_id) return i;
   }
 }
-
-// Tutor esegue fetch dei dati dei giocatori
-router.get("/tutor/update", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("games");
-    collection
-      .findOne({
-        game_key: req.query.game_key,
-      })
-      .then((err, response) => {
-        res.send(response);
-        client.close();
-      });
-  });
-});
-
-// Tutor aggiorna i dati dei giocatori
-router.post("/tutor/update", (req, res) => {
-  MongoClient.connect(mongo_url, function (err, client) {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("games");
-    collection
-      .find({
-        game_key: req.query.game_key,
-      })
-      .toArray((err, response) => {
-        console.log(response);
-        let db_index = findPlayerIndex(
-          req.query.player_id,
-          response[0].players
-        );
-        response[0].players[db_index].name = req.body.name;
-        collection
-          .updateOne(
-            { game_key: req.query.game_key },
-            {
-              $set: {
-                players: response[0].players,
-              },
-            }
-          )
-          .then(() => {
-            res.send(response[0].players[db_index]);
-          });
-        client.close();
-      });
-  });
-});
 
 router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
   try {
