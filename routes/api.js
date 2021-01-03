@@ -424,11 +424,8 @@ function find(collection_name, query = null) {
         collection
           .find(query)
           .toArray()
-          .then((err1, response) => {
-            console.log("Error");
-            console.log(err1);
-            console.log("Response");
-            console.log(response);
+          .then((response, data_error) => {
+            if (data_error) throw "Operation Error";
             client.close();
             resolve(response);
           });
