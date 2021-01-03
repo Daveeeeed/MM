@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 const port = "8000";
-const WSServer = require("ws").Server;
+const ws = require("ws");
 const server = require("http").createServer();
 const app = require("../app");
 
 // Create web socket server on top of a regular http server
-let webSocketServer = new WSServer({
+const webSocketServer = new ws.Server({
   server: server,
 });
 

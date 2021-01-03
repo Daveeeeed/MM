@@ -15,21 +15,7 @@ const mongo_dbName = "techweb";
 // Middlewares
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
-/*
-// Websocket
-var ws = require("ws");
-var webSocketServer = new ws.Server({ port: 8080 });
 
-webSocketServer.on("connection", (webSocket) => {
-  webSocket.on("message", (data) => {
-    webSocketServer.clients.forEach((client) => {
-      if (client.readyState === ws.OPEN) {
-        client.send(data);
-      }
-    });
-  });
-});
-*/
 router.get("/", function (req, res, next) {
   res.send("Api page - you shouldn't be here.");
 });
