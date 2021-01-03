@@ -144,36 +144,21 @@ router.post("/activities/edit", (req, res) => {
 });
 
 router.get("/stories", (req, res) => {
-  MongoClient.connect(mongo_url, (err, client) => {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("stories");
-    collection.find(req.query).toArray((response) => {
-      res.send(response);
-      client.close();
-    });
-  });
+  find("stories", req.query ? req.query : null).then((response) =>
+    res.send(response)
+  );
 });
 
 router.get("/missions", (req, res) => {
-  MongoClient.connect(mongo_url, (err, client) => {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("missions");
-    collection.find(req.query).toArray((response) => {
-      res.send(response);
-      client.close();
-    });
-  });
+  find("missions", req.query ? req.query : null).then((response) =>
+    res.send(response)
+  );
 });
 
 router.get("/activities", (req, res) => {
-  MongoClient.connect(mongo_url, (err, client) => {
-    let mongo_db = client.db(mongo_dbName);
-    let collection = mongo_db.collection("activities");
-    collection.find(req.query).toArray((response) => {
-      res.send(response);
-      client.close();
-    });
-  });
+  find("activities", req.query ? req.query : null).then((response) =>
+    res.send(response)
+  );
 });
 
 // Fetch iniziale del tutor
@@ -420,6 +405,33 @@ function insertOne(collection_name, element) {
           client.close();
           resolve(response);
         });
+      });
+    } catch (error) {
+      console.log(error);
+      reject();
+    }
+  });
+}
+
+// Trova e ritrna un array contenente gli elementi corrispondenti alla query
+function find(collection_name, query = null) {
+  return new Promise((resolve, reject) => {
+    try {
+      MongoClient.connect(mongo_url, (err, client) => {
+        if (err) throw "Connection Error";
+        let mongo_db = client.db(mongo_dbName);
+        let collection = mongo_db.collection(collection_name);
+        collection
+          .find(query)
+          .toArray()
+          .then((err1, response) => {
+            console.log("Error");
+            console.log(err1);
+            console.log("Response");
+            console.log(response);
+            client.close();
+            resolve(response);
+          });
       });
     } catch (error) {
       console.log(error);
