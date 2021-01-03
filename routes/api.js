@@ -213,21 +213,42 @@ router.get("/activities", (req, res) => {
 });
 
 router.get("/tutor", (req, res) => {
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .find({
+        game_key: req.query.game_key,
+      })
+      .toArray((err, response) => {
+        res.send(response);
+        client.close();
+      });
+  });
+  /*
   db.get("games")
     .find({
       game_key: req.query.game_key,
     })
     .then((response) => res.send(response[0]));
+    */
 });
 
 router.post("/tutor", (req, res) => {
-  db.get("games")
-    .insert({
-      story_key: req.query.story_key,
-      game_key: req.query.game_key,
-      players: [],
-    })
-    .then(() => res.send());
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .insertOne({
+        story_key: req.query.story_key,
+        game_key: req.query.game_key,
+        players: [],
+      })
+      .then(() => {
+        res.send();
+        client.close();
+      });
+  });
 });
 
 // Player esegue l'update dello status
@@ -401,11 +422,17 @@ router.post("/uploadPhoto", upload.single("photo"), (req, res) => {
 });
 
 router.get("/resetGames", (req, res) => {
-  db.get("games")
-    .remove()
-    .then(() => {
-      res.send("Games successfully removed.");
-    });
+  MongoClient.connect(mongo_url, function (err, client) {
+    let mongo_db = client.db(mongo_dbName);
+    let collection = mongo_db.collection("games");
+    collection
+      .deleteMany({
+        game_key: req.query.game_key,
+      })
+      .then(() => {
+        res.send("Games successfully removed.");
+      });
+  });
 });
 
 /* GET test route */
