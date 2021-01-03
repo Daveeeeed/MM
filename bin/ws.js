@@ -13,3 +13,15 @@ webSocketServer.on("connection", (webSocket) => {
     });
   });
 });
+
+const express = require('express')
+const app = express()
+const port = 8100
+
+app.get('/', (req, res) => {
+  res.send('Server per websocket')
+})
+
+app.listen(port, () => {
+  console.log("Server avviato")
+})
