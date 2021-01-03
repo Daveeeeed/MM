@@ -144,21 +144,15 @@ router.post("/activities/edit", (req, res) => {
 });
 
 router.get("/stories", (req, res) => {
-  find("stories", req.query ? req.query : null).then((response) =>
-    res.send(response)
-  );
+  find("stories", req.query).then((response) => res.send(response));
 });
 
 router.get("/missions", (req, res) => {
-  find("missions", req.query ? req.query : null).then((response) =>
-    res.send(response)
-  );
+  find("missions", req.query).then((response) => res.send(response));
 });
 
 router.get("/activities", (req, res) => {
-  find("activities", req.query ? req.query : null).then((response) =>
-    res.send(response)
-  );
+  find("activities", req.query).then((response) => res.send(response));
 });
 
 // Fetch iniziale del tutor
@@ -221,7 +215,7 @@ router.post("/tutor/update", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((response, error) => {
-        let db_index = findPlayerIndex(req.query.player_id, response.players);
+        let db_index = findPlayer(req.query.player_id, response.players).index;
         response.players[db_index].name = req.body.name;
         collection
           .updateOne(
@@ -250,7 +244,7 @@ router.post("/player/update", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((response, error) => {
-        let db_index = findPlayerIndex(req.query.player_id, response.players);
+        let db_index = findPlayer(req.query.player_id, response.players).index;
         response.players[db_index].status = req.body.status;
         response.players[db_index].mission_points = req.body.mission_points;
         response.players[db_index].mission_activities =
@@ -284,7 +278,8 @@ router.get("/player", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((response, error) => {
-        if (!error) res.send(findPlayer(req.query.player_id, response.players));
+        if (!error)
+          res.send(findPlayer(req.query.player_id, response.players).player);
         else res.sendStatus(400);
         client.close();
       });
@@ -440,15 +435,13 @@ function find(collection_name, query = null) {
 // Ritorna l'oggetto player se trovato nella partita
 function findPlayer(player_id, players) {
   for (let i = 0; i < players.length; i++) {
-    if (players[i].id == player_id) return players[i];
+    if (players[i].id == player_id)
+      return {
+        player: players[i],
+        index: i,
+      };
   }
-}
-
-// Ritorna l'indice dell'oggetto player se trovato nella partita
-function findPlayerIndex(player_id, players) {
-  for (let i = 0; i < players.length; i++) {
-    if (players[i].id == player_id) return i;
-  }
+  return null;
 }
 
 module.exports = router;
