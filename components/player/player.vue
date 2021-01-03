@@ -272,8 +272,8 @@ module.exports = {
         for (let i = 0; i < array.length; i++) {
           if (array[i].key == key) return array[i];
         }
-      }
-      return -1;
+        return -1;
+      } else return null;
     },
     handleAnswer(answer) {
       this.verifying_answer = false;
