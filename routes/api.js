@@ -205,9 +205,7 @@ router.get("/tutor", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((err1, response) => {
-        console.log(err1)
-        console.log(response)
+      .then((response, error) => {
         res.send(response);
         client.close();
       });
@@ -241,9 +239,7 @@ router.get("/tutor/update", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((err1, response) => {
-        console.log(err1)
-        console.log(response)
+      .then((response, error) => {
         res.send(response);
         client.close();
       });
@@ -259,7 +255,7 @@ router.post("/tutor/update", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((response) => {
+      .then((response, error) => {
         let db_index = findPlayerIndex(req.query.player_id, response.players);
         response.players[db_index].name = req.body.name;
         collection
@@ -288,7 +284,7 @@ router.post("/player/update", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((response) => {
+      .then((response, error) => {
         let db_index = findPlayerIndex(req.query.player_id, response.players);
         response.players[db_index].status = req.body.status;
         response.players[db_index].mission_points = req.body.mission_points;
@@ -322,7 +318,7 @@ router.get("/player", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((response) => {
+      .then((response, error) => {
         if (response.length)
           res.send(findPlayer(req.query.player_id, response.players));
         else res.sendStatus(400);
@@ -340,7 +336,7 @@ router.post("/player", (req, res) => {
       .findOne({
         game_key: req.query.game_key,
       })
-      .then((response) => {
+      .then((response, error) => {
         if (response.length == 1) {
           response.players.push({
             id: req.query.player_id,
