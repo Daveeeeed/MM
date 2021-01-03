@@ -32,7 +32,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/stories/new", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.insertOne(req.body).then((response) => {
@@ -43,7 +43,7 @@ router.post("/stories/new", (req, res) => {
 });
 
 router.post("/missions/new", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
     collection.insertOne(req.body).then((response) => {
@@ -54,7 +54,7 @@ router.post("/missions/new", (req, res) => {
 });
 
 router.post("/activities/new", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
     collection.insertOne(req.body).then((response) => {
@@ -65,7 +65,7 @@ router.post("/activities/new", (req, res) => {
 });
 
 router.post("/stories/delete", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.findOneAndDelete({ key: req.body.key }).then((response) => {
@@ -76,7 +76,7 @@ router.post("/stories/delete", (req, res) => {
 });
 
 router.post("/missions/delete", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
     collection.findOneAndDelete({ key: req.body.key }).then((response) => {
@@ -87,7 +87,7 @@ router.post("/missions/delete", (req, res) => {
 });
 
 router.post("/activities/delete", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
     collection.findOneAndDelete({ key: req.body.key }).then((response) => {
@@ -98,7 +98,7 @@ router.post("/activities/delete", (req, res) => {
 });
 
 router.post("/stories/edit", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection
@@ -120,7 +120,7 @@ router.post("/stories/edit", (req, res) => {
 });
 
 router.post("/missions/edit", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
     collection
@@ -142,7 +142,7 @@ router.post("/missions/edit", (req, res) => {
 });
 
 router.post("/activities/edit", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
     collection
@@ -164,7 +164,7 @@ router.post("/activities/edit", (req, res) => {
 });
 
 router.get("/stories", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("stories");
     collection.find({}).toArray((response) => {
@@ -175,7 +175,7 @@ router.get("/stories", (req, res) => {
 });
 
 router.get("/missions", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("missions");
     collection.find({}).toArray((response) => {
@@ -186,7 +186,7 @@ router.get("/missions", (req, res) => {
 });
 
 router.get("/activities", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("activities");
     collection.find({}).toArray((response) => {
@@ -198,7 +198,7 @@ router.get("/activities", (req, res) => {
 
 // Fetch iniziale del tutor
 router.get("/tutor", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
@@ -232,7 +232,7 @@ router.post("/tutor", (req, res) => {
 
 // Fetch dei dati dei giocatori
 router.get("/tutor/update", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
@@ -248,7 +248,7 @@ router.get("/tutor/update", (req, res) => {
 
 // Tutor aggiorna i dati dei giocatori
 router.post("/tutor/update", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
@@ -277,7 +277,7 @@ router.post("/tutor/update", (req, res) => {
 
 // Player esegue l'update dello status
 router.post("/player/update", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
@@ -311,7 +311,7 @@ router.post("/player/update", (req, res) => {
 
 // Chiamata solo una volta all'apertura del player
 router.get("/player", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
@@ -329,7 +329,7 @@ router.get("/player", (req, res) => {
 
 // Chiamata alla creazione di un nuovo player
 router.post("/player", (req, res) => {
-  MongoClient.connect(mongo_url, (client) => {
+  MongoClient.connect(mongo_url, (err, client) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
