@@ -345,7 +345,7 @@ module.exports = {
       let that = this;
       this.wsc = new WebSocketClient();
 
-      this.wsc.open("wss://davide.tinti3.tw.cs.unibo.it");
+      this.wsc.open("wss://site181982.tw.cs.unibo.it");
 
       this.wsc.onmessage = function (data) {
         let message = JSON.parse(data.data);
@@ -494,7 +494,8 @@ WebSocketClient.prototype.open = function (url) {
     this.onmessage(data, flags, this.number);
   };
   this.instance.onclose = (e) => {
-    if (e.code == 1000) console.log("WebSocket: closed"); // CLOSE_NORMAL
+    if (e.code == 1000) console.log("WebSocket: closed");
+    // CLOSE_NORMAL
     else this.reconnect(e); // Abnormal closure
     this.onclose(e);
   };

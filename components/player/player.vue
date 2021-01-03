@@ -199,7 +199,7 @@ module.exports = {
       let that = this;
       this.wsc = new WebSocketClient();
 
-      this.wsc.open("wss://davide.tinti3.tw.cs.unibo.it");
+      this.wsc.open("wss://site181982.tw.cs.unibo.it");
 
       this.wsc.onmessage = function (data) {
         let message = JSON.parse(data.data);
