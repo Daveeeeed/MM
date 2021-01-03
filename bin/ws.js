@@ -2,7 +2,7 @@
 
 // Websocket
 var ws = require("ws");
-var webSocketServer = new ws.Server({ port: 8090 });
+var webSocketServer = new ws.Server({ port: 8100 });
 
 webSocketServer.on("connection", (webSocket) => {
   webSocket.on("message", (data) => {
@@ -16,7 +16,7 @@ webSocketServer.on("connection", (webSocket) => {
 
 const express = require('express')
 const app = express()
-const port = 8100
+const port = 8000
 
 app.get('/', (req, res) => {
   res.send('Server per websocket')
