@@ -319,7 +319,7 @@ router.get("/player", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((response, error) => {
-        if (response.length)
+        if (!error)
           res.send(findPlayer(req.query.player_id, response.players));
         else res.sendStatus(400);
         client.close();
@@ -337,7 +337,7 @@ router.post("/player", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((response, error) => {
-        if (response.length == 1) {
+        if (!error) {
           response.players.push({
             id: req.query.player_id,
             name: req.query.player_id,
