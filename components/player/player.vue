@@ -268,8 +268,10 @@ module.exports = {
     },
     // Utilities
     findObject(array, key) {
-      for (let i = 0; i < array.length; i++) {
-        if (array[i].key == key) return array[i];
+      if (array && key) {
+        for (let i = 0; i < array.length; i++) {
+          if (array[i].key == key) return array[i];
+        }
       }
       return -1;
     },
