@@ -364,10 +364,10 @@ router.get("/tutor/update", (req, res) => {
     let mongo_db = client.db(mongo_dbName);
     let collection = mongo_db.collection("games");
     collection
-      .find({
+      .findOne({
         game_key: req.query.game_key,
       })
-      .toArray((err, response) => {
+      .then((err, response) => {
         res.send(response);
         client.close();
       });
