@@ -222,6 +222,7 @@ router.get("/tutor", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((err, response) => {
+        console.log(response)
         res.send(response);
         client.close();
       });

@@ -329,7 +329,7 @@ module.exports = {
   methods: {
     initTutor() {
       fetch("/api/tutor?game_key=" + this.game_key)
-        .then((response) => response.json())
+        .then((response) => {console.log(response);response.json()})
         .then((data) => {
           this.game = data;
           this.game.players.forEach((player) => {
