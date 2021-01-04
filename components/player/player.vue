@@ -420,8 +420,9 @@ module.exports = {
       this.check_answer = false;
     },
     setFocusConfirmClose() {
-      $("#activity-title").focus();
       this.$bvModal.hide("error-alert");
+      $("#activity-title").focus();
+
     },
   },
   components: {
