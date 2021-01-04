@@ -286,6 +286,7 @@ module.exports = {
         {
           type: "Immagine",
           url: "",
+          description: "",
         },
         {
           type: "Video",

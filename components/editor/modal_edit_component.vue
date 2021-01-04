@@ -216,9 +216,11 @@
                 icon="plus"
               ></b-icon>
             </div>
-            <label for="range-1">Descrizione dell'immagine (opzionale)</label>
+            <label class="mt-4" for="image-description"
+              >Descrizione dell'immagine (opzionale)</label
+            >
             <b-form-textarea
-              class="my-2"
+              id="image-description"
               v-model="component.description"
               placeholder="Descrizione..."
               no-resize
@@ -382,10 +384,10 @@ module.exports = {
           return component.description;
         }
         case "Immagine": {
-          return true;
+          return component.url;
         }
         case "Video": {
-          return true;
+          return component.url;
         }
         case "Memory": {
           for (let i = 0; i < component.images.length; i++) {

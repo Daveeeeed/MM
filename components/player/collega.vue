@@ -11,7 +11,7 @@
         @click="completePhrase(part)"
       >
         {{ part.phrase
-        }}{{ part.matched_part ? part.matched_part.phrase : "..." }}
+        }}{{ part.matched_part ? " " + part.matched_part.phrase : "..." }}
       </b-button>
     </div>
     <p class="align-self-center" style="text-align: center">
