@@ -51,12 +51,12 @@ module.exports = {
   methods: {
     completePhrase(part) {
       if (this.selected_part) {
-        part.matched_part = this.selected_part;
-        this.selected_part = null;
         this.first_parts.forEach((first_part) => {
           if (first_part.matched_part == part.matched_part)
-            first_parts.matched_part = null;
+            first_part.matched_part = null;
         });
+        part.matched_part = this.selected_part;
+        this.selected_part = null;
       }
     },
     // Component selection
