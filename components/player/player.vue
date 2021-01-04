@@ -66,7 +66,7 @@
                   src="https://site181982.tw.cs.unibo.it/public/images/logo2.png"
                   alt="Logo"
                   height="200"
-                  @click="clearInterval(interval)"
+                  @click="deleteInterval()"
                 />
               </a>
               <div class="mt-2">Torna alla home</div>
@@ -377,6 +377,9 @@ module.exports = {
     },
     confirmAnswer() {
       this.check_answer = true;
+    },
+    deleteInterval() {
+      clearInterval(this.interval);
     },
   },
   components: {

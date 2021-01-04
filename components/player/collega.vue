@@ -56,12 +56,14 @@ module.exports = {
     completePhrase(part) {
       if (this.selected_part) {
         this.first_parts.forEach((first_part) => {
-          if (first_part.matched_part == part.matched_part)
+          if (first_part.matched_part == part.matched_part) {
             first_part.matched_part = null;
+            console.log("resettato uno");
+            this.$forceUpdate();
+          }
         });
         part.matched_part = this.selected_part;
         this.selected_part = null;
-        this.$forceUpdate();
       }
     },
     // Component selection
