@@ -3,18 +3,19 @@
     <div class="activity-text" id="question">
       {{ element.component.question }}
     </div>
-    <b-form-group>
-      <b-form-radio
-        v-for="(radio_answer, index) in element.component.answers"
-        :key="index"
-        v-model="answer"
-        :value="index"
-        name="answers"
-        class="my-1"
-        role="group"
-        >{{ radio_answer }}
-      </b-form-radio>
-    </b-form-group>
+    <fieldset>
+      <b-form-group>
+        <b-form-radio
+          v-for="(radio_answer, index) in element.component.answers"
+          :key="index"
+          v-model="answer"
+          :value="index"
+          name="answers"
+          class="my-1"
+          >{{ radio_answer }}
+        </b-form-radio>
+      </b-form-group>
+    </fieldset>
   </div>
 </template>
 
