@@ -1,13 +1,25 @@
 <template>
   <div>
-    <h2>Prime parti</h2>
-    <div v-for="(part, index) in first_parts" :key="index">
-      {{part.phrase}}
+    <h2>Seconde parti</h2>
+    <div class="d-flex flex-wrap mission-group-item">
+      <b-button
+        v-for="(part, index) in first_parts"
+        :key="index"
+        class="m-2 list-group-item"
+        @click="selectPart(part)"
+        :disabled="disableSpecial"
+        :class="checkSelected(part)"
+        style="height: 75px; width: 130px"
+      >
+        {{ part.phrase }}
+      </b-button>
     </div>
+    <!--
     <h2>Seconde parti</h2>
     <div v-for="(part, index) in second_parts" :key="index">
-      {{part.phrase}}
+      {{ part.phrase }}
     </div>
+    -->
   </div>
 </template>
 
@@ -17,6 +29,7 @@ module.exports = {
     return {
       first_parts: [],
       second_parts: [],
+      selected_part: null,
     };
   },
   props: {
@@ -29,6 +42,23 @@ module.exports = {
     },
   },
   methods: {
+    // Component selection
+    selectPart(part) {
+      if (this.selected_part) {
+        if (this.selected_part == part) {
+          this.selected_part = null;
+        } else {
+          this.selected_part = part;
+        }
+      } else {
+        this.selected_part = part;
+      }
+    },
+    partClass(part) {
+      return {
+        unavailable: part != this.selected_part,
+      };
+    },
     sendAnswer() {
       let is_correct = false;
       this.$emit("answer-sent", is_correct);
@@ -60,4 +90,27 @@ module.exports = {
 };
 </script>
 
-<style></style>
+<style>
+.list-group-item {
+  background-color: var(--object-color);
+  color: var(--text-color);
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 2px 0 var(--active-color);
+  overflow: hidden;
+  outline: 0;
+}
+
+.list-group-item:hover {
+  background-color: var(--hover-color);
+}
+
+.list-group-item:focus {
+  background-color: var(--hover-color);
+}
+
+.list-group-item.unavailable {
+  color: var(--disabled-color);
+  box-shadow: 0 2px 0 var(--disabled-color);
+}
+</style>
