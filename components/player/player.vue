@@ -22,7 +22,7 @@
         >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
-              <h1>{{current_activity.title}}</h1>
+              <div aria-label={{current_activity.title}}>{{current_activity.title}}</div>
               <component
                 v-for="(element, index) in current_activity.elements"
                 :key="index"
@@ -66,6 +66,7 @@
                   src="https://site181982.tw.cs.unibo.it/public/images/logo2.png"
                   alt="Logo"
                   height="200"
+                  air-label="Torna alla home"
                   @click="clearInterval(interval)"
                 />
               </a>
