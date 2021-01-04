@@ -54,7 +54,7 @@ module.exports = {
         part.matched_part = this.selected_part;
         this.selected_part = null;
         this.first_parts.forEach((first_part) => {
-          if (firts_part.matched_part == part.matched_part)
+          if (first_part.matched_part == part.matched_part)
             first_parts.matched_part = null;
         });
       }
@@ -123,6 +123,8 @@ module.exports = {
   border-radius: 10px;
   overflow: hidden;
   outline: 0;
+  width: fit-content;
+  text-align: start;
 }
 
 .connect-item:hover {
