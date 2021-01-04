@@ -201,7 +201,10 @@
         <div v-if="component.type == 'Immagine'" style="width: 100%">
           <h5>Immagine</h5>
           <p>La seguente immagine sarà mostrata nella schermata</p>
-          <div class="d-flex justify-content-center" style="width: 100%">
+          <div
+            class="d-flex flex-column align-items-center"
+            style="width: 100%"
+          >
             <div
               class="image-container"
               @click="openImageSelector()"
@@ -213,6 +216,14 @@
                 icon="plus"
               ></b-icon>
             </div>
+            <label for="range-1">Descrizione dell'immagine (opzionale)</label>
+            <b-form-textarea
+              class="my-2"
+              v-model="component.description"
+              placeholder="Descrizione..."
+              no-resize
+              rows="3"
+            ></b-form-textarea>
             <b-form-file
               v-model="photo_file_input"
               accept="image/*"

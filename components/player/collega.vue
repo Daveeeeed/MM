@@ -1,6 +1,8 @@
 <template>
   <div class="d-flex flex-column" style="width: 100%">
-    <h2 class="align-self-center">Prime parti</h2>
+    <p class="align-self-center" style="text-align: center">
+      Completa le frasi...
+    </p>
     <div class="align-self-start d-flex flex-column">
       <b-button
         v-for="(part, index) in first_parts"
@@ -8,11 +10,13 @@
         class="m-2 connect-item"
         @click="completePhrase(part)"
       >
-        {{ part.phrase }}
-        {{ part.matched_part ? part.matched_part.phrase : "..." }}
+        {{ part.phrase
+        }}{{ part.matched_part ? part.matched_part.phrase : "..." }}
       </b-button>
     </div>
-    <h2 class="align-self-center">Seconde parti</h2>
+    <p class="align-self-center" style="text-align: center">
+      ...scegliendo tra queste parti
+    </p>
     <div class="d-flex flex-wrap justify-content-center">
       <b-button
         v-for="(part, index) in second_parts"
@@ -57,6 +61,7 @@ module.exports = {
         });
         part.matched_part = this.selected_part;
         this.selected_part = null;
+        this.$forceUpdate();
       }
     },
     // Component selection
