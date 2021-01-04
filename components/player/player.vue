@@ -93,7 +93,7 @@
               autofocus
               class="mx-1"
               @click="ok"
-              :aria-label="alert - message"
+              :aria-label="alert_message"
             >
               Ok
             </b-button>
