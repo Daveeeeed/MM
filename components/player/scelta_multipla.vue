@@ -9,15 +9,16 @@
         v-for="(radio_answer, index) in element.component.answers"
         :key="index"
       >
-        <input
-          :id="'radio-button' + index"
-          v-model="answer"
-          :value="index"
-          name="answers"
-          class="my-1"
-          type="radio"
-        />
-        <label :for="'radio-button' + index">{{ radio_answer }}</label>
+        <div class="my-1">
+          <input
+            :id="'radio-button' + index"
+            v-model="answer"
+            :value="index"
+            name="answers"
+            type="radio"
+          />
+          <label :for="'radio-button' + index">{{ radio_answer }}</label>
+        </div>
       </div>
     </div>
   </div>
