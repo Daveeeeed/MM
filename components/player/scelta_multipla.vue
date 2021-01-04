@@ -4,8 +4,7 @@
       {{ element.component.question }}
     </div>
   <div role="radiogroup">
-      <b-form-group>
-        <b-form-radio
+      <imput
           v-for="(radio_answer, index) in element.component.answers"
           :key="index"
           v-model="answer"
@@ -13,8 +12,7 @@
           name="answers"
           class="my-1"
           >{{ radio_answer }}
-        </b-form-radio>
-      </b-form-group>
+      </imput>
   </div>
   </div>
 </template>
