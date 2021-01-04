@@ -1,25 +1,27 @@
 <template>
-  <div>
-    <h2>Seconde parti</h2>
-    <div class="d-flex flex-wrap mission-group-item">
-      <b-button
-        v-for="(part, index) in first_parts"
-        :key="index"
-        class="m-2 list-group-item"
-        @click="selectPart(part)"
-        :disabled="disableSpecial"
-        :class="checkSelected(part)"
-        style="height: 75px; width: 130px"
-      >
+  <div class="d-flex flex-wrap">
+    <div class="d-flex flex-column align-items-center">
+      <h2>Prime parti</h2>
+      <div v-for="(part, index) in first_parts" :key="index">
         {{ part.phrase }}
-      </b-button>
+      </div>
     </div>
-    <!--
-    <h2>Seconde parti</h2>
-    <div v-for="(part, index) in second_parts" :key="index">
-      {{ part.phrase }}
+    <div class="d-flex flex-column align-items-center">
+      <h2>Seconde parti</h2>
+      <div class="d-flex flex-wrap mission-group-item justify-content-center">
+        <b-button
+          v-for="(part, index) in second_parts"
+          :key="index"
+          class="m-2 list-group-item"
+          @click="selectPart(part)"
+          :disabled="disablePart(part)"
+          :class="checkSelected(part)"
+          style="height: 75px; width: 130px"
+        >
+          {{ part.phrase }}
+        </b-button>
+      </div>
     </div>
-    -->
   </div>
 </template>
 
@@ -42,6 +44,9 @@ module.exports = {
     },
   },
   methods: {
+    disablePart(part) {
+      return false;
+    },
     // Component selection
     selectPart(part) {
       if (this.selected_part) {
