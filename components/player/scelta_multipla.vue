@@ -3,7 +3,7 @@
     <div class="activity-text" id="question">
       {{ element.component.question }}
     </div>
-    <fieldset>
+  <div role="radiogroup">
       <b-form-group>
         <b-form-radio
           v-for="(radio_answer, index) in element.component.answers"
@@ -15,7 +15,7 @@
           >{{ radio_answer }}
         </b-form-radio>
       </b-form-group>
-    </fieldset>
+  </div>
   </div>
 </template>
 
