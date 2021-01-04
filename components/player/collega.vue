@@ -54,7 +54,7 @@ module.exports = {
         this.selected_part = part;
       }
     },
-    partClass(part) {
+    checkSelected(part) {
       return {
         unavailable: part != this.selected_part,
       };
