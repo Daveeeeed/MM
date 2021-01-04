@@ -3,17 +3,17 @@
     <div class="activity-text" id="question">
       {{ element.component.question }}
     </div>
-  <div role="radiogroup">
-      <imput
-          v-for="(radio_answer, index) in element.component.answers"
-          :key="index"
-          v-model="answer"
-          :value="index"
-          name="answers"
-          class="my-1"
-          >{{ radio_answer }}
-      </imput>
-  </div>
+    <div role="radiogroup">
+      <input
+        v-for="(radio_answer, index) in element.component.answers"
+        :key="index"
+        v-model="answer"
+        :value="index"
+        name="answers"
+        class="my-1"
+        type="radio"
+      />{{ radio_answer }}
+    </div>
   </div>
 </template>
 
