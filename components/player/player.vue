@@ -3,7 +3,8 @@
     <div v-if="player" class="d-flex flex-column">
       <div id="toolbar" class="px-3">
         <strong id="score" style="color: white"
-          >Punteggio: {{ player.total_points }} / {{player.total_activities}}</strong
+          >Punteggio: {{ player.total_points }} /
+          {{ player.total_activities }}</strong
         >
         <b-button class="chat-btn" aria-label="chat" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
@@ -65,6 +66,7 @@
                   src="https://site181982.tw.cs.unibo.it/public/images/logo2.png"
                   alt="Logo"
                   height="200"
+                  @click="clearInterval(interval)"
                 />
               </a>
               <div class="mt-2">Torna alla home</div>
@@ -126,6 +128,7 @@ module.exports = {
       verifying_answer: false,
       // received answer from tutor
       answer_verified: false,
+      interval: null,
     };
   },
   methods: {
@@ -148,7 +151,7 @@ module.exports = {
               .then((player_data) => {
                 // check if gsmr is new or already started
                 this.player = player_data;
-                setInterval(this.updateStatus, 2000);
+                this.interval = setInterval(this.updateStatus, 2000);
                 let new_game = !this.player.status.path;
                 this.current_path = new_game
                   ? this.story.paths[

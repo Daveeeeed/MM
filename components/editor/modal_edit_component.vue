@@ -201,7 +201,10 @@
         <div v-if="component.type == 'Immagine'" style="width: 100%">
           <h5>Immagine</h5>
           <p>La seguente immagine sarà mostrata nella schermata</p>
-          <div class="d-flex justify-content-center" style="width: 100%">
+          <div
+            class="d-flex flex-column align-items-center"
+            style="width: 100%"
+          >
             <div
               class="image-container"
               @click="openImageSelector()"
@@ -213,6 +216,16 @@
                 icon="plus"
               ></b-icon>
             </div>
+            <label class="mt-4" for="image-description"
+              >Descrizione dell'immagine (opzionale)</label
+            >
+            <b-form-textarea
+              id="image-description"
+              v-model="component.description"
+              placeholder="Descrizione..."
+              no-resize
+              rows="3"
+            ></b-form-textarea>
             <b-form-file
               v-model="photo_file_input"
               accept="image/*"
@@ -371,10 +384,10 @@ module.exports = {
           return component.description;
         }
         case "Immagine": {
-          return true;
+          return component.url;
         }
         case "Video": {
-          return true;
+          return component.url;
         }
         case "Memory": {
           for (let i = 0; i < component.images.length; i++) {
