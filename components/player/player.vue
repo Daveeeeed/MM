@@ -21,6 +21,7 @@
         >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
+              <h1>{{current_activity.title}}</h1>
               <component
                 v-for="(element, index) in current_activity.elements"
                 :key="index"

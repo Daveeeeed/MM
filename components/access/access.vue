@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="access">
     <b-container
       fluid
       class="d-flex flex-column align-items-center justify-content-center"

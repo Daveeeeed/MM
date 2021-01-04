@@ -1,9 +1,10 @@
 <template>
   <div class="d-flex flex-column">
-    <div class="activity-text" id="question">
+    <label for="question-input" class="activity-text" id="question">
       {{ element.component.question }}
-    </div>
+    </label>
     <b-input
+      id="question-input"
       class="mb-4"
       v-model="answer"
       placeholder="Inserisci la risposta..."

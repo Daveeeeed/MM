@@ -15,9 +15,9 @@
       class="story-card"
       :style="'background-image: url(' + story.settings.background + ')'"
     >
-      <h3 class="my-2 story-name">
+      <h2 class="my-2 story-name">
         {{ story.title }}
-      </h3>
+      </h2>
       <b-button
         :href="'/play?key=' + story.key"
         class="my-2 play-button"
