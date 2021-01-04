@@ -80,11 +80,24 @@
 
       <!-- Answer alert -->
       <b-modal id="error-alert" hide-header ok-only>
-        <b-container class="mt-2" fluid>
-          <h4>
-            {{ alert_message }}
-          </h4>
-        </b-container>
+        <template #default>
+          <b-container class="mt-2" fluid>
+            <h4>
+              {{ alert_message }}
+            </h4>
+          </b-container>
+        </template>
+        <template #modal-footer="{ ok }">
+          <b-row d-flex justify-content-end>
+            <b-button
+              autofocus
+              class="mx-1"
+              @click="ok"
+              :aria-label="alert - message"
+            >
+            </b-button>
+          </b-row>
+        </template>
       </b-modal>
     </div>
     <div v-else id="story-loading" class="full-centered">
