@@ -11,7 +11,9 @@
         @click="completePhrase(part)"
       >
         {{ part.phrase
-        }}{{ part.matched_part ? " " + part.matched_part.phrase : "..." }}
+        }}{{
+          reload && part.matched_part ? " " + part.matched_part.phrase : "..."
+        }}
       </b-button>
     </div>
     <p class="align-self-center" style="text-align: center">
@@ -38,6 +40,7 @@ module.exports = {
       first_parts: [],
       second_parts: [],
       selected_part: null,
+      reload: 1,
     };
   },
   props: {
@@ -59,7 +62,7 @@ module.exports = {
           if (first_part.matched_part == part.matched_part) {
             first_part.matched_part = null;
             console.log("resettato uno");
-            this.$forceUpdate();
+            this.reload++;
           }
         });
         part.matched_part = this.selected_part;
