@@ -82,7 +82,7 @@
       <b-modal id="error-alert" hide-header ok-only>
         <template #default>
           <b-container class="mt-2" fluid>
-            <h4>
+            <h4 aria-hidden="true">
               {{ alert_message }}
             </h4>
           </b-container>
