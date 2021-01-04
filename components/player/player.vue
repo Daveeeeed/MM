@@ -95,6 +95,7 @@
               @click="ok"
               :aria-label="alert - message"
             >
+              Ok
             </b-button>
           </b-row>
         </template>
