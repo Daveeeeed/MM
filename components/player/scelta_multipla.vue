@@ -4,15 +4,21 @@
       {{ element.component.question }}
     </div>
     <div role="radiogroup">
-      <input
+      <div
+        class="d-flex flex-column"
         v-for="(radio_answer, index) in element.component.answers"
         :key="index"
-        v-model="answer"
-        :value="index"
-        name="answers"
-        class="my-1"
-        type="radio"
-      />{{ radio_answer }}
+      >
+        <input
+          :id="'radio-button' + index"
+          v-model="answer"
+          :value="index"
+          name="answers"
+          class="my-1"
+          type="radio"
+        />
+        <label :for="'radio-button' + index">{{ radio_answer }}</label>
+      </div>
     </div>
   </div>
 </template>
