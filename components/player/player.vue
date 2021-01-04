@@ -22,7 +22,9 @@
         >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
-              <div aria-label={{current_activity.title}}>{{current_activity.title}}</div>
+              <div :aria-label="current_activity.title">
+                {{ current_activity.title }}
+              </div>
               <component
                 v-for="(element, index) in current_activity.elements"
                 :key="index"
