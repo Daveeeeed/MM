@@ -51,7 +51,7 @@ module.exports = {
     is_answer_done: function () {
       let a = true;
       this.first_parts.forEach((part) => {
-        if (!part.matched_part) return false;
+        if (!part.matched_part) a = false;
       });
       return a;
     },

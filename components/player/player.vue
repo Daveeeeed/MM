@@ -74,11 +74,13 @@
           </div>
         </div>
       </div>
-      <b-modal id="error-alert" hide-header>
+
+      <!-- Answer alert -->
+      <b-modal id="error-alert" hide-header ok-only>
         <b-container class="mt-2" fluid>
-          <div>
+          <h4>
             {{ alert_message }}
-          </div>
+          </h4>
         </b-container>
       </b-modal>
     </div>
@@ -708,5 +710,18 @@ body {
   background-position: center;
   filter: brightness(0);
   transition: all 0.3s ease 0s;
+}
+
+.modal-footer {
+  border: none;
+}
+
+.modal-content {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.modal-body {
+  border: none;
 }
 </style>
