@@ -26,7 +26,7 @@
         >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
-              <div :aria-label="current_activity.title">
+              <div id="activity-title" :aria-label="current_activity.title">
                 {{ current_activity.title }}
               </div>
               <component
@@ -420,8 +420,7 @@ module.exports = {
       this.check_answer = false;
     },
     setFocusConfirmClose() {
-      $("#confirm-button-modal").attr("autofocus", "");
-      $("#chat-btn").attr("autofocus", "autofocus");
+      $("#activity-title").focus();
       this.$bvModal.hide("error-alert");
     },
   },
