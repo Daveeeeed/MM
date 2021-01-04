@@ -164,6 +164,7 @@
                       ></b-form-select>
                     </b-col>
                     <b-col
+                      v-if="selected_activity.wrong"
                       cols="4"
                       offset="2"
                       style="
@@ -307,9 +308,12 @@ module.exports = {
     },
     valid_mission_activities: function () {
       for (let i = 0; i < this.mission.activities.length; i++) {
+        let wrong_presence = this.mission.activities[i].wrong != null;
         if (
           this.mission.activities[i].correct.key == null ||
-          this.mission.activities[i].wrong.key == null
+          (wrong_presence
+            ? this.mission.activities[i].wrong.key == null
+            : false)
         )
           return false;
       }
@@ -368,10 +372,12 @@ module.exports = {
         key: null,
         points: 1,
       };
-      a.wrong = {
-        key: null,
-        points: 0,
-      };
+      if (a.type != "Testo" || a.type != "Memory")
+        a.wrong = {
+          key: null,
+          points: 0,
+        };
+      else a.wrong = null;
       this.mission.activities.push(a);
     },
     removeActivity(activity) {
