@@ -30,7 +30,7 @@
                 :element="element"
                 :answer_confirmed="check_answer"
                 :answer_verified="answer_verified"
-                @answer-checked="check_answer = false"
+                @answer-checked="onAnswerChecked"
                 @verify-answer="verifyAnswer"
                 @answer-sent="handleAnswer"
               >
@@ -66,7 +66,7 @@
                   src="https://site181982.tw.cs.unibo.it/public/images/logo2.png"
                   alt="Logo"
                   height="200"
-                  air-label="Torna alla home"
+                  aria-label="Torna alla home"
                   @click="clearInterval(interval)"
                 />
               </a>
@@ -75,6 +75,13 @@
           </div>
         </div>
       </div>
+      <b-modal id="error-alert" hide-header>
+        <b-container class="mt-2" fluid>
+          <div>
+            {{ alert_message }}
+          </div>
+        </b-container>
+      </b-modal>
     </div>
     <div v-else id="story-loading" class="full-centered">
       <b-spinner label="loading"></b-spinner>
@@ -130,6 +137,7 @@ module.exports = {
       // received answer from tutor
       answer_verified: false,
       interval: null,
+      alert_message: "",
     };
   },
   methods: {
@@ -280,6 +288,8 @@ module.exports = {
       } else return null;
     },
     handleAnswer(answer) {
+      this.alert_message = answer ? "Risposta corretta" : "Risposta sbagliata";
+      this.$bvModal.show("error-alert");
       this.verifying_answer = false;
       if (answer) this.player.status.time_stuck = 0;
 
@@ -378,6 +388,16 @@ module.exports = {
     },
     confirmAnswer() {
       this.check_answer = true;
+    },
+    onAnswerChecked(complete) {
+      if (!complete) {
+        this.alert_message = "Completa l'attività per confermare la risposta";
+        this.$bvModal.show("error-alert");
+      }
+      this.check_answer = false;
+    },
+    deleteInterval() {
+      clearInterval(this.interval);
     },
   },
   components: {

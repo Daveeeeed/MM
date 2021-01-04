@@ -15,7 +15,7 @@ module.exports = {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
         this.$emit("answer-sent", true);
-        this.$emit("answer-checked");
+        this.$emit("answer-checked", true);
       }
     },
   },

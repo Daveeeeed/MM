@@ -11,7 +11,9 @@
         @click="completePhrase(part)"
       >
         {{ part.phrase
-        }}{{ part.matched_part ? " " + part.matched_part.phrase : "..." }}
+        }}{{
+          reload && part.matched_part ? " " + part.matched_part.phrase : "..."
+        }}
       </b-button>
     </div>
     <p class="align-self-center" style="text-align: center">
@@ -38,6 +40,7 @@ module.exports = {
       first_parts: [],
       second_parts: [],
       selected_part: null,
+      reload: 1,
     };
   },
   props: {
@@ -46,22 +49,25 @@ module.exports = {
   },
   computed: {
     is_answer_done: function () {
+      let a = true;
       this.first_parts.forEach((part) => {
         if (!part.matched_part) return false;
       });
-      return true;
+      return a;
     },
   },
   methods: {
     completePhrase(part) {
       if (this.selected_part) {
         this.first_parts.forEach((first_part) => {
-          if (first_part.matched_part == part.matched_part)
+          if (first_part.matched_part == this.selected_part) {
             first_part.matched_part = null;
+            //console.log("resettato uno");
+            //this.reload++;
+          }
         });
         part.matched_part = this.selected_part;
         this.selected_part = null;
-        this.$forceUpdate();
       }
     },
     // Component selection
@@ -92,8 +98,9 @@ module.exports = {
   watch: {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
-        if (this.is_answer_done) this.sendAnswer();
-        this.$emit("answer-checked");
+        let complete = this.is_answer_done;
+        if (complete) this.sendAnswer();
+        this.$emit("answer-checked", complete);
       }
     },
   },

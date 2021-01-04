@@ -42,8 +42,9 @@ module.exports = {
   watch: {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
-        if (this.is_answer_done) this.sendAnswer();
-        this.$emit("answer-checked");
+        let complete = this.is_answer_done;
+        if (complete) this.sendAnswer();
+        this.$emit("answer-checked", complete);
       }
     },
   },
