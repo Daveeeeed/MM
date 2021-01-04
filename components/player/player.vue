@@ -5,7 +5,7 @@
         <strong id="score" style="color: white"
           >Punteggio: {{ player.total_points }} / {{player.total_activities}}</strong
         >
-        <b-button text="chat" class="chat-btn" v-b-toggle.sidebar-chat
+        <b-button class="chat-btn" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
         ></b-button>
       </div>
@@ -21,7 +21,7 @@
         >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
-              <h1>{{current_activity.title}}</h1>
+              <arial-label>{{current_activity.title}}</arial-label>
               <component
                 v-for="(element, index) in current_activity.elements"
                 :key="index"
