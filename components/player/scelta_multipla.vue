@@ -3,7 +3,7 @@
     <div class="activity-text" id="question">
       {{ element.component.question }}
     </div>
-    <b-form-group role="group">
+    <b-form-group>
       <b-form-radio
         v-for="(radio_answer, index) in element.component.answers"
         :key="index"
@@ -11,6 +11,7 @@
         :value="index"
         name="answers"
         class="my-1"
+        role="group"
         >{{ radio_answer }}
       </b-form-radio>
     </b-form-group>
