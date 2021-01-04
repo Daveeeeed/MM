@@ -137,10 +137,9 @@
                     {{ selected_activity.title }}
                   </h3>
                   <h5 class="pt-3">Collegamenti con le altre attività</h5>
-                  <b-row class="m-0" style="width: 100%">
+                  <b-row class="m-0 justify-content-center" style="width: 100%">
                     <b-col
                       cols="4"
-                      offset="1"
                       style="
                         background-color: #171926;
                         text-align: center;
@@ -148,6 +147,7 @@
                         box-shadow: 0 2px 0#00bd58;
                         outline: 0;
                       "
+                      class="mx-3"
                     >
                       <b-icon
                         icon="check"
@@ -166,7 +166,6 @@
                     <b-col
                       v-if="selected_activity.wrong"
                       cols="4"
-                      offset="2"
                       style="
                         background-color: #171926;
                         text-align: center;
@@ -174,6 +173,7 @@
                         box-shadow: 0 2px 0#FF3D4A;
                         outline: 0;
                       "
+                      class="mx-3"
                     >
                       <b-icon
                         icon="x"
