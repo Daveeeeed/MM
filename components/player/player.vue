@@ -6,7 +6,11 @@
           >Punteggio: {{ player.total_points }} /
           {{ player.total_activities }}</strong
         >
-        <b-button class="chat-btn" aria-label="chat" v-b-toggle.sidebar-chat
+        <b-button
+          class="chat-btn"
+          id="chat-btn"
+          aria-label="chat"
+          v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
         ></b-button>
       </div>
@@ -79,7 +83,7 @@
       </div>
 
       <!-- Answer alert -->
-      <b-modal id="error-alert" hide-header ok-only>
+      <b-modal id="error-alert" hide-header>
         <template #default>
           <b-container class="mt-2" fluid>
             <h4 aria-hidden="true">
@@ -87,13 +91,14 @@
             </h4>
           </b-container>
         </template>
-        <template #modal-footer="{ ok }">
+        <template #modal-footer>
           <b-row d-flex justify-content-end>
             <b-button
               autofocus
               class="mx-1"
-              @click="ok"
+              @click="setFocusConfirmClose"
               :aria-label="alert_message"
+              id="confirm-button-modal"
             >
               Ok
             </b-button>
@@ -414,8 +419,10 @@ module.exports = {
       }
       this.check_answer = false;
     },
-    deleteInterval() {
-      clearInterval(this.interval);
+    setFocusConfirmClose() {
+      $("#confirm-button-modal").attr("autofocus", "");
+      $("#chat-btn").attr("autofocus", "autofocus");
+      this.$bvModal.hide("error-alert");
     },
   },
   components: {
