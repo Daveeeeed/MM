@@ -372,13 +372,21 @@ module.exports = {
         key: null,
         points: 1,
       };
-      if (a.type != "Testo" || a.type != "Memory")
+      if (this.activityCanBeWrong(activity))
         a.wrong = {
           key: null,
           points: 0,
         };
       else a.wrong = null;
       this.mission.activities.push(a);
+    },
+    activityCanBeWrong(activity) {
+      let response = true;
+      activity.elements.forEach((element) => {
+        if (element.component.type == "Testo") response = false;
+        if (element.component.type == "Memory") response = false;
+      });
+      return response;
     },
     removeActivity(activity) {
       let index = this.mission.activities.indexOf(activity);
