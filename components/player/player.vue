@@ -5,7 +5,7 @@
         <strong id="score" style="color: white"
           >Punteggio: {{ player.total_points }} / {{player.total_activities}}</strong
         >
-        <b-button class="chat-btn" v-b-toggle.sidebar-chat
+        <b-button text="chat" class="chat-btn" v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
         ></b-button>
       </div>
@@ -199,7 +199,6 @@ module.exports = {
     initWebSocket() {
       let that = this;
       this.wsc = new WebSocketClient();
-
       this.wsc.open("wss://site181982.tw.cs.unibo.it");
 
       this.wsc.onmessage = function (data) {
