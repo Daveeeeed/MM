@@ -1,24 +1,24 @@
 <template>
-  <div class="d-flex flex-column">
+  <div class="d-flex flex-column" style="width: 100%">
     <h2 class="align-self-center">Prime parti</h2>
-    <div class="align-self-start d-flex flex-column mission-group-item">
+    <div class="align-self-start d-flex flex-column">
       <b-button
         v-for="(part, index) in first_parts"
         :key="index"
-        class="m-2 list-group-item"
+        class="m-2 connect-item"
         @click="completePhrase(part)"
       >
-        {{ part.phrase }}...
+        {{ part.phrase }}
+        {{ part.matched_part ? part.matched_part.phrase : "..." }}
       </b-button>
     </div>
     <h2 class="align-self-center">Seconde parti</h2>
-    <div class="d-flex flex-wrap mission-group-item justify-content-center">
+    <div class="d-flex flex-wrap justify-content-center">
       <b-button
         v-for="(part, index) in second_parts"
         :key="index"
-        class="m-2 list-group-item"
+        class="m-2 connect-item shadowed"
         @click="selectPart(part)"
-        :disabled="disablePart(part)"
         :class="checkSelected(part)"
       >
         {{ part.phrase }}
@@ -42,14 +42,23 @@ module.exports = {
   },
   computed: {
     is_answer_done: function () {
-      return false;
+      this.first_parts.forEach((part) => {
+        if (!part.matched_part) return false;
+      });
+      return true;
     },
   },
   methods: {
-    disablePart(part) {
-      return false;
+    completePhrase(part) {
+      if (this.selected_part) {
+        part.matched_part = this.selected_part;
+        this.selected_part = null;
+        this.first_parts.forEach((first_part) => {
+          if (firts_part.matched_part == part.matched_part)
+            first_parts.matched_part = null;
+        });
+      }
     },
-    completePhrase(part) {},
     // Component selection
     selectPart(part) {
       if (this.selected_part) {
@@ -68,7 +77,10 @@ module.exports = {
       };
     },
     sendAnswer() {
-      let is_correct = false;
+      let is_correct = true;
+      this.first_parts.forEach((part) => {
+        if (part.index != part.matched_part.index) is_correct = false;
+      });
       this.$emit("answer-sent", is_correct);
     },
   },
@@ -86,6 +98,7 @@ module.exports = {
       this.first_parts.push({
         index: index,
         phrase: answer.first,
+        matched_part: null,
       });
       this.second_parts.push({
         index: index,
@@ -99,25 +112,28 @@ module.exports = {
 </script>
 
 <style>
-.list-group-item {
+.shadowed {
+  box-shadow: 0 2px 0 var(--active-color);
+}
+
+.connect-item {
   background-color: var(--object-color);
   color: var(--text-color);
   text-align: center;
   border-radius: 10px;
-  box-shadow: 0 2px 0 var(--active-color);
   overflow: hidden;
   outline: 0;
 }
 
-.list-group-item:hover {
+.connect-item:hover {
   background-color: var(--hover-color);
 }
 
-.list-group-item:focus {
+.connect-item:focus {
   background-color: var(--hover-color);
 }
 
-.list-group-item.unavailable {
+.connect-item.unavailable {
   color: var(--disabled-color);
   box-shadow: 0 2px 0 var(--disabled-color);
 }
