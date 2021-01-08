@@ -15,6 +15,7 @@
         ></b-button>
       </div>
       <div
+        role="group"
         id="activity"
         :style="'background-image: url(' + this.story.settings.background + ')'"
       >
