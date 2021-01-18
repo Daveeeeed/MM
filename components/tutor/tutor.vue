@@ -7,46 +7,40 @@
         </div>
       </div>
       <div class="d-flex" style="height: 80%">
-        <div class="scrollable mx-5">
-          <b-list-group v-if="selected_section == sections[0]">
-            <b-list-group-item
-              v-for="(player, index) in game.players"
-              :key="index"
-              class="px-2 player-row"
-            >
-              <div class="d-flex align-items-center">
-                <div class="ml-3 flex-grow-1" style="width: 44%">
-                  {{ player.name }}
-                </div>
-                <div class="mr-3">
-                  <b-button
+        <div class="scrollable mx-2">
+
+          <b-table
+            v-if="selected_section == sections[0]"
+            :items="player"
+            :fields="home_fields"
+          >
+            <template v-slot:cell(actions)="data">
+              <b-button
                     class="status-button"
-                    @click="showInfo(player)"
-                    :class="infoButtonClass(player)"
+                    @click="showInfo(data.item)"
+                    :class="infoButtonClass(data.item)"
                   >
                     <b-icon-info-circle></b-icon-info-circle>
                   </b-button>
                   <b-button
                     class="status-button"
-                    @click="openChat(player)"
-                    :class="chatButtonClass(player)"
+                    @click="openChat(data.item)"
+                    :class="chatButtonClass(data.item)"
                   >
                     <b-icon-chat></b-icon-chat>
                   </b-button>
                   <b-button
                     class="status-button"
-                    @click="showPhotoModal(player)"
-                    :class="photoButtonClass(player)"
+                    @click="showPhotoModal(data.item)"
+                    :class="photoButtonClass(data.item)"
                   >
                     <b-icon-camera></b-icon-camera>
                   </b-button>
-                </div>
-              </div>
-            </b-list-group-item>
-          </b-list-group>
+            </template>
+          </b-table>
+
 
           <b-table
-            class="px-2"
             v-if="selected_section == sections[1]"
             :items="ordinate_player"
             :fields="ranking_fields"
@@ -271,6 +265,16 @@ module.exports = {
         {
           title: "IMPOSTAZIONI",
         },
+      ],
+      home_fields: [
+        {
+          key: "name",
+          label: "Giocatore",
+        },
+        {
+          key: "actions",
+          label: "Azioni"
+        }
       ],
       ranking_fields: [
         {
