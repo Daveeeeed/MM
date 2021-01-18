@@ -2,11 +2,9 @@
   <div id="app">
     <div style="height: 100vh; width: 100vw" class="d-flex flex-column">
       <div class="topbar d-flex align-items-center justify-content-center">
-        <div style="font-size: 5vh">
-          <h4>{{ selected_section.title }}</h4>
-        </div>
+          <h2>{{ selected_section.title }}</h2>
       </div>
-      <div class="d-flex" style="height: 80%">
+      <div class="d-flex page-content">
         <div class="scrollable mx-2">
 
           <b-table
@@ -233,7 +231,7 @@
           </b-modal>
         </div>
       </div>
-      <div class="d-flex py-1 px-1" style="height: 10%">
+      <div class="d-flex py-1 px-1 topbar" >
         <b-button class="flex-fill m-1" @click="selected_section = sections[0]">
           <b-icon icon="person-fill"></b-icon>
         </b-button>
@@ -575,8 +573,12 @@ body {
 }
 
 .topbar {
-  height: 10%;
+  height: 4rem;
   background-color: var(--secondary-color);
+}
+
+.page-content{
+  height: calc(100vh - 4rem - 4rem);
 }
 
 .scrollable {
@@ -710,4 +712,6 @@ body {
   vertical-align: middle;
   white-space: nowrap;
 }
+
+
 </style>
