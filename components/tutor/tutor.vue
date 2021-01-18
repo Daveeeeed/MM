@@ -10,6 +10,9 @@
         <div class="scrollable mx-2">
 
           <b-table
+                      responsive
+            borderless
+            hover
             v-if="selected_section == sections[0]"
             :items="game.players"
             :fields="home_fields"
@@ -41,6 +44,9 @@
 
 
           <b-table
+                      responsive
+            borderless
+            hover
             v-if="selected_section == sections[1]"
             :items="ordinate_player"
             :fields="ranking_fields"
@@ -270,6 +276,7 @@ module.exports = {
         {
           key: "name",
           label: "Giocatore",
+          thStyle: "width: 70%;",
         },
         {
           key: "actions",
@@ -673,5 +680,32 @@ body {
 
 .status-button:focus {
   background-color: unset;
+}
+
+.b-table {
+  border-collapse: separate;
+  border-spacing: 0px 15px;
+}
+
+.table-row {
+  background-color: var(--object-color);
+  color: var(--text-color);
+}
+
+.cell-default {
+  color: var(--text-color);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--hover-color);
 }
 </style>
