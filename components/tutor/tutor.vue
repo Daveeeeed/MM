@@ -11,7 +11,7 @@
 
           <b-table
             v-if="selected_section == sections[0]"
-            :items="player"
+            :items="game.players"
             :fields="home_fields"
           >
             <template v-slot:cell(actions)="data">
