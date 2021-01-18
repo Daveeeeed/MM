@@ -12,7 +12,6 @@
           <b-table
                       responsive
             borderless
-            hover
             v-if="selected_section == sections[0]"
             :items="game.players"
             :fields="home_fields"
@@ -48,7 +47,6 @@
           <b-table
                       responsive
             borderless
-            hover
             v-if="selected_section == sections[1]"
             :items="ordinate_player"
             :fields="ranking_fields"
@@ -292,14 +290,17 @@ module.exports = {
         {
           key: "name",
           label: "Nome",
+          thStyle: "width: 100%",
         },
         {
           key: "time",
           label: "Tempo",
+          thStyle: "width: min-content",
         },
         {
           key: "percentage",
           label: "Percentuale",
+          thStyle: "width: min-content",
         },
       ],
       selected_section: null,
@@ -708,9 +709,5 @@ body {
 .table th {
   vertical-align: middle;
   white-space: nowrap;
-}
-
-.table-hover tbody tr:hover {
-  background-color: var(--hover-color);
 }
 </style>
