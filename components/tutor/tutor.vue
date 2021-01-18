@@ -16,6 +16,8 @@
             v-if="selected_section == sections[0]"
             :items="game.players"
             :fields="home_fields"
+            tbody-tr-class="table-row"
+            thead-class="cell-default"
           >
             <template v-slot:cell(actions)="data">
               <b-button
@@ -50,6 +52,8 @@
             v-if="selected_section == sections[1]"
             :items="ordinate_player"
             :fields="ranking_fields"
+            tbody-tr-class="table-row"
+            thead-class="cell-default"
           >
             <template v-slot:cell(percentage)="data">
               {{
