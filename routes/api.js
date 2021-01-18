@@ -275,7 +275,9 @@ router.post("/player", (req, res) => {
         game_key: req.query.game_key,
       })
       .then((response, error) => {
-        if (!error) {
+        if (error || response.story_key != req.query.story_key) {
+          res.send({ ok: false });
+        } else {
           response.players.push({
             id: req.query.player_id,
             name: req.query.player_id,
@@ -310,7 +312,7 @@ router.post("/player", (req, res) => {
             .then(() => {
               res.send({ ok: true });
             });
-        } else res.send({ ok: false });
+         }
       });
   });
 });

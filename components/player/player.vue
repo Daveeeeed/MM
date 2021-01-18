@@ -118,7 +118,7 @@
         <div
           id="message-box"
           class="d-flex flex-column"
-          style="height: 50%; overflow-y: auto"
+          style="height: 100%; overflow-y: auto"
         >
           <div
             v-for="(message, index) in messages"
@@ -675,12 +675,18 @@ body {
   bottom: 0px;
   right: 0px;
   width: 100%;
+  height: 54px;
 }
 
 .b-sidebar {
   height: 100% !important;
   background-color: var(--primary-color) !important;
   color: var(--text-color) !important;
+}
+
+.b-sidebar-body {
+  flex-grow: 0 !important;
+  height: calc(100% - 54px - 52px);
 }
 
 .activity-image {
