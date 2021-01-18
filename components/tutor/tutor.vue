@@ -280,11 +280,12 @@ module.exports = {
         {
           key: "name",
           label: "Giocatore",
-          thStyle: "width: 70%;",
+          thStyle: "width: 100%",
         },
         {
           key: "actions",
-          label: "Azioni"
+          label: "Azioni",
+          thStyle: "width: min-content",
         }
       ],
       ranking_fields: [
