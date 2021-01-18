@@ -281,7 +281,6 @@ router.post("/player", (req, res) => {
           response.players.push({
             id: req.query.player_id,
             name: req.query.player_id,
-            username: "Nome in codice",
             status: {
               path: null,
               mission: null,

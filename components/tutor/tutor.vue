@@ -15,11 +15,8 @@
               class="px-2 player-row"
             >
               <div class="d-flex align-items-center">
-                <div class="ml-3" style="width: 44%">
+                <div class="ml-3 flex-grow-1" style="width: 44%">
                   {{ player.name }}
-                </div>
-                <div class="flex-grow-1">
-                  {{ player.username }}
                 </div>
                 <div class="mr-3">
                   <b-button
@@ -48,27 +45,41 @@
             </b-list-group-item>
           </b-list-group>
 
-          <b-list-group v-if="selected_section == sections[1]">
-            <b-list-group-item
-              v-for="(player, index) in ordinate_player"
-              :key="index"
-              class="px-2 player-row"
+          <b-table
+            class="px-2"
+            v-if="selected_section == sections[1]"
+            :items="ordinate_player"
+            :fields="ranking_fields"
+          >
+            <template v-slot:cell(percentage)="data">
+              {{
+                ((player.total_points / player.total_activities) * 100).toFixed(
+                  2
+                )
+              }}
+              %
+            </template>
+          </b-table>
+
+          <b-container
+            v-if="selected_section == sections[2]"
+            style="height: 100%; width: 100vw"
+          >
+            <div
+              style="height: 90%; width: 100%"
+              class="esp d-flex align-items-center justify-content-center"
             >
-              <div class="d-flex align-items-center">
-                <div class="ml-3" style="width: 30%">
-                  {{ player.name }}
-                </div>
-                <div style="width: 30%">
-                  {{ player.username }}
-                </div>
-                <div class="flex-grow-1">Tempo totale: {{ player.time }}</div>
-                <div class="mr-3">
-                  Percentuale:
-                  {{ (player.total_points / player.total_activities) * 100 }} %
-                </div>
-              </div>
-            </b-list-group-item>
-          </b-list-group>
+              <b-button
+                class="esporta ml-2 mr-2"
+                style="height: 25vh; width: 70%"
+              >
+                <h3>Scarica file JSon</h3>
+              </b-button>
+            </div>
+            <div style="height: 10%" class="d-flex justify-content-center">
+              <h3>Chiave d'accesso alla partita: {{ game_key }}</h3>
+            </div>
+          </b-container>
 
           <b-modal
             id="info-modal"
@@ -101,25 +112,28 @@
                   <h5 class="mt-4 ml-4">
                     {{ selected_player.status.mission.title }}
                   </h5>
-
                   <h5 class="mt-4 ml-4">Attività corrente</h5>
                   <h5 class="mt-4 ml-4">
                     {{ selected_player.status.activity.title }}
                   </h5>
-                  <h5 class="mt-4 ml-4">Time stuck</h5>
                   <h5 class="mt-4 ml-4">
-                    {{ selected_player.status.time_stuck }}
+                    Tempo trascorso nell'attività corrente
                   </h5>
-                  <h5 class="mt-4 ml-4">Tempo totale</h5>
                   <h5 class="mt-4 ml-4">
-                    {{ selected_player.time }}
+                    {{ selected_player.status.time_stuck }} secondi
                   </h5>
-                  <h5 class="mt-4 ml-4">Percentuale</h5>
+                  <h5 class="mt-4 ml-4">
+                    Tempo trascorso dall'avvio della partita
+                  </h5>
+                  <h5 class="mt-4 ml-4">{{ selected_player.time }} secondi</h5>
+                  <h5 class="mt-4 ml-4">Percentuale di risposte corrette</h5>
                   <h5 class="mt-4 ml-4">
                     {{
-                      (selected_player.total_points /
-                        selected_player.total_activities) *
-                      100
+                      (
+                        (selected_player.total_points /
+                          selected_player.total_activities) *
+                        100
+                      ).toFixed(2)
                     }}
                     %
                   </h5>
@@ -217,25 +231,6 @@
               </div>
             </div>
           </b-modal>
-          <b-container
-            v-if="selected_section == sections[2]"
-            style="height: 100%; width: 100vw"
-          >
-            <div
-              style="height: 90%; width: 100%"
-              class="esp d-flex align-items-center justify-content-center"
-            >
-              <b-button
-                class="esporta ml-2 mr-2"
-                style="height: 25vh; width: 70%"
-              >
-                <h3>Scarica file JSon</h3>
-              </b-button>
-            </div>
-            <div style="height: 10%" class="d-flex justify-content-center">
-              <h3>Chiave d'accesso alla partita: {{ game_key }}</h3>
-            </div>
-          </b-container>
         </div>
       </div>
       <div class="d-flex py-1 px-1" style="height: 10%">
@@ -277,6 +272,20 @@ module.exports = {
         },
         {
           title: "IMPOSTAZIONI",
+        },
+      ],
+      ranking_fields: [
+        {
+          key: "name",
+          label: "Nome",
+        },
+        {
+          key: "time",
+          label: "Tempo",
+        },
+        {
+          key: "percentage",
+          label: "Percentuale",
         },
       ],
       selected_section: null,

@@ -686,7 +686,7 @@ body {
 
 .b-sidebar-body {
   flex-grow: 0 !important;
-  height: calc(100% - 54px - 52px);
+  height: calc(100% - 54px - 52px) !important;
 }
 
 .activity-image {
