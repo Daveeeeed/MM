@@ -53,9 +53,7 @@
           >
             <template v-slot:cell(percentage)="data">
               {{
-                ((player.total_points / player.total_activities) * 100).toFixed(
-                  2
-                )
+                ((data.item.player.total_points / data.item.player.total_activities) * 100).toFixed(2)
               }}
               %
             </template>
