@@ -53,7 +53,7 @@
           >
             <template v-slot:cell(percentage)="data">
               {{
-                ((data.item.player.total_points / data.item.player.total_activities) * 100).toFixed(2)
+                playerPercentage(data)
               }}
               %
             </template>
@@ -334,6 +334,12 @@ module.exports = {
     },
   },
   methods: {
+    playerPercentage(data){
+      console.log(data)
+      let player = data.item;
+      let percentage = (player.total_points / player.total_activities) * 100;
+      return percentage.toFixed(2);
+    },
     initTutor() {
       fetch("/api/tutor?game_key=" + this.game_key)
         .then((response) => response.json())
