@@ -369,9 +369,8 @@ module.exports = {
   },
   methods: {
     playerPercentage(data) {
+      let player = data.item;
       if (player.total_activities) {
-        console.log(data);
-        let player = data.item;
         let percentage = (player.total_points / player.total_activities) * 100;
         return percentage.toFixed(2);
       } else return 0;
