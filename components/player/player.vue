@@ -66,7 +66,11 @@
               </div>
               <div class="mb-2">
                 Percentuale di completamento pari a
-                {{ player.total_activities ? (player.total_points / player.total_activities) * 100 : '0'}}%
+                {{
+                  player.total_activities
+                    ? (player.total_points / player.total_activities) * 100
+                    : "0"
+                }}%
               </div>
               <a href="/" class="my-2">
                 <img
@@ -263,8 +267,10 @@ module.exports = {
     },
     // Send player data to server
     updateStatus() {
-      this.player.status.time_stuck += 2;
-      this.player.time += 2;
+      if (this.current_activity) {
+        this.player.status.time_stuck += 2;
+        this.player.time += 2;
+      }
       fetch(
         "/api/player/update?game_key=" +
           this.game_key +
@@ -319,7 +325,7 @@ module.exports = {
 
       let result = answer
         ? this.current_activity.correct // = 1
-        : this.current_activity.wrong;  // = 0
+        : this.current_activity.wrong; // = 0
 
       let activity_points = result.points;
       this.player.total_points += parseInt(activity_points);
@@ -423,7 +429,6 @@ module.exports = {
     setFocusConfirmClose() {
       this.$bvModal.hide("error-alert");
       $("#activity-title").focus();
-
     },
   },
   components: {
