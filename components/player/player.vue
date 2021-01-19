@@ -66,7 +66,7 @@
               </div>
               <div class="mb-2">
                 Percentuale di completamento pari a
-                {{ (player.total_points / player.total_activities) * 100 }}%
+                {{ player.total_activities ? (player.total_points / player.total_activities) * 100 : '0'}}%
               </div>
               <a href="/" class="my-2">
                 <img
@@ -318,8 +318,8 @@ module.exports = {
       if (answer) this.player.status.time_stuck = 0;
 
       let result = answer
-        ? this.current_activity.correct
-        : this.current_activity.wrong;
+        ? this.current_activity.correct // = 1
+        : this.current_activity.wrong;  // = 0
 
       let activity_points = result.points;
       this.player.total_points += parseInt(activity_points);

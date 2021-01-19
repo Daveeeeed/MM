@@ -291,13 +291,13 @@ router.post("/player", (req, res) => {
             // tempo totale di gioco
             time: 0,
             // punti della missione corrente
-            mission_points: 1,
+            mission_points: 0,
             // attività visitate nella missione corrente
-            mission_activities: 1,
+            mission_activities: 0,
             // punti totali
-            total_points: 1,
+            total_points: 0,
             // attività visitate totali
-            total_activities: 1,
+            total_activities: 0,
           });
           collection
             .updateOne(

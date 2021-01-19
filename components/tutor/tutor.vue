@@ -2,13 +2,12 @@
   <div id="app">
     <div style="height: 100vh; width: 100vw" class="d-flex flex-column">
       <div class="topbar d-flex align-items-center justify-content-center">
-          <h2>{{ selected_section.title }}</h2>
+        <h2>{{ selected_section.title }}</h2>
       </div>
       <div class="d-flex page-content">
         <div class="scrollable mx-2">
-
           <b-table
-                      responsive
+            responsive
             borderless
             v-if="selected_section == sections[0]"
             :items="game.players"
@@ -18,32 +17,31 @@
           >
             <template v-slot:cell(actions)="data">
               <b-button
-                    class="status-button"
-                    @click="showInfo(data.item)"
-                    :class="infoButtonClass(data.item)"
-                  >
-                    <b-icon-info-circle></b-icon-info-circle>
-                  </b-button>
-                  <b-button
-                    class="status-button"
-                    @click="openChat(data.item)"
-                    :class="chatButtonClass(data.item)"
-                  >
-                    <b-icon-chat></b-icon-chat>
-                  </b-button>
-                  <b-button
-                    class="status-button"
-                    @click="showPhotoModal(data.item)"
-                    :class="photoButtonClass(data.item)"
-                  >
-                    <b-icon-camera></b-icon-camera>
-                  </b-button>
+                class="status-button"
+                @click="showInfo(data.item)"
+                :class="infoButtonClass(data.item)"
+              >
+                <b-icon-info-circle></b-icon-info-circle>
+              </b-button>
+              <b-button
+                class="status-button"
+                @click="openChat(data.item)"
+                :class="chatButtonClass(data.item)"
+              >
+                <b-icon-chat></b-icon-chat>
+              </b-button>
+              <b-button
+                class="status-button"
+                @click="showPhotoModal(data.item)"
+                :class="photoButtonClass(data.item)"
+              >
+                <b-icon-camera></b-icon-camera>
+              </b-button>
             </template>
           </b-table>
 
-
           <b-table
-                      responsive
+            responsive
             borderless
             v-if="selected_section == sections[1]"
             :items="ordinate_player"
@@ -52,9 +50,7 @@
             thead-class="cell-default"
           >
             <template v-slot:cell(percentage)="data">
-              {{
-                playerPercentage(data)
-              }}
+              {{ playerPercentage(data) }}
               %
             </template>
           </b-table>
@@ -127,11 +123,13 @@
                   <h5 class="mt-4 ml-4">Percentuale di risposte corrette</h5>
                   <h5 class="mt-4 ml-4">
                     {{
-                      (
-                        (selected_player.total_points /
-                          selected_player.total_activities) *
-                        100
-                      ).toFixed(2)
+                      selected_player.total_activities
+                        ? (
+                            (selected_player.total_points /
+                              selected_player.total_activities) *
+                            100
+                          ).toFixed(2)
+                        : "0"
                     }}
                     %
                   </h5>
@@ -231,7 +229,7 @@
           </b-modal>
         </div>
       </div>
-      <div class="d-flex py-1 px-1 topbar" >
+      <div class="d-flex py-1 px-1 topbar">
         <b-button class="flex-fill m-1" @click="selected_section = sections[0]">
           <b-icon icon="person-fill"></b-icon>
         </b-button>
@@ -282,7 +280,7 @@ module.exports = {
           key: "actions",
           label: "Azioni",
           thStyle: "width: min-content",
-        }
+        },
       ],
       ranking_fields: [
         {
@@ -322,26 +320,47 @@ module.exports = {
       for (let i = 0; i < a.length; i++) {
         var swapped = false;
         for (let j = 1; j < a.length - i; j++) {
-          if (
-            a[j - 1].total_points / a[j - 1].total_activities ==
-            a[j].total_points / a[j].total_activities
-          ) {
-            if (a[j - 1].time > a[j].time) {
+          if (a[j - 1].total_activities != 0 && a[j].total_activities != 0) {
+            if (
+              a[j - 1].total_points / a[j - 1].total_activities ==
+              a[j].total_points / a[j].total_activities
+            ) {
+              if (a[j - 1].time > a[j].time) {
+                let temp = a[j - 1];
+                a[j - 1] = a[j];
+                a[j] = temp;
+                swapped = true;
+              }
+            }
+            if (
+              a[j - 1].total_points / a[j - 1].total_activities <
+              a[j].total_points / a[j].total_activities
+            ) {
               let temp = a[j - 1];
               a[j - 1] = a[j];
               a[j] = temp;
               swapped = true;
             }
+          }else{
+            if (a[j - 1].total_activities == 0 && a[j].total_activities != 0) {
+              let temp = a[j - 1];
+              a[j - 1] = a[j];
+              a[j] = temp;
+              swapped = true;
+            }
+            if(a[j - 1].total_activities == 0 && a[j].total_activities == 0){
+              if (a[j - 1].time > a[j].time) {
+                let temp = a[j - 1];
+                a[j - 1] = a[j];
+                a[j] = temp;
+                swapped = true;
+              }
+            }
           }
-          if (
-            a[j - 1].total_points / a[j - 1].total_activities <
-            a[j].total_points / a[j].total_activities
-          ) {
-            let temp = a[j - 1];
-            a[j - 1] = a[j];
-            a[j] = temp;
-            swapped = true;
-          }
+
+
+
+
         }
         if (!swapped) break;
       }
@@ -349,11 +368,13 @@ module.exports = {
     },
   },
   methods: {
-    playerPercentage(data){
-      console.log(data)
-      let player = data.item;
-      let percentage = (player.total_points / player.total_activities) * 100;
-      return percentage.toFixed(2);
+    playerPercentage(data) {
+      if (player.total_activities) {
+        console.log(data);
+        let player = data.item;
+        let percentage = (player.total_points / player.total_activities) * 100;
+        return percentage.toFixed(2);
+      } else return 0;
     },
     initTutor() {
       fetch("/api/tutor?game_key=" + this.game_key)
@@ -577,7 +598,7 @@ body {
   background-color: var(--secondary-color);
 }
 
-.page-content{
+.page-content {
   height: calc(100vh - 4rem - 4rem);
 }
 
@@ -712,6 +733,4 @@ body {
   vertical-align: middle;
   white-space: nowrap;
 }
-
-
 </style>
