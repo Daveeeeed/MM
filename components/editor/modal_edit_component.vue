@@ -26,6 +26,12 @@
             placeholder="Risposte..."
             v-model="component.answers"
           ></b-form-tags>
+          <h5>Numero risposte richieste</h5>
+          <b-form-input
+            class="white-text"
+            type="number"
+            v-model="component.nr_answer_required"
+          ></b-form-input>
         </div>
 
         <!-- SCELTA MULTIPLA -->
@@ -357,7 +363,11 @@ module.exports = {
       let component = this.component;
       switch (component.type) {
         case "Domanda": {
-          return component.question && component.answers.length;
+          return (
+            component.question &&
+            component.answers.length &&
+            component.nr_answer_required
+          );
         }
         case "Scelta-Multipla": {
           if (component.question && component.correct_answer) {

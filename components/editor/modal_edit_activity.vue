@@ -241,6 +241,7 @@ module.exports = {
           type: "Domanda",
           question: "",
           answers: [],
+          nr_answer_required: 1,
         },
         {
           type: "Scelta-Multipla",
