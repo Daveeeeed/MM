@@ -729,13 +729,13 @@ body {
 
 .player-message {
   background-color: var(--secondary-color);
-  text-align: left;
+  text-align: end;
   margin-left: 60px !important;
 }
 
 .tutor-message {
   background-color: var(--form-color);
-  text-align: end;
+  text-align: left;
   margin-right: 60px !important;
 }
 

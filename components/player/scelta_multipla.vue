@@ -51,8 +51,10 @@ module.exports = {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
         let complete = this.is_answer_done;
-        this.answer = null;
-        if (complete) this.sendAnswer();
+        if (complete) {
+          this.sendAnswer();
+          this.answer = null;
+        }
         this.$emit("answer-checked", complete);
       }
     },

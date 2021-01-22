@@ -59,8 +59,6 @@ module.exports = {
         this.first_parts.forEach((first_part) => {
           if (first_part.matched_part == this.selected_part) {
             first_part.matched_part = null;
-            //console.log("resettato uno");
-            //this.reload++;
           }
         });
         part.matched_part = this.selected_part;
@@ -96,7 +94,9 @@ module.exports = {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
         let complete = this.is_answer_done;
-        if (complete) this.sendAnswer();
+        if (complete) {
+          this.sendAnswer();
+        }
         this.$emit("answer-checked", complete);
       }
     },
