@@ -31,7 +31,7 @@ module.exports = {
   methods: {
     sendAnswer() {
       let current = this.answer.toLowerCase();
-      let correct = this.element.component.answers;
+      let correct = JSON.parse(JSON.stringify(this.element.component.answers));
       let current_answers = current.split(",");
       current_answers.forEach((ans, index) => {
         current_answers[index] = ans.replace(" ", "");
@@ -43,7 +43,7 @@ module.exports = {
       for (let i = 0; i < current_answers.length; i++) {
         console.log("iteration");
         for (let j = 0; j < correct.length; j++) {
-          if (current_answers[i] == correct[j]) {
+          if (current_answers[i] == correct[j].toLowerCase()) {
             nr--;
             console.log("found");
             correct.splice(j, 1);
