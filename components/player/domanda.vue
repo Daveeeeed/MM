@@ -37,19 +37,13 @@ module.exports = {
         current_answers[index] = ans.replace(" ", "");
       });
       let nr = this.element.component.nr_answer_required;
-      console.log(current);
-      console.log("NR è uguale a");
-      console.log(nr);
       for (let i = 0; i < current_answers.length; i++) {
-        console.log("iteration");
         for (let j = 0; j < correct.length; j++) {
           if (current_answers[i] == correct[j].toLowerCase()) {
             nr--;
-            console.log("found");
             correct.splice(j, 1);
           }
           if (nr == 0) {
-            console.log("nr uguale a zero");
             this.$emit("answer-sent", true);
             return;
           }
