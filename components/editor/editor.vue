@@ -727,11 +727,9 @@ module.exports = {
             mission.activities.forEach((activity) => {
               activity.elements.forEach((element) => {
                 if (
-                  element.type == "Foto" ||
-                  element.type == "Immagine" ||
-                  element.type == "Video" ||
-                  element.type == "Word Invaders" ||
-                  element.type == "Memory"
+                  element.component.type == "Foto" ||
+                  element.component.type == "Video" ||
+                  element.component.type == "Memory"
                 )
                   a = false;
               });
@@ -749,11 +747,9 @@ module.exports = {
       data.item.activities.forEach((activity) => {
         activity.elements.forEach((element) => {
           if (
-            element.type == "Foto" ||
-            element.type == "Immagine" ||
-            element.type == "Video" ||
-            element.type == "Word Invaders" ||
-            element.type == "Memory"
+            element.component.type == "Foto" ||
+            element.component.type == "Video" ||
+            element.component.type == "Memory"
           )
             a = false;
         });
@@ -767,11 +763,9 @@ module.exports = {
       let a = true;
       data.item.elements.forEach((element) => {
         if (
-          element.type == "Foto" ||
-          element.type == "Immagine" ||
-          element.type == "Video" ||
-          element.type == "Word Invaders" ||
-          element.type == "Memory"
+          element.component.type == "Foto" ||
+          element.component.type == "Video" ||
+          element.component.type == "Memory"
         )
           a = false;
       });
