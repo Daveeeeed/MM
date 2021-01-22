@@ -1,8 +1,19 @@
 <template>
   <div class="d-flex flex-column" style="width: 100%">
     <p class="align-self-center" style="text-align: center">
-      Completa le frasi...
+      Completa le quattro frasi usando gli elementi di seguito.
     </p>
+    <div class="d-flex flex-wrap justify-content-center">
+      <b-button
+        v-for="(part, index) in second_parts"
+        :key="index"
+        class="m-2 connect-item shadowed"
+        @click="selectPart(part)"
+        :class="checkSelected(part)"
+      >
+        {{ part.phrase }}
+      </b-button>
+    </div>
     <div class="align-self-start d-flex flex-column">
       <b-button
         v-for="(part, index) in first_parts"
@@ -14,20 +25,6 @@
         }}{{
           reload && part.matched_part ? " " + part.matched_part.phrase : "..."
         }}
-      </b-button>
-    </div>
-    <p class="align-self-center" style="text-align: center">
-      ...scegliendo tra queste parti
-    </p>
-    <div class="d-flex flex-wrap justify-content-center">
-      <b-button
-        v-for="(part, index) in second_parts"
-        :key="index"
-        class="m-2 connect-item shadowed"
-        @click="selectPart(part)"
-        :class="checkSelected(part)"
-      >
-        {{ part.phrase }}
       </b-button>
     </div>
   </div>

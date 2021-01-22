@@ -104,6 +104,7 @@
                 size="sm"
                 style="background-color: #8f65fc"
                 @click="onPublish(data)"
+                title="Pubblica"
               >
                 <b-icon-play-fill></b-icon-play-fill>
               </b-button>
@@ -112,6 +113,7 @@
                 size="sm"
                 style="background-color: #003086"
                 @click="onArchive(data)"
+                title="Archivia"
               >
                 <b-icon-archive-fill></b-icon-archive-fill>
               </b-button>
@@ -119,6 +121,7 @@
                 size="sm"
                 style="background-color: #ff3d4a"
                 @click="onDelete(data, active_section.navbar_name)"
+                title="Elimina"
               >
                 <b-icon-trash-fill></b-icon-trash-fill>
               </b-button>
@@ -126,6 +129,7 @@
                 size="sm"
                 style="background-color: #00bec8"
                 @click="onEdit(data)"
+                title="Modifica"
               >
                 <b-icon-pencil-square></b-icon-pencil-square>
               </b-button>
@@ -133,6 +137,7 @@
                 size="sm"
                 style="background-color: #ffa300"
                 @click="onClone(data)"
+                title="Duplica"
               >
                 <b-icon-back></b-icon-back>
               </b-button>

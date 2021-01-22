@@ -76,12 +76,13 @@ body {
   margin-top: 10px;
   margin-bottom: 10px;
   box-shadow: 0px 3px 0px var(--active-color), 3px 3px 8px black;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .story-name {

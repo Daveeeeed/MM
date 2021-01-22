@@ -75,6 +75,7 @@
             </div>
           </b-container>
 
+          <!-- Info Modal -->
           <b-modal
             id="info-modal"
             size="lg"
@@ -144,7 +145,13 @@
             </template>
           </b-modal>
 
-          <b-modal id="chat-modal" size="lg">
+          <!-- Chat Modal -->
+          <b-modal
+            id="chat-modal"
+            size="lg"
+            @show="is_chat_open = true"
+            @close="is_chat_open = false"
+          >
             <template #modal-header>
               <h4 class="m-0" v-if="selected_player">
                 Chat con {{ selected_player.name }}
@@ -258,6 +265,8 @@ module.exports = {
       message: "",
       name_to_edit: "",
       messages: {},
+      last_viewed_message: {},
+      is_chat_open: false,
       photos: {},
       sections: [
         {
@@ -341,14 +350,14 @@ module.exports = {
               a[j] = temp;
               swapped = true;
             }
-          }else{
+          } else {
             if (a[j - 1].total_activities == 0 && a[j].total_activities != 0) {
               let temp = a[j - 1];
               a[j - 1] = a[j];
               a[j] = temp;
               swapped = true;
             }
-            if(a[j - 1].total_activities == 0 && a[j].total_activities == 0){
+            if (a[j - 1].total_activities == 0 && a[j].total_activities == 0) {
               if (a[j - 1].time > a[j].time) {
                 let temp = a[j - 1];
                 a[j - 1] = a[j];
@@ -357,10 +366,6 @@ module.exports = {
               }
             }
           }
-
-
-
-
         }
         if (!swapped) break;
       }
@@ -385,6 +390,8 @@ module.exports = {
               this.messages[player.id] = [];
             if (this.photos[player.id] == undefined)
               this.photos[player.id] = {};
+            if (this.last_viewed_message[player.id] == undefined)
+              this.last_viewed_message[player.id] = 0;
           });
           setInterval(this.updateTutor, 2000);
         });
@@ -408,6 +415,11 @@ module.exports = {
                 text: message.message,
                 sender: false,
               });
+              if (
+                that.is_chat_open &&
+                that.selected_player_id == message.player_id
+              )
+                that.last_viewed_message[message.player_id] = that.messages[message.player_id].length;
               break;
             case "photo":
               that.photos[message.player_id].answer = message.answer;
@@ -429,6 +441,8 @@ module.exports = {
               this.messages[player.id] = [];
             if (this.photos[player.id] == undefined)
               this.photos[player.id] = {};
+            if (this.last_viewed_message[player.id] == undefined)
+              this.last_viewed_message[player.id] = 0;
           });
         });
     },
@@ -459,6 +473,7 @@ module.exports = {
     openChat(player) {
       this.selected_player_id = player.id;
       this.$bvModal.show("chat-modal");
+      this.last_viewed_message[player.id] = this.messages[player.id].length;
     },
     showInfo(player) {
       this.selected_player_id = player.id;
@@ -497,7 +512,8 @@ module.exports = {
     },
     chatButtonClass(player) {
       return {
-        red: player.status.need_help,
+        red:
+          this.last_viewed_message[player.id] < this.messages[player.id].length,
       };
     },
     showPhotoModal(player) {

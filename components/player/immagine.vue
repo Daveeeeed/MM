@@ -5,9 +5,6 @@
       :src="element.component.url"
       :alt="element.component.description"
     />
-    <div class="activity-text" style="text-align: center">
-      {{ element.component.description }}
-    </div>
   </div>
 </template>
 

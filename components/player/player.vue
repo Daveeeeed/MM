@@ -9,6 +9,7 @@
         <b-button
           class="chat-btn"
           id="chat-btn"
+          :class="chatButtonClass()"
           aria-label="chat"
           v-b-toggle.sidebar-chat
           ><b-icon-chat-fill></b-icon-chat-fill
@@ -68,7 +69,10 @@
                 Percentuale di completamento pari a
                 {{
                   player.total_activities
-                    ? (player.total_points / player.total_activities) * 100
+                    ? (
+                        (player.total_points / player.total_activities) *
+                        100
+                      ).toFixed(2)
                     : "0"
                 }}%
               </div>
@@ -117,7 +121,14 @@
     </div>
 
     <!-- Chat -->
-    <b-sidebar id="sidebar-chat" title="Chat" right shadow backdrop>
+    <b-sidebar
+      id="sidebar-chat"
+      title="Chat"
+      right
+      shadow
+      backdrop
+      @change="changeChatVisibility"
+    >
       <template #default>
         <div
           id="message-box"
@@ -155,6 +166,8 @@ module.exports = {
       player: null,
       message_input: "",
       messages: [],
+      last_viewed_message: 0,
+      is_chat_open: false,
       story: null,
       current_activity: null,
       current_path: null,
@@ -255,6 +268,8 @@ module.exports = {
                 text: message.message,
                 sender: false,
               });
+              if (that.is_chat_open)
+                that.last_viewed_message = that.messages.length;
               break;
             case "photo":
               that.handleAnswer(message.answer);
@@ -307,6 +322,15 @@ module.exports = {
         this.message_input = "";
         this.updateStatus();
       }
+    },
+    chatButtonClass() {
+      return {
+        red: this.last_viewed_message < this.messages.length,
+      };
+    },
+    changeChatVisibility(visible) {
+      this.is_chat_open = visible;
+      if (visible) this.last_viewed_message = this.messages.length;
     },
     // Utilities
     findObject(array, key) {
@@ -759,5 +783,9 @@ body {
 
 .modal-body {
   border: none;
+}
+
+.red {
+  background-color: red;
 }
 </style>

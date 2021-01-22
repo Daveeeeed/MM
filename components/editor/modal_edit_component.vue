@@ -366,7 +366,7 @@ module.exports = {
           return (
             component.question &&
             component.answers.length &&
-            component.nr_answer_required
+            component.nr_answer_required > 0
           );
         }
         case "Scelta-Multipla": {
