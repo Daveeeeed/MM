@@ -3,6 +3,15 @@
     <label for="question-input" class="activity-text" id="question">
       {{ element.component.question }}
     </label>
+    <label
+      v-if="element.component.nr_answer_required > 1"
+      for="question-input"
+      class="activity-text"
+      id="question"
+    >
+      Inserisci {{ element.component.nr_answer_required }} risposte separate da
+      una virgola
+    </label>
     <b-input
       id="question-input"
       class="mb-4"
