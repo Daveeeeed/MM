@@ -22,7 +22,7 @@
           ></b-form-input>
           <h5>Risposte</h5>
           <b-form-tags
-            class="white-text"
+            class="white-text mb-2"
             placeholder="Risposte..."
             v-model="component.answers"
           ></b-form-tags>

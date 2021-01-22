@@ -66,6 +66,7 @@
               <b-button
                 class="esporta ml-2 mr-2"
                 style="height: 25vh; width: 70%"
+                @click="exportData"
               >
                 <h3>Scarica file JSon</h3>
               </b-button>
@@ -537,6 +538,21 @@ module.exports = {
       );
       this.photos[this.selected_player_id] = {};
     },
+    exportData() {
+      let data = JSON.stringify(this.game);
+      let blob = new Blob([data], {
+        type: "application/json",
+      });
+      let filename = "Dati di gioco";
+      let link = document.createElement("a");
+      link.download = filename;
+      //Funzione createObjectURL cross-browser
+      let createObjectURL =
+        (window.URL || window.webkitURL || {}).createObjectURL ||
+        function () {};
+      link.href = createObjectURL(blob);
+      link.click();
+    },
   },
   created: function () {
     let urlParams = new URLSearchParams(window.location.search);
@@ -712,21 +728,22 @@ body {
 }
 
 .player-message {
-  color: var(--text-color);
-  text-align: end;
+  background-color: var(--secondary-color);
+  text-align: left;
+  margin-left: 60px !important;
 }
 
 .tutor-message {
-  color: #5affcb;
-  text-align: left;
+  background-color: var(--form-color);
+  text-align: end;
+  margin-right: 60px !important;
 }
 
 .message {
-  border: 1px solid #ffffff;
   border-radius: 5px;
-  background-color: #28293d;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  box-shadow: 3px 3px 8px black;
 }
 
 .esp .esporta {
