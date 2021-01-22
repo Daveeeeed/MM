@@ -419,7 +419,8 @@ module.exports = {
                 that.is_chat_open &&
                 that.selected_player_id == message.player_id
               )
-                that.last_viewed_message[message.player_id] = that.messages[message.player_id].length;
+                that.last_viewed_message[message.player_id] =
+                  that.messages[message.player_id].length;
               break;
             case "photo":
               that.photos[message.player_id].answer = message.answer;
@@ -495,6 +496,9 @@ module.exports = {
           text: this.message,
           sender: true,
         });
+        this.last_viewed_message[this.selected_player.id] = this.messages[
+          this.selected_player.id
+        ].length;
         this.message = "";
       }
     },
@@ -682,17 +686,29 @@ body {
 .modal-body {
   padding: 0px;
 }
+
 .orange {
-  background-color: orange;
+  background-color: orange !important;
 }
+
+.orange:focus {
+  background-color: orange !important;
+}
+
 .red {
-  background-color: red;
+  background-color: red !important;
 }
-.green {
-  background-color: green;
+
+.red:hover {
+  background-color: red !important;
 }
+
 .blue {
-  background-color: blue;
+  background-color: blue !important;
+}
+
+.blue:hover {
+  background-color: blue !important;
 }
 
 .player-message {

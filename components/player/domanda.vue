@@ -32,17 +32,29 @@ module.exports = {
     sendAnswer() {
       let current = this.answer.toLowerCase();
       let correct = this.element.component.answers;
-      let is_correct = false;
-      for (let i = 0; i < correct.length; i++) {
-        is_correct = is_correct || correct[i].toLowerCase() == current;
+      let current_answers = current.split(",");
+      current_answers.forEach((ans, index) => {
+        current_answers[index] = ans.replace(" ", "");
+      });
+      let nr = this.element.component.nr_answer_required;
+
+      for (let i = 0; i < current_answers.length; i++) {
+        for (let j = 0; j < correct.length; j++) {
+          if (current_answers[i] == correct[j]) {
+            nr--;
+            correct.splice(j, 1);
+          }
+          if (nr == 0) this.$emit("answer-sent", true);
+        }
       }
-      this.$emit("answer-sent", is_correct);
+      this.$emit("answer-sent", false);
     },
   },
   watch: {
     answer_confirmed(isConfirmed) {
       if (isConfirmed) {
         let complete = this.is_answer_done;
+        this.answer = null;
         if (complete) this.sendAnswer();
         this.$emit("answer-checked", complete);
       }

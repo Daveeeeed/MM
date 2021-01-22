@@ -319,6 +319,7 @@ module.exports = {
           text: this.message_input,
           sender: true,
         });
+        this.last_viewed_message = this.messages.length;
         this.message_input = "";
         this.updateStatus();
       }
@@ -786,6 +787,10 @@ body {
 }
 
 .red {
+  background-color: red;
+}
+
+.red:focus {
   background-color: red;
 }
 </style>
