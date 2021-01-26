@@ -205,7 +205,7 @@ module.exports = {
                 let new_game = !this.player.status.path;
                 this.current_path = new_game
                   ? this.story.paths[
-                      Math.round(Math.random() * (this.story.paths.length - 1))
+                      Math.floor(Math.random() * this.story.paths.length)
                     ]
                   : this.findObject(
                       this.story.paths,

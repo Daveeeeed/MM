@@ -201,7 +201,7 @@ router.post("/tutor/update", (req, res) => {
             { game_key: req.query.game_key },
             {
               $set: {
-                players: response.players,
+                ["players." + db_index.toString() + ".name"]: req.body.name,
               },
             }
           )
@@ -311,7 +311,7 @@ router.post("/player", (req, res) => {
             .then(() => {
               res.send({ ok: true });
             });
-         }
+        }
       });
   });
 });
