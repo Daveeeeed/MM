@@ -466,7 +466,7 @@ module.exports = {
           }),
         }
       ).then((response) => {
-        this.selected_player.name = this.name_to_edit;
+        if (response.ok) this.selected_player.name = this.name_to_edit;
       });
     },
     setInfoModal() {

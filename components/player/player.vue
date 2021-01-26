@@ -300,8 +300,6 @@ module.exports = {
           body: JSON.stringify(this.player),
         }
       )
-        .then((response) => response.json())
-        .then((data) => (this.player = data));
     },
     sendMessage() {
       if (this.message_input) {

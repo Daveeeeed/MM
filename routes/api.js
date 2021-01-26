@@ -195,7 +195,6 @@ router.post("/tutor/update", (req, res) => {
       })
       .then((response, error) => {
         let db_index = findPlayer(req.query.player_id, response.players).index;
-        response.players[db_index].name = req.body.name;
         collection
           .updateOne(
             { game_key: req.query.game_key },
@@ -206,7 +205,7 @@ router.post("/tutor/update", (req, res) => {
             }
           )
           .then(() => {
-            res.send(response.players[db_index]);
+            res.send();
           });
         client.close();
       });
@@ -224,24 +223,23 @@ router.post("/player/update", (req, res) => {
       })
       .then((response, error) => {
         let db_index = findPlayer(req.query.player_id, response.players).index;
-        response.players[db_index].status = req.body.status;
-        response.players[db_index].mission_points = req.body.mission_points;
-        response.players[db_index].mission_activities =
-          req.body.mission_activities;
-        response.players[db_index].total_points = req.body.total_points;
-        response.players[db_index].total_activities = req.body.total_activities;
-        response.players[db_index].time = req.body.time;
+        let root_str = "players." + db_index.toString() + ".";
         collection
           .updateOne(
             { game_key: req.query.game_key },
             {
               $set: {
-                players: response.players,
+                [root_str + "status"]: req.body.status,
+                [root_str + "mission_points"]: req.body.mission_points,
+                [root_str + "mission_activities"]: req.body.mission_activities,
+                [root_str + "total_points"]: req.body.total_points,
+                [root_str + "total_activities"]: req.body.total_activities,
+                [root_str + "time"]: req.body.time,
               },
             }
           )
           .then(() => {
-            res.send(response.players[db_index]);
+            res.send();
           });
       });
   });
