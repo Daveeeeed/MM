@@ -46,7 +46,7 @@ module.exports = {
   data() {
     return {
       stories: [],
-      story_info: {},
+      story_info: null,
     };
   },
   methods: {
