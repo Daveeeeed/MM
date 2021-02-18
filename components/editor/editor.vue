@@ -626,6 +626,7 @@ module.exports = {
             paths: data.item.paths,
             settings: data.item.settings,
           };
+          cloned.settings.accessible = false;
           break;
         }
         case "Missioni": {
