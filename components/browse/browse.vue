@@ -33,9 +33,21 @@
       >
     </div>
 
-    <b-modal id="story-info-modal">
-      <div v-if="story_info">
-        {{ story_info.settings.player }}
+    <b-modal id="story-info-modal" title="Informazioni" ok-only>
+      <div v-if="story_info" class="d-flex flex-column">
+        <div>Tipo di giocatore</div>
+        <ul>
+          <li>Singolo: {{ story_info.settings.player.single ? "✓" : "✗" }}</li>
+          <li>Gruppo: {{ story_info.settings.player.group ? "✓" : "✗" }}</li>
+          <li>Classe: {{ story_info.settings.player.class ? "✓" : "✗" }}</li>
+        </ul>
+        <div>Età consigliata</div>
+        <ul v-if="story_info">
+          <li>7-10: {{ story_info.settings.player.sette ? "✓" : "✗" }}</li>
+          <li>11-14: {{ story_info.settings.player.undici ? "✓" : "✗" }}</li>
+          <li>15-18: {{ story_info.settings.player.quindici ? "✓" : "✗" }}</li>
+        </ul>
+        <div>Accessibile: {{ true ? "✓" : "✗" }}</div>
       </div>
     </b-modal>
   </div>
@@ -118,5 +130,24 @@ body {
 
 .play-button:focus {
   background: var(--hover-color);
+}
+
+.modal-header {
+  background-color: var(--secondary-color);
+  border: 0px;
+}
+
+.modal-footer {
+  background-color: var(--secondary-color);
+  border: 0px;
+}
+
+.modal-content {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.modal-body {
+  padding: 0px;
 }
 </style>
