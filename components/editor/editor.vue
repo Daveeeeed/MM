@@ -737,6 +737,7 @@ module.exports = {
           }
         });
       });
+      data.item.settings.accessible = a;
       return a;
     },
     missionCompletedContent(data) {

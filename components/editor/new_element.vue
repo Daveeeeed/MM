@@ -113,6 +113,7 @@ module.exports = {
             settings: {
               published: false,
               archived: false,
+              accessible: false,
               player: {
                 sette: this.sette,
                 undici: this.undici,
@@ -121,7 +122,6 @@ module.exports = {
                 group: this.gruppo,
                 class: this.classe,
               },
-              final_phrases: ["","",""],
               background: null,
             },
           };
@@ -173,5 +173,4 @@ module.exports = {
 };
 </script>
 
-<style>
-</style>
+<style></style>

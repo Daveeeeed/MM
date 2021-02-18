@@ -34,7 +34,7 @@
     </div>
 
     <b-modal id="story-info-modal" title="Informazioni" ok-only>
-      <div v-if="story_info" class="d-flex flex-column">
+      <div v-if="story_info" class="px-3 py-2 d-flex flex-column">
         <div>Tipo di giocatore</div>
         <ul>
           <li>Singolo: {{ story_info.settings.player.single ? "✓" : "✗" }}</li>
@@ -47,7 +47,7 @@
           <li>11-14: {{ story_info.settings.player.undici ? "✓" : "✗" }}</li>
           <li>15-18: {{ story_info.settings.player.quindici ? "✓" : "✗" }}</li>
         </ul>
-        <div>Accessibile: {{ true ? "✓" : "✗" }}</div>
+        <div>Accessibile: {{ story_info.settings.accessible ? "✓" : "✗" }}</div>
       </div>
     </b-modal>
   </div>
@@ -116,6 +116,19 @@ body {
 
 .story-name {
   text-shadow: 0px 0px 20px black, 0px 0px 8px black;
+}
+
+/* BOTTONE */
+.btn {
+  background-color: var(--form-color);
+  border: none;
+  border-radius: 10px;
+}
+
+.btn:hover {
+  background-color: var(--hover-color);
+  border: none;
+  border-radius: 10px;
 }
 
 .play-button {
