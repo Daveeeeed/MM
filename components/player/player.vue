@@ -28,7 +28,7 @@
         >
           <div id="activity-wrapper" class="p-5">
             <div id="activity-content">
-              <b-button autofocus @click="" id="activity-title" :aria-label="current_activity.title">
+              <b-button  @click="" id="activity-title" :aria-label="current_activity.title">
                 {{ current_activity.title }}
               </b-button>
               <component
