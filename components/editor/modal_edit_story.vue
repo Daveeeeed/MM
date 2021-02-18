@@ -282,7 +282,7 @@
               v-if="active_section == sections[4]"
               cols="10"
             >
-              <b-container class="d-flex flex-column" fluid id="stocazzo">
+              <b-container class="d-flex flex-column" fluid>
                 <div class="m-3 d-flex flex-column align-items-center">
                   <h5>Titolo</h5>
                   <b-form-input

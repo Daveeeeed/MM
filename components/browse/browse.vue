@@ -17,6 +17,12 @@
     >
       <h2 class="my-2 story-name">
         {{ story.title }}
+        <sup
+          ><b-icon
+            icon="info-circle"
+            @click="showStoryInfoModal(story)"
+          ></b-icon
+        ></sup>
       </h2>
       <b-button
         :href="'/play?key=' + story.key"
@@ -26,6 +32,12 @@
         >Gioca</b-button
       >
     </div>
+
+    <b-modal id="story-info-modal">
+      <div v-if="story_info">
+        {{ story_info.settings.player }}
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -34,9 +46,14 @@ module.exports = {
   data() {
     return {
       stories: [],
+      story_info: {},
     };
   },
   methods: {
+    showStoryInfoModal(story) {
+      this.$bvModal.show("story-info-modal");
+      this.story_info = story;
+    },
     fetchStories() {
       fetch("/api/stories")
         .then((response) => response.json())
