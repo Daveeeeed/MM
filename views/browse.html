@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <title>Storie disponibili</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <link
+      rel="icon"
+      href="https://site181982.tw.cs.unibo.it/public/images/logo2.png"
+      type="image/png"
+      sizes="any"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <!-- Load required Bootstrap and BootstrapVue CSS -->
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
+    />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://site181982.tw.cs.unibo.it/public/styles/palette.css"
+    />
+    <!-- Load polyfills to support older browsers -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+
+    <!-- Load Vue followed by BootstrapVue -->
+    <!-- Developement -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <!-- Production -->
+    <!-- <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script> -->
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+    <!-- Load HTTP Vue Loader to use Vue Single File Components -->
+    <script src="https://unpkg.com/http-vue-loader"></script>
+    <!-- Load Qr Code Generator -->
+    <script src="https://site181982.tw.cs.unibo.it/public/javascripts/kjua-0.9.0.min.js"></script>
+  </head>
+
+  <body>
+    <main id="app">
+      <browse></browse>
+    </main>
+
+    <script type="text/javascript">
+      new Vue({
+        el: "#app",
+        components: {
+          browse: httpVueLoader("comp/browse/browse.vue"),
+        },
+      });
+    </script>
+    <!-- Load JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </body>
+</html>
